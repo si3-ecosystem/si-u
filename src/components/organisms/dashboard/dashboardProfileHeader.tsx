@@ -3,13 +3,12 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { StatsCard, StatsCardGrid } from "./dashboardStatsCard";
-import { JSX } from "react";
 import { ProfileDiamond } from "@/components/molecules/icons/ProfileDiamond";
 
 interface statsData {
   title: string;
   value: string;
-  icon: any;
+  icon: React.ReactNode;
   iconColor: string;
 }
 
