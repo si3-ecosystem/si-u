@@ -1,7 +1,6 @@
 "use client";
 
 import { NotificationButton } from "@/components/organisms/layout/notification";
-import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -62,9 +61,7 @@ export function NotificationPopover({
         <div className="flex items-center justify-between py-3.5 px-6 border-b">
           <h3 className=" font-medium text-black">Notifications</h3>
           {unreadCount > 0 && (
-            <Button
-              variant="link"
-              size="sm"
+            <div
               className="text-brand text-sm font-medium"
               onClick={() => {
                 onMarkAllRead?.();
@@ -72,7 +69,7 @@ export function NotificationPopover({
               }}
             >
               Mark all as read
-            </Button>
+            </div>
           )}
         </div>
         <div className="max-h-[330px] overflow-y-auto py-4 flex flex-col gap-6 ">

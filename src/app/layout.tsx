@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressContentEditableWarning={true}>
       <body
         className={` antialiased w-screen overflow-hidden overflow-y-scroll`}
       >

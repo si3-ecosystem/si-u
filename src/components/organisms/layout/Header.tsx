@@ -1,7 +1,6 @@
 "use client";
 
 import { Grid, Star, User } from "lucide-react";
-import { NotificationButton } from "./notification";
 import { ProfileDropdown } from "./ProfileDropdown";
 import Link from "next/link";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
@@ -74,7 +73,6 @@ export function Header() {
 
   const handleReadAll = () => {
     console.log("Reading all notifications");
-    // Navigate to a notifications page or clear notifications
   };
   return (
     <header className="flex sticky z-50 top-0 right-0 left-0 h-16 bg-white items-center justify-between  px-6 md:!pr-20">
