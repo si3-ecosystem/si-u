@@ -1,0 +1,17 @@
+import { SectionBanner } from "@/components/molecules/banners/SectionBanner";
+
+const data = {
+  title: "SI HER GUIDES",
+  description:
+    "Si Her is a global community of women & non-binary emerging tech leaders. In Si Her, we develop our professional and leadership potential as guides in the new economy.",
+  background: "/guides/sessionBackground.svg",
+  image: "/placeholder.png",
+};
+
+export function Banner() {
+  return (
+    <section className="container mx-auto ">
+      <SectionBanner data={data} />
+    </section>
+  );
+}
