@@ -3,7 +3,7 @@ import { Highlights } from "@/components/organisms/ideas-lab/Highlights";
 
 export default function page() {
   return (
-    <div>
+    <div className="py-8">
       <Banner />
       <Highlights />
     </div>

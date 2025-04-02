@@ -51,7 +51,7 @@ export function Header() {
         <ProfileDropdown
           username="annabanana.edu"
           subtext="annabanana.siher.eth"
-          avatarUrl="/placeholder.svg?height=80&width=80"
+          avatarUrl="/placeholder.png"
           menuItems={profileMenuItems}
           onLogout={handleLogout}
         />

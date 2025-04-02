@@ -1,16 +1,16 @@
 import { SectionBanner } from "@/components/molecules/banners/SectionBanner";
 
 const data = {
-  title: "DEAI WEB3",
+  title: "FIXX SEASON 1",
   description:
-    "Si Her is a global community of women & non-binary emerging tech leaders. In Si Her, we develop our professional and leadership potential as guides in the new economy.",
+    "FIXX (Financial Inclusion XX Chromosomes) is a program with education on how to improve financial inclusion within Web3.",
   background: "/guides/sessionBackground.svg",
   image: "/placeholder.png",
 };
 
 export function Banner() {
   return (
-    <section className="container mx-auto ">
+    <section className="container mx-auto w-full ">
       <SectionBanner data={data} />
     </section>
   );
