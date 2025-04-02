@@ -16,7 +16,6 @@ import {
   UserSquare2,
   Presentation,
   ScrollText,
-  Boxes,
   BookMarked,
   Users2,
 } from "lucide-react";
@@ -67,11 +66,11 @@ const subMenuGroups: SubMenuGroup[] = [
     items: [
       { title: "Sessions", icon: Video, href: "/guides/sessions" },
       { title: "Ideas Lab", icon: Brain, href: "/guides/ideas-lab" },
-      { title: "Kollaborator", icon: Share2, href: "/kollaborator" },
+      { title: "Kollaborator", icon: Share2, href: "/guides/kollaborator" },
       {
         title: "Diversity Tracker",
         icon: Users2,
-        href: "/diversity-tracker",
+        href: "/guides/diversity-tracker",
       },
     ],
   },
@@ -83,17 +82,29 @@ const subMenuGroups: SubMenuGroup[] = [
         title: "Web3 Natives",
         icon: UserSquare2,
         href: "/web3-natives",
-        badge: "(Moderator)",
       },
       { title: "Ideas Lab", icon: Brain, href: "/ideas-lab" },
+      {
+        title: "Diversity Tracker",
+        icon: Users2,
+        href: "/scholars/diversity-tracker",
+      },
     ],
   },
   {
     title: "FIXX PARTICIPANTS",
     items: [
-      { title: "FIXX Sessions", icon: Presentation, href: "/fixx-sessions" },
-      { title: "FIXX Playbook", icon: ScrollText, href: "/fixx-playbook" },
-      { title: "Diversity Tracker", icon: Boxes, href: "/diversity-tracker" },
+      {
+        title: "FIXX Sessions",
+        icon: Presentation,
+        href: "/fixx/fixx-sessions",
+      },
+      { title: "FIXX Playbook", icon: ScrollText, href: "/fixx/fixx-playbook" },
+      {
+        title: "Diversity Tracker",
+        icon: Users2,
+        href: "/fixx/diversity-tracker",
+      },
     ],
   },
   {
@@ -115,13 +126,11 @@ export function AppSidebar() {
 
   if (!open) return null;
 
-  // Collect all menu items into a single array for comparison
   const allMenuItems: MenuItem[] = [
     ...mainMenuItems,
     ...subMenuGroups.flatMap((group) => group.items),
   ];
 
-  // Find the longest href that matches the current pathname
   const longestMatchingHref = allMenuItems
     .filter((item) => {
       if (item.href === "/") {
@@ -131,7 +140,6 @@ export function AppSidebar() {
     })
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
-  // Helper function to determine if a menu item is active
   const isActive = (href: string) => {
     return href === longestMatchingHref;
   };

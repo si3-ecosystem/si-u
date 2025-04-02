@@ -3,7 +3,7 @@ import WorkShops from "@/components/organisms/guides/workShops";
 
 export default function page() {
   return (
-    <div>
+    <div className="py-8">
       <Banner />
       <WorkShops />
     </div>

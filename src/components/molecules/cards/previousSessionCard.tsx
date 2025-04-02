@@ -11,7 +11,7 @@ export interface Session {
 export function PreviousSessionCard({ session }: { session: Session }) {
   return (
     <>
-      <Card className="bg-white p-3 rounded-lg shadow-md overflow-hidden sm:max-w-[286px] sm:w-full">
+      <Card className="bg-white p-3 rounded-lg  overflow-hidden sm:max-w-[286px] sm:w-full">
         <div className="relative mb-4 rounded-lg overflow-hidden">
           <Image
             src="/guides/previoussession.png"
