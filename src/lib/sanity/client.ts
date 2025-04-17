@@ -10,6 +10,7 @@ import {
   sessionByIdQuery,
   sessionCategoryCountQuery,
   sessionQuery,
+  sessionSchemaByIdQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -82,6 +83,12 @@ export async function getSessionCategoryCont() {
 export async function getSessionById(id: string) {
   if (client) {
     return (await client.fetch(sessionByIdQuery, { id })) || {};
+  }
+  return {};
+}
+export async function getSessionPageData() {
+  if (client) {
+    return (await client.fetch(sessionSchemaByIdQuery)) || {};
   }
   return {};
 }

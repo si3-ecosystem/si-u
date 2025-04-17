@@ -22,7 +22,6 @@ export function useSessionTable(
   initialCategory: string = "all",
   initialStatus: string = "all"
 ) {
-  console.log("sessions", sessions);
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([
@@ -127,7 +126,7 @@ export function useSessionTable(
 
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(
-      new Set(sessions.map((session) => session.category))
+      new Set(sessions?.map((session) => session.category))
     );
     return ["all", ...uniqueCategories];
   }, [sessions]);

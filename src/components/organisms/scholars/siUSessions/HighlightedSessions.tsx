@@ -5,6 +5,8 @@ import { Session } from "@/types/session";
 import { Row } from "@tanstack/react-table";
 
 interface HighlightedSessionsProps {
+  title: string;
+  description: string;
   rows: Row<Session>[];
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
@@ -19,6 +21,8 @@ interface HighlightedSessionsProps {
 }
 
 export function HighlightedSessions({
+  title,
+  description,
   rows,
   globalFilter,
   setGlobalFilter,
@@ -34,9 +38,14 @@ export function HighlightedSessions({
   return (
     <div>
       <div className="flex items-center justify-between w-full mb-8">
-        <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
-          Highlighted Sessions
-        </h2>
+        <div>
+          <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
+            {title}
+          </h2>
+          <p className="text-brandGray text-base leading-[140%] font-normal mb-4">
+            {description}
+          </p>
+        </div>
         <SessionFilterDropdown
           globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}

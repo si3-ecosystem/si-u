@@ -11,7 +11,12 @@ const data = {
 export function Banner() {
   return (
     <section className="container mx-auto ">
-      <SectionBanner data={data} className="max-w-[340px]" />
+      <SectionBanner
+        data={data}
+        setGlobalFilter={() => {}}
+        globalFilter=""
+        className="max-w-[340px]"
+      />
     </section>
   );
 }

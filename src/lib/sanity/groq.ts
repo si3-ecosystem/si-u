@@ -79,3 +79,25 @@ export const sessionByIdQuery = groq`
     status
   }
 `;
+
+export const sessionSchemaByIdQuery = groq`
+  *[_type == "sessionSchema" ][0] {
+    _id,
+    title,
+    description,
+    topics[]-> {
+      title,
+      categoryKey,
+      description,
+      "icon":thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background,
+        alt,
+      }
+    },
+    siutitle,
+    siudescription,
+   
+  }
+`;

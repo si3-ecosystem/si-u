@@ -19,11 +19,7 @@ export interface Session {
     _id: string;
     communityName: string;
     communityDescription: string;
-    communityLogo: {
-      asset: {
-        url: string;
-      };
-    } | null;
+    communityLogo: SanityImage;
   } | null;
   position: string;
   description: string;
@@ -42,4 +38,21 @@ export interface Session {
 export interface SessionCategoryCount {
   category: string;
   count: number;
+}
+
+export interface Topic {
+  title: string;
+  description: string;
+  categoryKey: string;
+  icon: SanityImage;
+}
+
+export interface SessionSchema {
+  _id: string;
+  title: string;
+  description: string;
+  topics: Topic[];
+  siutitle: string;
+  siudescription: string;
+  siusessions: Session[];
 }

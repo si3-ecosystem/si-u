@@ -11,7 +11,7 @@ const data = {
 export function Banner() {
   return (
     <section className="container mx-auto w-full ">
-      <SectionBanner data={data} />
+      <SectionBanner data={data} setGlobalFilter={() => {}} globalFilter="" />
     </section>
   );
 }

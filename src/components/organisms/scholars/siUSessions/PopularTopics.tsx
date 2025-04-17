@@ -1,69 +1,43 @@
-import { Blockchain } from "@/components/molecules/icons/Blockchain";
-import { Crypto } from "@/components/molecules/icons/Crypto";
-import { Defi } from "@/components/molecules/icons/Defi";
-import { Nfts } from "@/components/molecules/icons/Nfts";
-import { SessionCategoryCount } from "@/types/session";
+import { urlForImage } from "@/lib/sanity/image";
+import { SessionSchema, Topic } from "@/types/session";
+import Image from "next/image";
 
-interface Topic {
-  icon: JSX.Element;
-  title: string;
-  categoryKey: string;
-}
-
-export function PopularTopics({
-  categoryCounts,
-}: {
-  categoryCounts: SessionCategoryCount[];
-}) {
-  const topics: Topic[] = [
-    {
-      icon: <Blockchain />,
-      title: "Blockchain",
-      categoryKey: "blockchain",
-    },
-    {
-      icon: <Nfts />,
-      title: "NFTs",
-      categoryKey: "nfts",
-    },
-    {
-      icon: <Crypto />,
-      title: "Cryptocurrency",
-      categoryKey: "cryptocurrency",
-    },
-    {
-      icon: <Defi />,
-      title: "DeFi",
-      categoryKey: "defi",
-    },
-  ];
-
-  const getCount = (key: string) =>
-    categoryCounts.find((cat) => cat.category === key)?.count || 0;
-
+export function PopularTopics({ data }: { data: SessionSchema }) {
+  if (!data) return null;
   return (
     <div>
       <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
-        Popular Topics
+        {data.title}
       </h2>
       <p className="text-brandGray text-base leading-[140%] font-normal mb-4">
-        Explore popular categories
+        {data.description}
       </p>
       <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide md:overflow-x-visible no-scrollbar gap-6">
-        {topics.map((item, key) => (
-          <div
-            key={key}
-            className="flex flex-col gap-3 p-4 max-w-[228px] w-full rounded-lg bg-white"
-          >
-            <div>{item.icon}</div>
-            <h3 className="text-xl font-medium leading-6 text-black">
-              {item.title}
-            </h3>
-            <p className="text-base font-medium opacity-50">
-              {getCount(item.categoryKey)} Upcoming Sessions
-            </p>
-          </div>
-        ))}
+        {data?.topics?.map((item: Topic, key) => {
+          const imageurl = item.icon && urlForImage(item.icon)?.src;
+          return (
+            <div
+              key={key}
+              className="flex flex-col gap-3 p-4 max-w-[228px] w-full rounded-lg bg-white"
+            >
+              {imageurl && (
+                <Image
+                  src={imageurl}
+                  alt={item.title}
+                  width={32}
+                  height={32}
+                  className="w-8 h-8"
+                />
+              )}
+              <h3 className="text-xl font-medium leading-6 text-black">
+                {item.title}
+              </h3>
+              <p className="text-base font-medium opacity-50">
+                {item.description}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
