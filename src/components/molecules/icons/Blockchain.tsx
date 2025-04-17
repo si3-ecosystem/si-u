@@ -8,7 +8,7 @@ export function Blockchain() {
         viewBox="0 0 33 33"
         fill="none"
       >
-        <g clip-path="url(#clip0_894_6902)">
+        <g clipPath="url(#clip0_894_6902)">
           <path
             d="M16.6488 16.0684L17.2612 20.6427L16.6488 24.5059L8.57812 20.2871V11.8496L12.9197 13.2559L16.6488 16.0684Z"
             fill="#FD637A"

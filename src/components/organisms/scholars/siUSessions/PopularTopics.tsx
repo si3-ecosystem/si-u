@@ -2,31 +2,45 @@ import { Blockchain } from "@/components/molecules/icons/Blockchain";
 import { Crypto } from "@/components/molecules/icons/Crypto";
 import { Defi } from "@/components/molecules/icons/Defi";
 import { Nfts } from "@/components/molecules/icons/Nfts";
+import { SessionCategoryCount } from "@/types/session";
 
-const topics = [
-  {
-    icon: <Blockchain />,
-    title: "Blockchain",
-    info: "04 Upcoming Sessions",
-  },
-  {
-    icon: <Nfts />,
-    title: "NFT's",
-    info: "12 Upcoming Sessions",
-  },
-  {
-    icon: <Crypto />,
-    title: "Cryptocurrency",
-    info: " 12 Upcoming Sessions",
-  },
-  {
-    icon: <Defi />,
-    title: "DeFi",
-    info: "4 Upcoming Sessions",
-  },
-];
+interface Topic {
+  icon: JSX.Element;
+  title: string;
+  categoryKey: string;
+}
 
-export function PopularTopics() {
+export function PopularTopics({
+  categoryCounts,
+}: {
+  categoryCounts: SessionCategoryCount[];
+}) {
+  const topics: Topic[] = [
+    {
+      icon: <Blockchain />,
+      title: "Blockchain",
+      categoryKey: "blockchain",
+    },
+    {
+      icon: <Nfts />,
+      title: "NFTs",
+      categoryKey: "nfts",
+    },
+    {
+      icon: <Crypto />,
+      title: "Cryptocurrency",
+      categoryKey: "cryptocurrency",
+    },
+    {
+      icon: <Defi />,
+      title: "DeFi",
+      categoryKey: "defi",
+    },
+  ];
+
+  const getCount = (key: string) =>
+    categoryCounts.find((cat) => cat.category === key)?.count || 0;
+
   return (
     <div>
       <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
@@ -45,7 +59,9 @@ export function PopularTopics() {
             <h3 className="text-xl font-medium leading-6 text-black">
               {item.title}
             </h3>
-            <p className="text-base font-medium opacity-50">{item.info}</p>
+            <p className="text-base font-medium opacity-50">
+              {getCount(item.categoryKey)} Upcoming Sessions
+            </p>
           </div>
         ))}
       </div>

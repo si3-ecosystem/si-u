@@ -8,7 +8,7 @@ export function SessionsCompleted() {
         viewBox="0 0 25 25"
         fill="none"
       >
-        <g clip-path="url(#clip0_894_5608)">
+        <g clipPath="url(#clip0_894_5608)">
           <path d="M19.5 0.117188H0.5V24.1172H19.5V0.117188Z" fill="#F3F3F3" />
           <path d="M16.75 2.7168H3.25V3.71678H16.75V2.7168Z" fill="#CED6E0" />
           <path d="M16.75 6.16602H3.25V7.166H16.75V6.16602Z" fill="#CED6E0" />

@@ -8,6 +8,10 @@ interface HighlightedSessionData {
   title: string;
   description: string;
   ctaLink: string;
+  progress?: number;
+  status?: string;
+  position?: string;
+  community?: string;
 }
 
 interface HighlightedSessionCardProps {
@@ -32,21 +36,45 @@ export function HighlightedSessionCard({
         />
         <Badge className="absolute top-2 left-2  ">Web3 Natives</Badge>
       </div>
-      <div className="flex flex-col ">
-        <h2>{data.title}</h2>
-        <p className="text-sm font-medium text-brand leading-5 mt-1">
-          karakrysthal X Elena
-        </p>
-        <p className="text-xs text-brandGray leading-[18px] mt-1">
-          Co-Founder & DC, Metis
-        </p>
-        <h2 className="text-black text-sm leading-5 mt-2">
-          {data.description}
-        </h2>
+      <div className="h-full flex flex-col justify-between gap-4 max-h-[220px]">
+        <div className="flex flex-col ">
+          <h2>{data.title}</h2>
+          <p className="text-sm font-medium text-brand leading-5 mt-1">
+            {data.community}
+          </p>
+          <p className="text-xs text-brandGray leading-[18px] mt-1">
+            {data.position}
+          </p>
+
+          {data?.status === "in_progress" ? (
+            <div className="mt-4">
+              <div className="flex  flex-col">
+                <div className="w-full flex items-center justify-between gap-4">
+                  <span className="text-sm font-semibold text-left w-full text-gray-600 mb-2">
+                    ENROLLED
+                  </span>
+                  <span className=" text-sm font-semibold text-[#8B8B8B]">
+                    {data.progress}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-purple-600 h-2.5 rounded-full"
+                    style={{ width: `${data.progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <h2 className="text-black text-sm leading-5 mt-2 line-clamp-4">
+              {data.description}
+            </h2>
+          )}
+        </div>
         <Button
           asChild
           variant={"outline"}
-          className="w-full hover:bg-black hover:text-white h-11 rounded-lg mt-4"
+          className="w-full hover:bg-black hover:text-white h-11 rounded-lg "
         >
           <Link href={data.ctaLink || "#"}>Learn More</Link>
         </Button>

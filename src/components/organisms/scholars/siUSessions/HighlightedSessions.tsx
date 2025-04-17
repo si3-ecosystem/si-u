@@ -1,29 +1,83 @@
 import { HighlightedSessionCard } from "@/components/molecules/cards/HighlightedSessionCard";
-import { SlidersHorizontal } from "lucide-react";
+import { SessionFilterDropdown } from "@/components/molecules/filters/SessionFilterDropdown";
+import { urlForImage } from "@/lib/sanity/image";
+import { Session } from "@/types/session";
+import { Row } from "@tanstack/react-table";
 
-export function HighlightedSessions() {
-  const sessionData = {
-    title: "Si Her Granting Pathways",
-    description:
-      "We are opening up the new month reflecting on the successes our last month.",
-    ctaLink: "/learn-more",
-  };
+interface HighlightedSessionsProps {
+  rows: Row<Session>[];
+  globalFilter: string;
+  setGlobalFilter: (value: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (value: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (value: string) => void;
+  selectedCommunity: string;
+  setSelectedCommunity: (value: string) => void;
+  dateRange: { start: string | null; end: string | null };
+  setDateRange: (value: { start: string | null; end: string | null }) => void;
+}
+
+export function HighlightedSessions({
+  rows,
+  globalFilter,
+  setGlobalFilter,
+  selectedCategory,
+  setSelectedCategory,
+  selectedStatus,
+  setSelectedStatus,
+  selectedCommunity,
+  setSelectedCommunity,
+  dateRange,
+  setDateRange,
+}: HighlightedSessionsProps) {
   return (
     <div>
       <div className="flex items-center justify-between w-full mb-8">
         <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
           Highlighted Sessions
         </h2>
-        <div className="text-black text-xl lg:text-2xl font-medium mb-2 flex items-center gap-2">
-          <SlidersHorizontal />
-          Filter
-        </div>
+        <SessionFilterDropdown
+          globalFilter={globalFilter}
+          setGlobalFilter={setGlobalFilter}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          selectedCommunity={selectedCommunity}
+          setSelectedCommunity={setSelectedCommunity}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+        />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-        <HighlightedSessionCard
-          data={sessionData}
-          imageUrl="/card_placeholder.png"
-        />
+        {rows.length === 0 ? (
+          <p>No sessions found.</p>
+        ) : (
+          rows.map((row) => {
+            const session = row.original;
+
+            return (
+              <HighlightedSessionCard
+                key={session._id}
+                data={{
+                  title: session.title,
+                  description: session.description,
+                  ctaLink: `/scholars/si-u-sessions/${session._id}`,
+                  progress: session.progress,
+                  status: session.status,
+                  position: session.position,
+                  community: session.community?.communityName,
+                }}
+                imageUrl={
+                  session.thumbnail
+                    ? urlForImage(session.thumbnail)?.src
+                    : "/card_placeholder.png"
+                }
+              />
+            );
+          })
+        )}
       </div>
     </div>
   );

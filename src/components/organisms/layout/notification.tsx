@@ -4,7 +4,6 @@ import type * as React from "react";
 import { Bell } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 interface NotificationButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,19 +16,17 @@ export function NotificationButton({
   ...props
 }: NotificationButtonProps) {
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className={cn("relative rounded-full bg-white border", className)}
+    <span
+      className={cn("relative w-5 h-5 rounded-full bg-white border", className)}
       {...props}
     >
-      <Bell className="h-5 w-5" />
+      <Bell className="h-5 w-5 " />
       {count > 0 && (
-        <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+        <span className="absolute -right-5 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
           {count > 99 ? "99+" : count}
         </span>
       )}
       <span className="sr-only">Notifications</span>
-    </Button>
+    </span>
   );
 }

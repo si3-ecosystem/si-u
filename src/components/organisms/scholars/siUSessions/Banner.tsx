@@ -8,10 +8,22 @@ const data = {
   image: "/guides/ideaslab.png",
 };
 
-export function Banner() {
+export function Banner({
+  globalFilter,
+  setGlobalFilter,
+}: {
+  globalFilter?: string;
+  setGlobalFilter?: (filter: string) => void;
+}) {
   return (
-    <section className="container mx-auto ">
-      <SectionBanner data={data} className="max-w-[340px]" showSearch />
+    <section className="w-full mx-auto ">
+      <SectionBanner
+        data={data}
+        globalFilter={globalFilter}
+        setGlobalFilter={setGlobalFilter || (() => {})}
+        className="max-w-[340px]"
+        showSearch
+      />
     </section>
   );
 }

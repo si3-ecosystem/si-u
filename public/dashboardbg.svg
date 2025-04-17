@@ -1,5 +1,5 @@
 <svg width="1032" height="268" viewBox="0 0 1032 268" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_894_5574)">
+<g clipPath="url(#clip0_894_5574)">
 <rect y="0.117188" width="1032" height="267" rx="12" fill="#E9E9E9"/>
 <g filter="url(#filter0_f_894_5574)">
 <rect x="-90.0703" y="124.549" width="722.76" height="517.56" rx="16" fill="url(#paint0_linear_894_5574)"/>
@@ -16,15 +16,15 @@
 <g style="mix-blend-mode:multiply" filter="url(#filter4_f_894_5574)">
 <rect x="-100.711" y="455.148" width="262.2" height="187.72" rx="16" fill="url(#paint4_linear_894_5574)"/>
 </g>
-<foreignObject x="455.486" y="-484.018" width="856.598" height="856.598"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_1_894_5574_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="4">
+<foreignObject x="455.486" y="-484.018" width="856.598" height="856.598"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clipPath:url(#bgblur_1_894_5574_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="4">
 <circle cx="883.786" cy="-55.7183" r="424.299" fill="white" fill-opacity="0.13"/>
 <circle cx="883.786" cy="-55.7183" r="423.799" stroke="white" stroke-opacity="0.42"/>
 </g>
-<foreignObject x="458.695" y="-540.701" width="856.598" height="856.598"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_2_894_5574_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="4">
+<foreignObject x="458.695" y="-540.701" width="856.598" height="856.598"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clipPath:url(#bgblur_2_894_5574_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="4">
 <circle cx="886.995" cy="-112.402" r="424.299" fill="white" fill-opacity="0.13"/>
 <circle cx="886.995" cy="-112.402" r="423.799" stroke="white" stroke-opacity="0.42"/>
 </g>
-<foreignObject x="455.486" y="-598.072" width="856.598" height="856.598"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_3_894_5574_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="4">
+<foreignObject x="455.486" y="-598.072" width="856.598" height="856.598"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clipPath:url(#bgblur_3_894_5574_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="4">
 <circle cx="883.786" cy="-169.773" r="424.299" fill="white" fill-opacity="0.13"/>
 <circle cx="883.786" cy="-169.773" r="423.799" stroke="white" stroke-opacity="0.42"/>
 </g>

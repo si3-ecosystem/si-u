@@ -11,9 +11,17 @@ type Props = {
   };
   className?: string;
   showSearch?: boolean;
+  globalFilter?: string;
+  setGlobalFilter: (value: string) => void;
 };
 
-export function SectionBanner({ data, className, showSearch = false }: Props) {
+export function SectionBanner({
+  data,
+  className,
+  showSearch = false,
+  globalFilter,
+  setGlobalFilter,
+}: Props) {
   return (
     <div className="w-full min-h-[206px] flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
       <Image
@@ -36,6 +44,8 @@ export function SectionBanner({ data, className, showSearch = false }: Props) {
             <input
               type="search"
               placeholder="Search Sessions"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
               className="text-opacity-50 w-full sm:w-[259px] h-11 outline-none border-none"
             />
             <button className="text-base text-white font-normal px-4 py-2 rounded-full bg-brand">
