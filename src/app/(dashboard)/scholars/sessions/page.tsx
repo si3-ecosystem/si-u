@@ -34,6 +34,7 @@ export default function SIUSession() {
     setSelectedCommunity,
     dateRange,
     setDateRange,
+    categoryCounts,
   } = useSessionTable(data || []);
 
   if (isLoading || isSessionPageLoading)
@@ -64,6 +65,7 @@ export default function SIUSession() {
         setGlobalFilter={setGlobalFilter}
       />
       <PopularTopics
+        categoryCounts={categoryCounts}
         data={
           sessionPageData ?? {
             _id: "",

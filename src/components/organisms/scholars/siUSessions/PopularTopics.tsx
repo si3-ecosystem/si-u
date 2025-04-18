@@ -1,9 +1,17 @@
 import { urlForImage } from "@/lib/sanity/image";
-import { SessionSchema, Topic } from "@/types/session";
+import { SessionCategoryCount, SessionSchema, Topic } from "@/types/session";
 import Image from "next/image";
 
-export function PopularTopics({ data }: { data: SessionSchema }) {
+export function PopularTopics({
+  data,
+  categoryCounts,
+}: {
+  data: SessionSchema;
+  categoryCounts: SessionCategoryCount[];
+}) {
   if (!data) return null;
+
+  console.log("categories", categoryCounts, data);
   return (
     <div>
       <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
@@ -33,7 +41,17 @@ export function PopularTopics({ data }: { data: SessionSchema }) {
                 {item.title}
               </h3>
               <p className="text-base font-medium opacity-50">
-                {item.description}
+                {(() => {
+                  const cat = categoryCounts?.find(
+                    (c) => c.category === item.categoryKey
+                  );
+                  const count = cat ? cat.count : 0;
+                  return (
+                    <span className="ml-2 text-brandGray">
+                      {count.toString().padStart(2, "0")} upcoming sessions
+                    </span>
+                  );
+                })()}
               </p>
             </div>
           );
