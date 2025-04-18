@@ -43,11 +43,26 @@ export default function SIUSession() {
       </div>
     );
 
-  console.log("sessionPageData", sessionPageData);
-
   return (
     <div className="max-w-[1920px] mx-auto w-full bg-[#f6f6f6] p-6 min-h-screen md:!pr-20 flex flex-col gap-8 lg:gap-16">
-      <Banner globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+      <Banner
+        data={
+          sessionPageData?.banner ?? {
+            title: "",
+            description: "",
+            thumbnail: {
+              _type: "image",
+              asset: { _ref: "", _type: "reference" },
+            },
+            background: {
+              _type: "image",
+              asset: { _ref: "", _type: "reference" },
+            },
+          }
+        }
+        globalFilter={globalFilter}
+        setGlobalFilter={setGlobalFilter}
+      />
       <PopularTopics
         data={
           sessionPageData ?? {
@@ -58,6 +73,18 @@ export default function SIUSession() {
             siutitle: "",
             siudescription: "",
             siusessions: [],
+            banner: {
+              title: "",
+              description: "",
+              thumbnail: {
+                _type: "image",
+                asset: { _ref: "", _type: "reference" },
+              },
+              background: {
+                _type: "image",
+                asset: { _ref: "", _type: "reference" },
+              },
+            },
           }
         }
       />

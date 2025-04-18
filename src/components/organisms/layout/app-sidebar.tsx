@@ -77,7 +77,7 @@ const subMenuGroups: SubMenuGroup[] = [
   {
     title: "SI U SCHOLARS",
     items: [
-      { title: "SI-U Sessions", icon: Video, href: "/scholars/si-u-sessions" },
+      { title: "Sessions", icon: Video, href: "/scholars/sessions" },
       {
         title: "Web3 Natives",
         icon: UserSquare2,

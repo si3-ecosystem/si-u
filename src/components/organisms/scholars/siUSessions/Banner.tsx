@@ -1,23 +1,18 @@
-import { SectionBanner } from "@/components/molecules/banners/SectionBanner";
-
-const data = {
-  title: "SI U SCHOLARS",
-  description:
-    "A free introductory experience to Web3. Begin your journey into our ecosystem through education and community, with an intention towards leadership and collaboration.",
-  background: "/scholars/scholarsbg.svg",
-  image: "/guides/ideaslab.png",
-};
+import { SessionBanner } from "@/components/molecules/banners/SessionBanner";
+import { SessionBanner as Types } from "@/types/session";
 
 export function Banner({
   globalFilter,
   setGlobalFilter,
+  data,
 }: {
   globalFilter?: string;
   setGlobalFilter?: (filter: string) => void;
+  data: Types;
 }) {
   return (
     <section className="w-full mx-auto ">
-      <SectionBanner
+      <SessionBanner
         data={data}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter || (() => {})}

@@ -12,6 +12,8 @@ interface HighlightedSessionData {
   status?: string;
   position?: string;
   community?: string;
+  company?: string;
+  videourl?: string;
 }
 
 interface HighlightedSessionCardProps {
@@ -39,9 +41,16 @@ export function HighlightedSessionCard({
       <div className="h-full flex flex-col justify-between gap-4 max-h-[220px]">
         <div className="flex flex-col ">
           <h2>{data.title}</h2>
-          <p className="text-sm font-medium text-brand leading-5 mt-1">
-            {data.community}
-          </p>
+
+          {data.community ? (
+            <p className="text-sm font-medium text-brand leading-5 mt-1">
+              {data.community}
+            </p>
+          ) : (
+            <p className="text-sm font-medium text-brand leading-5 mt-1">
+              {data.company}
+            </p>
+          )}
           <p className="text-xs text-brandGray leading-[18px] mt-1">
             {data.position}
           </p>

@@ -15,6 +15,8 @@ export interface Session {
   order: number;
   thumbnail: SanityImage;
   title: string;
+  company?: string;
+  videoUrl?: string;
   community: {
     _id: string;
     communityName: string;
@@ -47,9 +49,17 @@ export interface Topic {
   icon: SanityImage;
 }
 
+export interface SessionBanner {
+  title: string;
+  description: string;
+  thumbnail: SanityImage;
+  background: SanityImage;
+}
+
 export interface SessionSchema {
   _id: string;
   title: string;
+  banner: SessionBanner;
   description: string;
   topics: Topic[];
   siutitle: string;

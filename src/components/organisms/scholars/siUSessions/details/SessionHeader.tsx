@@ -14,7 +14,7 @@ export default function SessionHeader({
   return (
     <div className="mb-6">
       <Link
-        href="/scholars/si-u-sessions"
+        href="/scholars/sessions"
         className="text-black hover:underline text-sm"
       >
         ← Back

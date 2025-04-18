@@ -24,6 +24,8 @@ export const sessionQuery = groq`
         }
       }
     },
+    company,
+    videoUrl,
     position,
     description,
     category,
@@ -84,6 +86,21 @@ export const sessionSchemaByIdQuery = groq`
   *[_type == "sessionSchema" ][0] {
     _id,
     title,
+   banner-> {
+      ...,
+      thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background,
+        alt
+      },
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background,
+        alt
+      }
+    },
     description,
     topics[]-> {
       title,

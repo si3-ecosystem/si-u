@@ -72,11 +72,13 @@ export function HighlightedSessions({
                 data={{
                   title: session.title,
                   description: session.description,
-                  ctaLink: `/scholars/si-u-sessions/${session._id}`,
+                  ctaLink: `/scholars/sessions/${session._id}`,
                   progress: session.progress,
                   status: session.status,
                   position: session.position,
                   community: session.community?.communityName,
+                  company: session.company,
+                  videourl: session.videoUrl,
                 }}
                 imageUrl={
                   session.thumbnail
