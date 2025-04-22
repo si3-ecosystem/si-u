@@ -11,7 +11,6 @@ export function PopularTopics({
 }) {
   if (!data) return null;
 
-  console.log("categories", categoryCounts, data);
   return (
     <div>
       <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">

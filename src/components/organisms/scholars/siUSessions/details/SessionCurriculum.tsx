@@ -11,7 +11,7 @@ export default function SessionCurriculum({
     <div className="bg-white">
       <h2 className="text-xl font-medium text-black">Course Curriculum</h2>
       <ul className="mt-6 space-y-4">
-        {curriculum.map((module, index) => (
+        {curriculum?.map((module, index) => (
           <li
             key={index}
             className="flex items-center rounded-lg border border-[#11244033] px-4 py-3"

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SanityImage, Tag } from "@/types/session";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,6 +15,9 @@ interface HighlightedSessionData {
   community?: string;
   company?: string;
   videourl?: string;
+  tags: Tag[];
+  speakerName?: string;
+  speakerImage: SanityImage | null;
 }
 
 interface HighlightedSessionCardProps {
@@ -36,7 +40,14 @@ export function HighlightedSessionCard({
           alt="scholars"
           className="h-full w-full object-cover"
         />
-        <Badge className="absolute top-2 left-2  ">Web3 Natives</Badge>
+        <div className="absolute top-2 left-2 flex flex-wrap gap-2">
+          {data?.tags?.length > 0 &&
+            data.tags.map((tag) => (
+              <Badge key={tag._id} className=" ">
+                {tag.title}
+              </Badge>
+            ))}
+        </div>
       </div>
       <div className="h-full flex flex-col justify-between gap-4 max-h-[220px]">
         <div className="flex flex-col ">
@@ -55,7 +66,7 @@ export function HighlightedSessionCard({
             {data.position}
           </p>
 
-          {data?.status === "in_progress" ? (
+          {/* {data?.status === "in_progress" ? (
             <div className="mt-4">
               <div className="flex  flex-col">
                 <div className="w-full flex items-center justify-between gap-4">
@@ -74,11 +85,11 @@ export function HighlightedSessionCard({
                 </div>
               </div>
             </div>
-          ) : (
-            <h2 className="text-black text-sm leading-5 mt-2 line-clamp-4">
-              {data.description}
-            </h2>
-          )}
+          ) : ( */}
+          <h2 className="text-black text-sm leading-5 mt-2 line-clamp-4">
+            {data.description}
+          </h2>
+          {/* )} */}
         </div>
         <Button
           asChild

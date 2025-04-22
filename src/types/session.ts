@@ -9,6 +9,12 @@ export interface SanityImage {
   alt?: string;
 }
 
+export interface Tag {
+  _id: string;
+  title: string;
+  slug: string;
+}
+
 export interface Session {
   _id: string;
   published: boolean;
@@ -26,6 +32,7 @@ export interface Session {
   position: string;
   description: string;
   category: "blockchain" | "nfts" | "cryptocurrency" | "defi";
+  tags: Tag[];
   progress: number;
   overview: string;
   curriculum: {
@@ -35,6 +42,8 @@ export interface Session {
   totalModules: number;
   lastActivity: string | null;
   status: "in_progress" | "completed" | "not_started";
+  speakerName?: string;
+  speakerImage: SanityImage | null;
 }
 
 export interface SessionCategoryCount {

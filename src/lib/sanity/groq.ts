@@ -37,7 +37,18 @@ export const sessionQuery = groq`
     },
     totalModules,
     lastActivity,
-    status
+    status,
+     tags[]-> {
+      _id,
+      title,
+      slug
+    },
+    speakerName,
+    speakerImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
+    }
   }
 `;
 
@@ -71,6 +82,7 @@ export const sessionByIdQuery = groq`
     category,
     progress,
     overview,
+    videoUrl,
     curriculum[] {
     ...,
       moduleTitle,
@@ -78,7 +90,13 @@ export const sessionByIdQuery = groq`
     },
     totalModules,
     lastActivity,
-    status
+    status,
+       speakerName,
+    speakerImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
+    }
   }
 `;
 
@@ -113,8 +131,15 @@ export const sessionSchemaByIdQuery = groq`
         alt,
       }
     },
+     
     siutitle,
     siudescription,
+     speakerName,
+    speakerImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
+    }
    
   }
 `;

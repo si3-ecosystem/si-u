@@ -47,6 +47,7 @@ export default function SessionDetailsPage() {
         progress={data.progress}
         lastActivity={data.lastActivity}
         status={data.status}
+        videoUrl={data.videoUrl}
       />
       <div className="bg-white p-8">
         <SessionOverview overview={data.overview} />
