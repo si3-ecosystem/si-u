@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { urlForImage } from "@/lib/sanity/image";
 import { SanityImage, Tag } from "@/types/session";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,6 +30,10 @@ export function HighlightedSessionCard({
   data,
   imageUrl,
 }: HighlightedSessionCardProps) {
+  const speakerImageUrl = data.speakerImage
+    ? urlForImage(data.speakerImage)?.src
+    : undefined;
+
   return (
     <Card className=" flex h-full w-full flex-col gap-6 shadow-none border-none  p-5">
       <div className="overflow-hidden rounded-2xl h-[144px] relative">
@@ -50,46 +55,44 @@ export function HighlightedSessionCard({
         </div>
       </div>
       <div className="h-full flex flex-col justify-between gap-4 max-h-[220px]">
-        <div className="flex flex-col ">
-          <h2>{data.title}</h2>
-
-          {data.community ? (
-            <p className="text-sm font-medium text-brand leading-5 mt-1">
-              {data.community}
-            </p>
-          ) : (
-            <p className="text-sm font-medium text-brand leading-5 mt-1">
-              {data.company}
-            </p>
-          )}
-          <p className="text-xs text-brandGray leading-[18px] mt-1">
-            {data.position}
-          </p>
-
-          {/* {data?.status === "in_progress" ? (
-            <div className="mt-4">
-              <div className="flex  flex-col">
-                <div className="w-full flex items-center justify-between gap-4">
-                  <span className="text-sm font-semibold text-left w-full text-gray-600 mb-2">
-                    ENROLLED
-                  </span>
-                  <span className=" text-sm font-semibold text-[#8B8B8B]">
-                    {data.progress}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-purple-600 h-2.5 rounded-full"
-                    style={{ width: `${data.progress}%` }}
-                  ></div>
-                </div>
+        <div className="flex flex-row gap-4">
+          <div className="flex flex-col flex-grow">
+            <div className="flex gap-4 justify-between w-full">
+              <div className="flex flex-col">
+                <h2 className="text-lg font-semibold">{data.title}</h2>
+                {data.community ? (
+                  <p className="text-base font-medium text-brand leading-5 mt-1">
+                    {data.community}
+                  </p>
+                ) : (
+                  <p className="text-base font-medium text-brand leading-5 mt-1">
+                    {data.company}
+                  </p>
+                )}
+                {data.speakerName && (
+                  <p className="text-sm text-brandGray leading-5 mt-1">
+                    {data.speakerName}
+                    {data.position && `, ${data.position}`}
+                  </p>
+                )}
               </div>
+              {speakerImageUrl && (
+                <div className="w-12 h-12 rounded-full overflow-hidden">
+                  <Image
+                    src={speakerImageUrl}
+                    width={48}
+                    height={48}
+                    alt={data.speakerName ?? "Speaker"}
+                    className="rounded-full object-cover w-full h-full"
+                  />
+                </div>
+              )}
             </div>
-          ) : ( */}
-          <h2 className="text-black text-sm leading-5 mt-2 line-clamp-4">
-            {data.description}
-          </h2>
-          {/* )} */}
+
+            <p className="text-sm text-brandGray leading-[18px] mt-2 line-clamp-3">
+              {data.description}
+            </p>
+          </div>
         </div>
         <Button
           asChild
