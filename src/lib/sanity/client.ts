@@ -6,6 +6,7 @@ import {
   previewSecretId,
 } from "./config";
 import {
+  diversityTrackerQuery,
   getAll,
   sessionByIdQuery,
   sessionCategoryCountQuery,
@@ -89,6 +90,13 @@ export async function getSessionById(id: string) {
 export async function getSessionPageData() {
   if (client) {
     return (await client.fetch(sessionSchemaByIdQuery)) || {};
+  }
+  return {};
+}
+
+export async function getDiversityTrackerData() {
+  if (client) {
+    return (await client.fetch(diversityTrackerQuery)) || {};
   }
   return {};
 }

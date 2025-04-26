@@ -16,7 +16,6 @@ import {
   UserSquare2,
   Presentation,
   ScrollText,
-  BookMarked,
   Users2,
 } from "lucide-react";
 import {
@@ -58,6 +57,11 @@ const mainMenuItems: MenuItem[] = [
     icon: BookOpen,
     href: "/guides",
   },
+  {
+    title: "Diversity Tracker",
+    icon: Users2,
+    href: "/diversity-tracker",
+  },
 ];
 
 const subMenuGroups: SubMenuGroup[] = [
@@ -67,11 +71,6 @@ const subMenuGroups: SubMenuGroup[] = [
       { title: "Sessions", icon: Video, href: "/guides/sessions" },
       { title: "Ideas Lab", icon: Brain, href: "/guides/ideas-lab" },
       { title: "Kollaborator", icon: Share2, href: "/guides/kollaborator" },
-      {
-        title: "Diversity Tracker",
-        icon: Users2,
-        href: "/guides/diversity-tracker",
-      },
     ],
   },
   {
@@ -84,11 +83,6 @@ const subMenuGroups: SubMenuGroup[] = [
         href: "/web3-natives",
       },
       { title: "Ideas Lab", icon: Brain, href: "/ideas-lab" },
-      {
-        title: "Diversity Tracker",
-        icon: Users2,
-        href: "/scholars/diversity-tracker",
-      },
     ],
   },
   {
@@ -100,22 +94,12 @@ const subMenuGroups: SubMenuGroup[] = [
         href: "/fixx/fixx-sessions",
       },
       { title: "FIXX Playbook", icon: ScrollText, href: "/fixx/fixx-playbook" },
-      {
-        title: "Diversity Tracker",
-        icon: Users2,
-        href: "/fixx/diversity-tracker",
-      },
     ],
   },
   {
     title: "DEAI WEB3 PARTICIPANTS",
     items: [
       { title: "DEAI Web3 Sessions", icon: Video, href: "/deai-web3-sessions" },
-      {
-        title: "DEAI Web3 Playbook",
-        icon: BookMarked,
-        href: "/deai-web3-playbook",
-      },
     ],
   },
 ];
