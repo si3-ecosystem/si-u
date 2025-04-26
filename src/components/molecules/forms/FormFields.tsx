@@ -144,12 +144,9 @@ export function CheckboxField({ form, name, label, options }) {
           <FormItem>
             <FormLabel className="mb-4 text-lg">{label}</FormLabel>
             <FormControl>
-              <div className="grid h-full w-full grid-cols-1 space-y-6 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid  justify-start align-top w-full grid-cols-1 space-y-6 sm:grid-cols-2 md:grid-cols-3">
                 {options.map((option) => (
-                  <div
-                    key={option}
-                    className="flex h-full items-center space-x-2"
-                  >
+                  <div key={option} className="flex items-end space-x-2">
                     <Checkbox
                       checked={field.value.includes(option)}
                       onCheckedChange={(checked) => {

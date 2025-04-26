@@ -51,7 +51,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function DiversityTrackerForm() {
+export function DiversityTrackerForm({ onSuccess }: { onSuccess: () => void }) {
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -105,6 +105,7 @@ export function DiversityTrackerForm() {
     onSuccess: () => {
       toast.success("Diversity tracker submitted successfully!");
       form.reset();
+      onSuccess();
     },
     onError: (error: Error) => {
       toast.error(error.message || "Something went wrong");
