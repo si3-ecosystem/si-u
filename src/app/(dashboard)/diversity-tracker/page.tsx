@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 export default function DiversityTrackerPage() {
   const [showChart, setShowChart] = useState(false);
 
-  // On mount, check localStorage for the flag
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("diversityTrackerChartShown");

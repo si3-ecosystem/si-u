@@ -27,7 +27,8 @@ import {
 import { LoaderCircleIcon } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { SuccessDialog } from "../dialogs/SuccessDialog";
 
 const formSchema = z.object({
   self_identity: z.string().min(1, "Please select a gender identity"),
@@ -52,6 +53,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function DiversityTrackerForm({ onSuccess }: { onSuccess: () => void }) {
+  const [showSuccess, setShowSuccess] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -103,6 +105,7 @@ export function DiversityTrackerForm({ onSuccess }: { onSuccess: () => void }) {
       return response.json();
     },
     onSuccess: () => {
+      setShowSuccess(true);
       toast.success("Diversity tracker submitted successfully!");
       form.reset();
       onSuccess();
@@ -235,6 +238,17 @@ export function DiversityTrackerForm({ onSuccess }: { onSuccess: () => void }) {
           </Button>
         </form>
       </Form>
+      {showSuccess && (
+        <SuccessDialog
+          open={showSuccess}
+          onOpenChange={setShowSuccess}
+          imageSrc="/icons/success.jpg"
+          title="Thank you for sharing your voice! 🎉"
+          description="Your input helps us build a more inclusive and equitable Web3 community. Stay connected for meaningful changes inspired by YOUR feedback!"
+          ctaLink="/"
+          ctaTitle="Back to Home"
+        />
+      )}
     </div>
   );
 }

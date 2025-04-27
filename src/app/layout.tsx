@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TanstackClientProvider } from "@/providers/TanstackClientProvider";
+import WalletProvider from "@/providers/WagmiProvider";
+import ReduxProvider from "@/providers/ReduxProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,7 +20,14 @@ export default function RootLayout({
       <body
         className={` antialiased w-screen overflow-hidden overflow-y-scroll`}
       >
-        <TanstackClientProvider>{children}</TanstackClientProvider>
+        <WalletProvider>
+          <ReduxProvider>
+            <TanstackClientProvider>
+              {children}
+              <Toaster />
+            </TanstackClientProvider>
+          </ReduxProvider>
+        </WalletProvider>
       </body>
     </html>
   );
