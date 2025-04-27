@@ -1,17 +1,10 @@
-import { SectionBanner } from "@/components/molecules/banners/SectionBanner";
+import { GuidesBanner } from "@/components/molecules/banners/GuidesBanner";
+import { GuidesSessionBanner } from "@/types/siherguides/session";
 
-const data = {
-  title: "DEAI WEB3",
-  description:
-    "Si Her is a global community of women & non-binary emerging tech leaders. In Si Her, we develop our professional and leadership potential as guides in the new economy.",
-  background: "/guides/sessionBackground.svg",
-  image: "/placeholder.png",
-};
-
-export function Banner() {
+export function Banner({ data }: { data: GuidesSessionBanner }) {
   return (
     <section className="container mx-auto ">
-      <SectionBanner data={data} setGlobalFilter={() => {}} globalFilter="" />
+      <GuidesBanner data={data} />
     </section>
   );
 }

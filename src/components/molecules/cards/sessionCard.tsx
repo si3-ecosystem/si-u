@@ -2,22 +2,12 @@ import { Card } from "@/components/ui/card";
 import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 import { AttendEventDropdown } from "../dropdowns/attendEventDropdown";
-
-export interface Session {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  language: string;
-  guide: string;
-  partner: {
-    name: string;
-    logo: string | null;
-  };
-}
+import { GuidesSession } from "@/types/siherguides/session";
+import { urlForImage } from "@/lib/sanity/image";
+import moment from "moment";
 
 interface SessionCardProps {
-  session: Session;
+  session: GuidesSession;
   openDropdownId: string | null;
   toggleDropdown: (id: string) => void;
   setOpenDropdownId: (id: string | null) => void;
@@ -29,6 +19,8 @@ export function SessionCard({
   toggleDropdown,
   setOpenDropdownId,
 }: SessionCardProps) {
+  const partnersImage =
+    session?.partner?.logo && urlForImage(session?.partner?.logo)?.src;
   return (
     <Card className="p-4 w-full">
       <div className="flex flex-col md:flex-row gap-4">
@@ -51,7 +43,7 @@ export function SessionCard({
           <div className="flex items-center gap-4 mb-4 text-xs text-[#5D5D5D]">
             <div className="flex items-center gap-1 text-xs leading-5">
               <Calendar className="w-5 h-5" />
-              <span>{session.date}</span>
+              <span>{moment(session.date).format("YYYY-MM-DD")}</span>
             </div>
             <div className="flex items-center gap-1 text-xs leading-5">
               <Clock className="w-5 h-5" />
@@ -64,7 +56,7 @@ export function SessionCard({
               <div>
                 <div className="text-xs text-[#333333]">Guided by:</div>
                 <div className="font-medium text-sm text-black">
-                  {session.guide}
+                  {session.guideName}
                 </div>
               </div>
 
@@ -74,8 +66,8 @@ export function SessionCard({
                 </div>
                 <div className="h-8 mt-1">
                   <Image
-                    src={session.partner.logo || "/uniswap.png"}
-                    alt={session.partner.name}
+                    src={partnersImage || "/uniswap.png"}
+                    alt={session.partner?.title || ""}
                     width={105}
                     height={30}
                     className="h-full w-auto object-contain"
@@ -86,13 +78,13 @@ export function SessionCard({
 
             <div className="mt-4 md:mt-0 relative max-lg:w-full">
               <button
-                onClick={() => toggleDropdown(session.id)}
+                onClick={() => toggleDropdown(session._id)}
                 className="text-white border border-black max-lg:w-full max-lg:text-center bg-black  font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2"
               >
                 Attend Event
               </button>
 
-              {openDropdownId === session.id && (
+              {openDropdownId === session._id && (
                 <AttendEventDropdown onClose={() => setOpenDropdownId(null)} />
               )}
             </div>

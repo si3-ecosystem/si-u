@@ -12,6 +12,7 @@ import {
   sessionCategoryCountQuery,
   sessionQuery,
   sessionSchemaByIdQuery,
+  siherGuidesSessionQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -97,6 +98,13 @@ export async function getSessionPageData() {
 export async function getDiversityTrackerData() {
   if (client) {
     return (await client.fetch(diversityTrackerQuery)) || {};
+  }
+  return {};
+}
+
+export async function getSiherGuidesSessionData() {
+  if (client) {
+    return (await client.fetch(siherGuidesSessionQuery)) || {};
   }
   return {};
 }

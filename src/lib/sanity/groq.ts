@@ -168,3 +168,50 @@ export const diversityTrackerQuery = groq`
     }
   }
 `;
+
+export const siherGuidesSessionQuery = groq`
+  *[_type == "siherGuidesSession"][0] {
+    _id,
+    title,
+    description,
+    banner->{
+      title,
+      description,
+      thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
+    "guides": guides[]->{
+      _id,
+      title,
+      description,
+      date,
+      time,
+      guideName,
+      guideImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      language,
+      partner->{
+        _id,
+        title,
+        ...,
+        logo
+      },
+      videoUrl,
+      featured,
+      rsvpChannelLink,
+      googleCalendarUrl,
+      allowCancel
+    }
+  }
+`;

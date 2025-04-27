@@ -4,60 +4,17 @@ import { SessionCard } from "@/components/molecules/cards/sessionCard";
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
 import React, { useState } from "react";
 
-const sessions = [
-  {
-    id: "1",
-    title: "Web3 Natives: Tokens Unlocked",
-    date: "June 20th, 2025",
-    time: "8:30 - 9:30 PM (UTC +4)",
-    guide: "Ali Mastova",
-    language: "English",
-    partner: {
-      name: "UNISWAP",
-      logo: "/uniswap.png",
-    },
-  },
-  {
-    id: "2",
-    title: "Si Her DeFi",
-    date: "June 22, 2025",
-    time: "8:30 - 9:30 PM (UTC +4)",
-    guide: "Ngozi Owanda",
-    language: "Spanish",
-    partner: {
-      name: "Coinbase",
-      logo: "/uniswap.png",
-    },
-  },
-];
+import { useSiherGuidesSessions } from "@/hooks/useSiherGuidesSessions";
+import { GuidesSession } from "@/types/siherguides/session";
 
-const prevSessionsData = [
-  {
-    id: "1",
-    title: "How to Build A Successful Team with Elena",
-    description: "karalevythal X Elena",
-    date: "Co-Founder & DC, Metis",
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "How to Build A Successful Team with Elena",
-    description: "karalevythal X Elena",
-    date: "Co-Founder & DC, Metis",
-    featured: false,
-  },
-  {
-    id: "3",
-    title: "How to Build A Successful Team with Elena",
-    description: "karalevythal X Elena",
-    date: "Co-Founder & DC, Metis",
-    featured: false,
-  },
-];
+interface WorkShopsProps {
+  guides: GuidesSession[];
+}
 
-export default function WorkShops() {
+export default function WorkShops({ guides }: WorkShopsProps) {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const { upcomingSessions, previousSessions } = useSiherGuidesSessions(guides);
 
   const toggleDropdown = (id: string) => {
     setOpenDropdownId(openDropdownId === id ? null : id);
@@ -83,21 +40,29 @@ export default function WorkShops() {
         <div className="mt-6">
           {activeTab === "upcoming" ? (
             <div className="grid gap-7">
-              {sessions.map((session) => (
-                <SessionCard
-                  key={session.id}
-                  session={session}
-                  openDropdownId={openDropdownId}
-                  toggleDropdown={toggleDropdown}
-                  setOpenDropdownId={setOpenDropdownId}
-                />
-              ))}
+              {upcomingSessions.length === 0 ? (
+                <div>No upcoming sessions.</div>
+              ) : (
+                upcomingSessions.map((session) => (
+                  <SessionCard
+                    key={session._id}
+                    session={session}
+                    openDropdownId={openDropdownId}
+                    toggleDropdown={toggleDropdown}
+                    setOpenDropdownId={setOpenDropdownId}
+                  />
+                ))
+              )}
             </div>
           ) : (
             <div className="flex flex-wrap gap-8">
-              {prevSessionsData.map((session) => (
-                <PreviousSessionCard key={session.id} session={session} />
-              ))}
+              {previousSessions.length === 0 ? (
+                <div>No previous sessions.</div>
+              ) : (
+                previousSessions.map((session) => (
+                  <PreviousSessionCard key={session._id} session={session} />
+                ))
+              )}
             </div>
           )}
         </div>

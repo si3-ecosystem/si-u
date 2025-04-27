@@ -1,5 +1,5 @@
 "use client";
-import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
+// import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
 import { SeasonSessionCard } from "@/components/molecules/cards/SeasonSessionCard";
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
 import React, { useState } from "react";
@@ -32,29 +32,29 @@ const sessions = [
   },
 ];
 
-const prevSessionsData = [
-  {
-    id: "1",
-    title: "How to Build A Successful Team with Elena",
-    description: "karalevythal X Elena",
-    date: "Co-Founder & DC, Metis",
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "How to Build A Successful Team with Elena",
-    description: "karalevythal X Elena",
-    date: "Co-Founder & DC, Metis",
-    featured: false,
-  },
-  {
-    id: "3",
-    title: "How to Build A Successful Team with Elena",
-    description: "karalevythal X Elena",
-    date: "Co-Founder & DC, Metis",
-    featured: false,
-  },
-];
+// const prevSessionsData = [
+//   {
+//     id: "1",
+//     title: "How to Build A Successful Team with Elena",
+//     description: "karalevythal X Elena",
+//     date: "Co-Founder & DC, Metis",
+//     featured: true,
+//   },
+//   {
+//     id: "2",
+//     title: "How to Build A Successful Team with Elena",
+//     description: "karalevythal X Elena",
+//     date: "Co-Founder & DC, Metis",
+//     featured: false,
+//   },
+//   {
+//     id: "3",
+//     title: "How to Build A Successful Team with Elena",
+//     description: "karalevythal X Elena",
+//     date: "Co-Founder & DC, Metis",
+//     featured: false,
+//   },
+// ];
 
 export function Sessions() {
   const [activeTab, setActiveTab] = useState("season1");
@@ -97,9 +97,9 @@ export function Sessions() {
             </div>
           ) : (
             <div className="flex flex-wrap gap-8">
-              {prevSessionsData.map((session) => (
+              {/* {prevSessionsData.map((session) => (
                 <PreviousSessionCard key={session.id} session={session} />
-              ))}
+              ))} */}
             </div>
           )}
         </div>
