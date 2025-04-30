@@ -8,6 +8,8 @@ import {
 import {
   diversityTrackerQuery,
   getAll,
+  ideaLabsSessionQuery,
+  ideaLabSessionByIdQuery,
   sessionByIdQuery,
   sessionCategoryCountQuery,
   sessionQuery,
@@ -105,6 +107,23 @@ export async function getDiversityTrackerData() {
 export async function getSiherGuidesSessionData() {
   if (client) {
     return (await client.fetch(siherGuidesSessionQuery)) || {};
+  }
+  return {};
+}
+
+export async function getIdeaLabsSessionData() {
+  if (client) {
+    return (await client.fetch(ideaLabsSessionQuery)) || {};
+  }
+  return {};
+}
+
+export async function getIdeaLabSessionById(id: string) {
+  if (client) {
+    const result = (await client.fetch(ideaLabSessionByIdQuery, { id })) || {};
+
+    console.log("result", result);
+    return result;
   }
   return {};
 }

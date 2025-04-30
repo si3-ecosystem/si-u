@@ -12,10 +12,19 @@ export default function SessionsPage() {
     queryFn: getSiherGuidesSessionData,
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error || !data) return <div>Error loading session data.</div>;
+  if (isLoading)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  if (error || !data)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        Error loading session data.
+      </div>
+    );
 
-  console.log("data", data);
   return (
     <div className="py-8">
       <GuidesBanner data={data} />

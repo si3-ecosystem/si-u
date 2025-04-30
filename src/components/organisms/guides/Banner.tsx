@@ -4,7 +4,11 @@ import { GuidesSessionBanner } from "@/types/siherguides/session";
 export function Banner({ data }: { data: GuidesSessionBanner }) {
   return (
     <section className="container mx-auto ">
-      <GuidesBanner data={data} />
+      <GuidesBanner
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        data={data}
+      />
     </section>
   );
 }

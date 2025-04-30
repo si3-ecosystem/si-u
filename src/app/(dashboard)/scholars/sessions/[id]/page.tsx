@@ -7,6 +7,7 @@ import SessionProgress from "@/components/organisms/scholars/siUSessions/details
 import { getSessionById } from "@/lib/sanity/client";
 import { Session } from "@/types/session";
 import { useQuery } from "@tanstack/react-query";
+
 import { redirect, useParams } from "next/navigation";
 
 export default function SessionDetailsPage() {
