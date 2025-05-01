@@ -94,7 +94,7 @@ export default function DashboardPage() {
     console.log("Explore sessions clicked");
   };
   return (
-    <div className="min-h-screen w-full bg-[#f6f6f6] p-6  md:!pr-20">
+    <div className="min-h-screen w-full bg-[#f6f6f6]">
       <DashboardProfileHeader
         username={profileData.username}
         subtext={profileData.subtext}

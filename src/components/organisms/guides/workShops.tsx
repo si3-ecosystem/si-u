@@ -22,7 +22,7 @@ export default function WorkShops({ guides }: WorkShopsProps) {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-11">
+      <div className="w-full py-11">
         <h1 className="text-2xl font-medium mb-1 ">Sessions</h1>
         <p className="text-[#454545] mb-6 leading-[140%] ">
           Presentations and workshops from leading organizations.

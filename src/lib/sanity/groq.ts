@@ -38,7 +38,8 @@ export const sessionQuery = groq`
     totalModules,
     lastActivity,
     status,
-     tags[]-> {
+    ...,
+     topic-> {
       _id,
       title,
       slug
@@ -298,4 +299,41 @@ export const fixSessionsQuery = groq`
       },
     }
   } | order(fixCards[0].date desc)
+`;
+
+export const communitiesQuery = groq`
+  *[_type == "cards" && published == true] | order(order asc){
+    _id,
+    published,
+    order,
+    background,
+    communityLogo,
+    communityName,
+    communityType,
+    communityLocation,
+    communityDescription,
+    communityWebsite,
+    communityLeaderName,
+    communityLeaderEmail,
+    xHandle,
+    linkedXHandle,
+    linkedIn,
+    discover
+  }
+`;
+
+export const COMMUNITY_BANNER_GROQ = `*[_type == "communitySchema"][0].banner{
+  title,
+  description,
+  thumbnail,
+  background,
+  ctaText
+}`;
+
+export const allTopicsQuery = groq`
+  *[_type == "topic"]{
+    _id,
+    title,
+    slug
+  }
 `;

@@ -35,7 +35,6 @@ export function HighlightedSessions({
   dateRange,
   setDateRange,
 }: HighlightedSessionsProps) {
-  console.log("rows", rows);
   return (
     <div>
       <div className="flex items-center justify-between w-full mb-8">
@@ -80,7 +79,7 @@ export function HighlightedSessions({
                   community: session.community?.communityName,
                   company: session.company,
                   videourl: session.videoUrl,
-                  tags: session.tags,
+                  topic: session.topic,
                   speakerName: session.speakerName,
                   speakerImage: session.speakerImage,
                 }}

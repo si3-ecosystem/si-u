@@ -11,7 +11,7 @@ export function Banner({
   data: Types;
 }) {
   return (
-    <section className="w-full mx-auto ">
+    <section className="w-full ">
       <SessionBanner
         data={data}
         globalFilter={globalFilter}

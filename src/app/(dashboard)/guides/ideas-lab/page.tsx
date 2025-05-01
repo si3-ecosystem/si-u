@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getIdeaLabsSessionData } from "@/lib/sanity/client";
 import { useIdeaLabs } from "@/hooks/useIdeaLabs";
 import type { IdeaLabsSession } from "@/types/idealabs_session";
+import Loading from "@/app/loading";
 
 export default function IdeaLabsPage() {
   const { data, isLoading, error } = useQuery<IdeaLabsSession>({
@@ -15,12 +16,8 @@ export default function IdeaLabsPage() {
   const cards = data?.cards || [];
   const ideaLabs = useIdeaLabs(cards);
 
-  if (isLoading)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
+  if (isLoading) return <Loading />;
+
   if (error || !data)
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -29,7 +26,7 @@ export default function IdeaLabsPage() {
     );
 
   return (
-    <div className="py-8">
+    <div className="">
       <Banner data={data.banner ?? {}} />
       <Highlights
         title={data.title}

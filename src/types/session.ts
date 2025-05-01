@@ -32,7 +32,7 @@ export interface Session {
   position: string;
   description: string;
   category: "blockchain" | "nfts" | "cryptocurrency" | "defi";
-  tags: Tag[];
+  topic: Topic | null;
   progress: number;
   overview: string;
   curriculum: {

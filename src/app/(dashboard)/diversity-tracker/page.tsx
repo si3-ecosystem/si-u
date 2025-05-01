@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/loading";
 import { DiversityTrackerBanner } from "@/components/molecules/banners/DiversityTrackerBanner";
 import { DiversityTrackerChart } from "@/components/molecules/charts/DiversityTrackerChart";
 import { DiversityTrackerForm } from "@/components/molecules/forms/DiversityTrackerForm";
@@ -43,12 +44,8 @@ export default function DiversityTrackerPage() {
     }
   }, [queryClient, showChart]);
 
-  if (isLoading || !data)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
+  if (isLoading) return <Loading />;
+  if (!data) return <div>No data found</div>;
 
   return (
     <section className="layout flex flex-col gap-7">

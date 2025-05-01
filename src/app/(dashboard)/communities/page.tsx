@@ -1,76 +1,48 @@
 "use client";
 
+import Loading from "@/app/loading";
 import { CollabCard } from "@/components/molecules/cards/collabCard";
 import { Banner } from "@/components/organisms/communities/Banner";
 import { CommunitiesSearchAndFilter } from "@/components/organisms/communities/CommunitiesSearchAndFilter";
-import { useCommunitiesFilter } from "@/hooks/useCommunitiesFilterReturn";
+import { useCommunitiesTable } from "@/hooks/useCommunitiesTable";
+import { Community } from "@/types/community";
 
-const communities = [
-  {
-    _id: "1",
-    published: true,
-    order: 1,
-    background: "/community/communitycardbg.png",
-    communityLogo: "/community/applistlogo.png",
-    communityName: "APP LIST",
-    communityType: ["Women & Non-Binary", "Education"],
-    communityLocation: "Global",
-    communityDescription:
-      "Find, Book and Meet Mentors around the world. Get virtual mentorship from over 1,374+ mentors from the world’s leading companies in our global community.",
-    communityWebsite: "https://applist.com",
-    communityLeaderName: "Kara Sher",
-    communityLeaderEmail: "kara@example.com",
-    xHandle: "kara_sher.eth",
-    linkedIn: "kara_sher.eth",
-    discover: "mentorship",
-  },
-  {
-    _id: "2",
-    published: true,
-    order: 2,
-    background: "/community/communitycardbg.png",
-    communityLogo: "/community/appaustinlogo.png",
-    communityName: "AIGA AUSTIN",
-    communityType: ["Women & Non-Binary"],
-    communityLocation: "Global",
-    communityDescription:
-      "AIGA is the professional association for design. We connect our creative community through programming that inspires, educates and advocates for design.",
-    communityWebsite: "https://aiga-austin.com",
-    communityLeaderName: "Kara Sher",
-    communityLeaderEmail: "kara@example.com",
-    xHandle: "kara_sher.eth",
-    linkedIn: "kara_sher.eth",
-    discover: "design",
-  },
-  {
-    _id: "3",
-    published: true,
-    order: 3,
-    background: "/community/communitycardbg.png",
-    communityLogo: "/community/appaustinlogo.png",
-    communityName: "API WHO DESIGN",
-    communityType: ["Women & Non-Binary", "Education"],
-    communityLocation: "Global",
-    communityDescription:
-      "API (Asian & Pacific Islanders) Who Design is a living and growing directory that features APIs in the design industry. Our mission is to highlight the breadth of talent within...",
-    communityWebsite: "https://apiwhodesign.com",
-    communityLeaderName: "Kara Sher",
-    communityLeaderEmail: "kara@example.com",
-    xHandle: "kara_sher.eth",
-    linkedIn: "kara_sher.eth",
-    discover: "design",
-  },
-];
 export default function CommunityPage() {
-  const { filteredCommunities } = useCommunitiesFilter(communities);
+  const {
+    filteredCommunities,
+    isLoading,
+    search,
+    setSearch,
+    type,
+    setType,
+    location,
+    setLocation,
+    allTypes,
+    allLocations,
+    pageCount,
+    pageIndex,
+    setPagination,
+  } = useCommunitiesTable();
+
+  if (isLoading) return <Loading />;
+
   return (
-    <div className="py-8 flex flex-col gap-10 lg:gap-16 max-lg:px-4">
+    <div className="py-8 flex flex-col gap-10 lg:gap-11 ">
       <Banner />
-      <CommunitiesSearchAndFilter communities={communities} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 container mx-auto w-full">
+      <CommunitiesSearchAndFilter
+        search={search}
+        setSearch={setSearch}
+        type={type}
+        setType={setType}
+        location={location}
+        setLocation={setLocation}
+        allTypes={allTypes}
+        allLocations={allLocations}
+      />
+      <div className="grid grid-cols-1 @[768px]/layout:grid-cols-2 @[1548px]/layout:grid-cols-3 gap-6 mt-6 w-full">
         {filteredCommunities.length > 0 ? (
-          filteredCommunities.map((community) => (
-            <CollabCard key={community.communityName} item={community} />
+          filteredCommunities.map((community: Community) => (
+            <CollabCard key={community._id} item={community} />
           ))
         ) : (
           <p className="col-span-3 text-center text-gray-500">
@@ -78,6 +50,37 @@ export default function CommunityPage() {
           </p>
         )}
       </div>
+      {pageCount > 1 && (
+        <div className="flex justify-center gap-4 mt-8">
+          <button
+            onClick={() =>
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: Math.max(0, pageIndex - 1),
+              }))
+            }
+            disabled={pageIndex === 0}
+            className="px-4 py-2 border rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="px-2 py-2">
+            Page {pageIndex + 1} of {pageCount}
+          </span>
+          <button
+            onClick={() =>
+              setPagination((prev) => ({
+                ...prev,
+                pageIndex: Math.min(pageCount - 1, pageIndex + 1),
+              }))
+            }
+            disabled={pageIndex >= pageCount - 1}
+            className="px-4 py-2 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

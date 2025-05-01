@@ -153,7 +153,7 @@ export function AppSidebar() {
                       isActive(item.href) && "bg-purple-50 text-purple-600"
                     )}
                   >
-                    <item.icon className="mr-3 h-5 w-5" />
+                    <item.icon className="mr-2 h-6 w-6" />
                     {item.title}
                   </Button>
                 </Link>
@@ -174,8 +174,10 @@ export function AppSidebar() {
                         isActive(item.href) && "bg-purple-50 text-purple-600"
                       )}
                     >
-                      <item.icon className="mr-3 h-5 w-5" />
-                      <span className="flex-1 text-left">{item.title}</span>
+                      <item.icon className="mr-2 h-6 w-6" />
+                      <span className="flex-1 text-left text-sm">
+                        {item.title}
+                      </span>
                       {item.badge && (
                         <span className="text-xs text-gray-400">
                           {item.badge}
@@ -194,7 +196,7 @@ export function AppSidebar() {
               variant="ghost"
               className="w-full justify-start h-11 !px-2.5"
             >
-              <Settings className="mr-3 h-5 w-5" />
+              <Settings className="mr-2 h-6 w-6" />
               Settings
             </Button>
           </Link>
@@ -202,7 +204,7 @@ export function AppSidebar() {
             variant="ghost"
             className="w-full justify-start h-11 text-red-500 !px-2.5"
           >
-            <LogOut className="mr-3 h-5 w-5" />
+            <LogOut className="mr-2 h-6 w-6" />
             Logout
           </Button>
         </SidebarFooter>

@@ -15,7 +15,7 @@ export function GuidesBanner({ data, className }: Props) {
     data?.banner?.background && urlForImage(data?.banner?.background)?.src;
 
   return (
-    <div className="w-full min-h-[206px] flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+    <div className="w-full min-h-[206px] flex relative z-10 rounded-lg">
       {backgroundImage && (
         <Image
           src={backgroundImage}

@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/organisms/ideas-lab/details/HeroSectio
 import { PortableText as PortableTextComponent } from "@portabletext/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Loading from "@/app/loading";
 
 export default function IdeaLabDetailsPage() {
   const params = useParams();
@@ -17,14 +18,8 @@ export default function IdeaLabDetailsPage() {
     enabled: !!id,
   });
 
-  console.log("data", data);
+  if (isLoading) return <Loading />;
 
-  if (isLoading)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
   if (error || !data)
     return (
       <div className="flex flex-col items-center justify-center h-screen">

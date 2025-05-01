@@ -4,29 +4,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-export interface Community {
-  _id: string;
-  published: boolean;
-  order: number;
-  background: string;
-  communityLogo: string;
-  communityName: string;
-  communityLocation: string;
-  communityType: string[];
-  communityDescription: string;
-  communityWebsite: string;
-  communityLeaderName: string;
-  communityLeaderEmail: string;
-  xHandle: string;
-  linkedIn: string;
-  discover: string;
-}
+import { Community } from "@/types/community";
+import { urlForImage } from "@/lib/sanity/image";
 
 export function CollabCard({ item }: { item: Community }) {
-  const cardBg = item.background;
+  const cardBg = item.background && urlForImage(item?.background)?.src;
 
-  const image = item.communityLogo;
+  const image = item.communityLogo && urlForImage(item?.communityLogo)?.src;
 
   return (
     <Card className="h-fit cursor-pointer overflow-hidden rounded-2xl !p-0 transition-all duration-300 !ease-in-out hover:shadow-lg sm:!h-full">

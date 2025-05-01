@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { urlForImage } from "@/lib/sanity/image";
-import { SanityImage, Tag } from "@/types/session";
+import { SanityImage, Topic } from "@/types/session";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,7 +16,7 @@ interface HighlightedSessionData {
   community?: string;
   company?: string;
   videourl?: string;
-  tags: Tag[];
+  topic: Topic | null;
   speakerName?: string;
   speakerImage: SanityImage | null;
 }
@@ -46,12 +46,9 @@ export function HighlightedSessionCard({
           className="h-full w-full object-cover"
         />
         <div className="absolute top-2 left-2 flex flex-wrap gap-2">
-          {data?.tags?.length > 0 &&
-            data.tags.map((tag) => (
-              <Badge key={tag._id} className=" ">
-                {tag.title}
-              </Badge>
-            ))}
+          {data.topic && (
+            <Badge key={data.topic.title}>{data.topic.title}</Badge>
+          )}
         </div>
       </div>
       <div className="h-full flex flex-col justify-between gap-4 max-h-[220px]">

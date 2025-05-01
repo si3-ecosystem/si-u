@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
+import { getAllTopics } from "@/lib/sanity/client";
 
 interface FilterOption {
   title: string;
@@ -29,14 +31,6 @@ interface SessionFilterDropdownProps {
   setDateRange: (value: { start: string | null; end: string | null }) => void;
 }
 
-const categoryOptions: FilterOption[] = [
-  { title: "All Categories", value: "all" },
-  { title: "Blockchain", value: "blockchain" },
-  { title: "NFTs", value: "nfts" },
-  { title: "Cryptocurrency", value: "cryptocurrency" },
-  { title: "DeFi", value: "defi" },
-];
-
 const statusOptions: FilterOption[] = [
   { title: "All Statuses", value: "all" },
   { title: "In Progress", value: "in_progress" },
@@ -50,6 +44,21 @@ export function SessionFilterDropdown({
   selectedStatus,
   setSelectedStatus,
 }: SessionFilterDropdownProps) {
+  const { data: topics, isLoading: topicsLoading } = useQuery({
+    queryKey: ["all-topics"],
+    queryFn: getAllTopics,
+  });
+
+  const topicOptions: FilterOption[] = topics
+    ? [
+        { title: "All Topics", value: "all" },
+        ...topics.map((t: any) => ({
+          title: t.title,
+          value: t.slug?.current || t.slug,
+        })),
+      ]
+    : [{ title: "All Topics", value: "all" }];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -66,11 +75,17 @@ export function SessionFilterDropdown({
             value={selectedCategory}
             onValueChange={setSelectedCategory}
           >
-            {categoryOptions.map((option) => (
-              <DropdownMenuRadioItem key={option.value} value={option.value}>
-                {option.title}
+            {topicsLoading ? (
+              <DropdownMenuRadioItem value="all" disabled>
+                Loading topics…
               </DropdownMenuRadioItem>
-            ))}
+            ) : (
+              topicOptions.map((option) => (
+                <DropdownMenuRadioItem key={option.value} value={option.value}>
+                  {option.title}
+                </DropdownMenuRadioItem>
+              ))
+            )}
           </DropdownMenuRadioGroup>
         </div>
 

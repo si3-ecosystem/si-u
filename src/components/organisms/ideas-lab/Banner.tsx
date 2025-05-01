@@ -16,8 +16,8 @@ export function Banner({ data }: BannerProps) {
   const imageUrl = data?.thumbnail && urlForImage(data?.thumbnail)?.src;
 
   return (
-    <section className="container mx-auto ">
-      <div className="w-full min-h-[206px] flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+    <section className="w-full ">
+      <div className="w-full min-h-[206px] flex relative z-10 rounded-lg">
         {backgroundImage && (
           <Image
             src={backgroundImage}

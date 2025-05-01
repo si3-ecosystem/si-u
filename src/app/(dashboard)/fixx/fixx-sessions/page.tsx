@@ -3,7 +3,7 @@ import { Sessions } from "@/components/organisms/fixx/fixx-sessions/Sessions";
 
 export default function page() {
   return (
-    <div className="w-full py-8">
+    <div className="w-full ">
       <Banner />
       <Sessions />
     </div>

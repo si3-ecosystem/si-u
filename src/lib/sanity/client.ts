@@ -16,6 +16,9 @@ import {
   sessionSchemaByIdQuery,
   siherGuidesSessionQuery,
   fixSessionsQuery,
+  communitiesQuery,
+  COMMUNITY_BANNER_GROQ,
+  allTopicsQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -133,4 +136,25 @@ export async function getFixSessions() {
     return (await client.fetch(fixSessionsQuery)) || {};
   }
   return {};
+}
+
+export async function getCommunities() {
+  if (client) {
+    return (await client.fetch(communitiesQuery)) || [];
+  }
+  return [];
+}
+
+export async function getCommunityBanner() {
+  if (client) {
+    return (await client.fetch(COMMUNITY_BANNER_GROQ)) || {};
+  }
+  return {};
+}
+
+export async function getAllTopics() {
+  if (client) {
+    return (await client.fetch(allTopicsQuery)) || [];
+  }
+  return [];
 }

@@ -17,7 +17,7 @@ export function NotificationButton({
 }: NotificationButtonProps) {
   return (
     <span
-      className={cn("relative w-5 h-5 rounded-full bg-white border", className)}
+      className={cn("relative w-5 h-5 rounded-full bg-white ", className)}
       {...props}
     >
       <Bell className="h-5 w-5 " />

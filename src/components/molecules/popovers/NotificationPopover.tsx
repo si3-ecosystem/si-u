@@ -54,7 +54,7 @@ export function NotificationPopover({
         <NotificationButton count={unreadCount} />
       </PopoverTrigger>
       <PopoverContent
-        className="w-64 sm:w-96 p-0 z-20 overflow-hidden rounded-l shadow"
+        className="w-64 sm:w-96 p-0 z-30 overflow-hidden rounded-lg border shadow-md"
         align="end"
         sideOffset={5}
       >

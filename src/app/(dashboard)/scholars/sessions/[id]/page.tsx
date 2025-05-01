@@ -1,5 +1,6 @@
 // app/scholars/si-u-sessions/[id]/page.tsx
 "use client";
+import Loading from "@/app/loading";
 import SessionOverview from "@/components/organisms/scholars/siUSessions/details/OverView";
 import SessionCurriculum from "@/components/organisms/scholars/siUSessions/details/SessionCurriculum";
 import SessionHeader from "@/components/organisms/scholars/siUSessions/details/SessionHeader";
@@ -8,7 +9,7 @@ import { getSessionById } from "@/lib/sanity/client";
 import { Session } from "@/types/session";
 import { useQuery } from "@tanstack/react-query";
 
-import { redirect, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function SessionDetailsPage() {
   const { id } = useParams();
@@ -23,14 +24,7 @@ export default function SessionDetailsPage() {
     enabled: !!sessionId,
   });
 
-  if (!sessionId) return redirect("/scholars/si-u-sessions");
-
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
+  if (isLoading) return <Loading />;
 
   if (!data || Object.keys(data).length === 0) {
     return <div className="text-center mt-10">Session not found</div>;

@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/app/loading";
 import { SeasonSessionCard } from "@/components/molecules/cards/SeasonSessionCard";
 import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
@@ -14,13 +15,13 @@ export function Sessions() {
     setOpenDropdownId(openDropdownId === id ? null : id);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
 
   const sessionsToShow = activeTab === "upcoming" ? upcoming : previous;
 
   return (
     <>
-      <div className="container mx-auto px-4 py-11">
+      <div className="w-full py-11">
         <h1 className="text-2xl font-medium mb-1 text-black">Sessions</h1>
         <p className="text-[#454545] mb-6 leading-[140%] ">
           Sessions led by experts in the areas of diversity, inclusion, equity
