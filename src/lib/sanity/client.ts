@@ -15,6 +15,7 @@ import {
   sessionQuery,
   sessionSchemaByIdQuery,
   siherGuidesSessionQuery,
+  fixSessionsQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -122,8 +123,14 @@ export async function getIdeaLabSessionById(id: string) {
   if (client) {
     const result = (await client.fetch(ideaLabSessionByIdQuery, { id })) || {};
 
-    console.log("result", result);
     return result;
+  }
+  return {};
+}
+
+export async function getFixSessions() {
+  if (client) {
+    return (await client.fetch(fixSessionsQuery)) || {};
   }
   return {};
 }

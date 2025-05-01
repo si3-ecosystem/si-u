@@ -267,3 +267,35 @@ export const ideaLabSessionByIdQuery = groq`
     body
   }
 `;
+
+export const fixSessionsQuery = groq`
+  *[_type == "fixxSession"]{
+    _id,
+    title,
+    description,
+    banner->{_id, title, image},
+    fixCards[]->{
+      _id,
+      title,
+      description,
+      category->{_id, title, slug},
+      language,
+      date,
+      time,
+      fixImage,
+      guideName,
+      guideImage,
+      videoUrl,
+      body,
+      rsvpChannelLink,
+      googleCalendarUrl,
+      allowCancel,
+      partner->{
+        _id,
+        title,
+        ...,
+        logo
+      },
+    }
+  } | order(fixCards[0].date desc)
+`;

@@ -1,68 +1,22 @@
 "use client";
-// import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
 import { SeasonSessionCard } from "@/components/molecules/cards/SeasonSessionCard";
+import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
+import { useFixSessions } from "@/hooks/useFixSessions";
 import React, { useState } from "react";
 
-const sessions = [
-  {
-    id: "1",
-    title: "Impact Tracking & Measurement",
-    date: "June 20th, 2025",
-    image: "/fixx/Lianna.png",
-    time: "8:30 - 9:30 PM (UTC +4)",
-    guide: "Ali Mastova",
-    language: "English",
-    partner: {
-      name: "UNISWAP",
-      logo: "/uniswap.png",
-    },
-  },
-  {
-    id: "2",
-    title: "Si Her DeFi",
-    date: "June 22, 2025",
-    time: "8:30 - 9:30 PM (UTC +4)",
-    guide: "Ngozi Owanda",
-    language: "Spanish",
-    partner: {
-      name: "Coinbase",
-      logo: "/uniswap.png",
-    },
-  },
-];
-
-// const prevSessionsData = [
-//   {
-//     id: "1",
-//     title: "How to Build A Successful Team with Elena",
-//     description: "karalevythal X Elena",
-//     date: "Co-Founder & DC, Metis",
-//     featured: true,
-//   },
-//   {
-//     id: "2",
-//     title: "How to Build A Successful Team with Elena",
-//     description: "karalevythal X Elena",
-//     date: "Co-Founder & DC, Metis",
-//     featured: false,
-//   },
-//   {
-//     id: "3",
-//     title: "How to Build A Successful Team with Elena",
-//     description: "karalevythal X Elena",
-//     date: "Co-Founder & DC, Metis",
-//     featured: false,
-//   },
-// ];
-
 export function Sessions() {
-  const [activeTab, setActiveTab] = useState("season1");
+  const [activeTab, setActiveTab] = useState("upcoming");
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const { loading, upcoming, previous } = useFixSessions();
 
   const toggleDropdown = (id: string) => {
     setOpenDropdownId(openDropdownId === id ? null : id);
   };
+
+  if (loading) return <div>Loading...</div>;
+
+  const sessionsToShow = activeTab === "upcoming" ? upcoming : previous;
 
   return (
     <>
@@ -75,33 +29,54 @@ export function Sessions() {
 
         <Tabs
           tabs={[
-            { id: "season1", label: "Season 1 Sessions" },
-            { id: "season2", label: "Season 2 Sessions" },
+            { id: "upcoming", label: "Upcoming Sessions" },
+            { id: "previous", label: "Previous Sessions" },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
 
         <div className="mt-6">
-          {activeTab === "season1" ? (
-            <div className="grid gap-7">
-              {sessions.map((session) => (
-                <SeasonSessionCard
-                  key={session.id}
-                  session={session}
-                  openDropdownId={openDropdownId}
-                  toggleDropdown={toggleDropdown}
-                  setOpenDropdownId={setOpenDropdownId}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-8">
-              {/* {prevSessionsData.map((session) => (
-                <PreviousSessionCard key={session.id} session={session} />
-              ))} */}
-            </div>
-          )}
+          <div className="grid gap-7">
+            {sessionsToShow.length === 0 ? (
+              <div className="text-gray-400">No sessions found.</div>
+            ) : (
+              sessionsToShow.map((session) =>
+                activeTab === "upcoming" ? (
+                  <SeasonSessionCard
+                    key={session._id}
+                    session={{
+                      id: session._id,
+                      title: session.title,
+                      date: session.date,
+                      time: session.time,
+                      language: session.language,
+                      image:
+                        session.fixImage?.asset?.url || "/card_placeholder.png",
+                      guide: session.guideName,
+                      partner: {
+                        name: session.category?.title || "",
+                        logo: null,
+                      },
+                    }}
+                    openDropdownId={openDropdownId}
+                    toggleDropdown={toggleDropdown}
+                    setOpenDropdownId={setOpenDropdownId}
+                  />
+                ) : (
+                  <PreviousSessionCard
+                    key={session._id}
+                    session={{
+                      ...session,
+                      description: session.description,
+                      date: session.date,
+                      title: session.title,
+                    }}
+                  />
+                )
+              )
+            )}
+          </div>
         </div>
       </div>
     </>
