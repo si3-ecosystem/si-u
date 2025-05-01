@@ -1,4 +1,4 @@
-import { Community } from "@/components/molecules/cards/collabCard";
+import { Community } from "@/types/community";
 import { useState } from "react";
 
 const communityTypes = [
