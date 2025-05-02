@@ -1,8 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { getCommunityBanner } from "@/lib/sanity/client";
-import { Button } from "@/components/ui/button";
-import { Info } from "lucide-react";
 import Image from "next/image";
 import { urlForImage } from "@/lib/sanity/image";
 
@@ -43,14 +41,14 @@ export function Banner() {
           <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">
             {banner.description || "Explore popular categories"}
           </p>
-          <div className="flex items-center gap-8 z-10 mt-5">
+          {/* <div className="flex items-center gap-8 z-10 mt-5">
             <Button className="rounded-lg " variant={"secondary"}>
               {banner.ctaText || "Add Community"}
             </Button>
             <div className="text-base font-bold leading-6 flex items-center">
               <p>Info</p> <Info className="ml-2" />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

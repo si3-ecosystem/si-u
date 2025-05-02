@@ -59,24 +59,24 @@
 </clipPath><clipPath id="bgblur_2_894_5574_clip_path" transform="translate(-458.695 540.701)"><circle cx="886.995" cy="-112.402" r="424.299"/>
 </clipPath><clipPath id="bgblur_3_894_5574_clip_path" transform="translate(-455.486 598.072)"><circle cx="883.786" cy="-169.773" r="424.299"/>
 </clipPath><linearGradient id="paint0_linear_894_5574" x1="-90.0703" y1="145.558" x2="576.653" y2="631.836" gradientUnits="userSpaceOnUse">
-<stop offset="0.00869483" stop-color="#B3BFFF"/>
-<stop offset="1" stop-color="#FADCD8"/>
+<stop offset="0.00869483" stopColor="#B3BFFF"/>
+<stop offset="1" stopColor="#FADCD8"/>
 </linearGradient>
 <linearGradient id="paint1_linear_894_5574" x1="257.25" y1="-177.442" x2="923.973" y2="308.836" gradientUnits="userSpaceOnUse">
-<stop offset="0.00869483" stop-color="#B3BFFF"/>
-<stop offset="1" stop-color="#FADCD8"/>
+<stop offset="0.00869483" stopColor="#B3BFFF"/>
+<stop offset="1" stopColor="#FADCD8"/>
 </linearGradient>
 <linearGradient id="paint2_linear_894_5574" x1="524.01" y1="179.757" x2="1190.73" y2="666.035" gradientUnits="userSpaceOnUse">
-<stop offset="0.00869483" stop-color="#B3BFFF"/>
-<stop offset="1" stop-color="#FADCD8"/>
+<stop offset="0.00869483" stopColor="#B3BFFF"/>
+<stop offset="1" stopColor="#FADCD8"/>
 </linearGradient>
 <linearGradient id="paint3_linear_894_5574" x1="644.85" y1="259.364" x2="1088.44" y2="583.1" gradientUnits="userSpaceOnUse">
-<stop offset="0.00869483" stop-color="#B3BFFF"/>
-<stop offset="1" stop-color="#FADCD8"/>
+<stop offset="0.00869483" stopColor="#B3BFFF"/>
+<stop offset="1" stopColor="#FADCD8"/>
 </linearGradient>
 <linearGradient id="paint4_linear_894_5574" x1="-100.711" y1="462.768" x2="141.126" y2="639.19" gradientUnits="userSpaceOnUse">
-<stop offset="0.00869483" stop-color="#B3BFFF"/>
-<stop offset="1" stop-color="#FADCD8"/>
+<stop offset="0.00869483" stopColor="#B3BFFF"/>
+<stop offset="1" stopColor="#FADCD8"/>
 </linearGradient>
 <clipPath id="clip0_894_5574">
 <rect y="0.117188" width="1032" height="267" rx="12" fill="white"/>

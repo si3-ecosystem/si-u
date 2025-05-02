@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   Users,
-  BookOpen,
+  // BookOpen,
   Video,
   Brain,
   Share2,
   Settings,
   LogOut,
-  UserSquare2,
+  // UserSquare2,
   Presentation,
   ScrollText,
   Users2,
@@ -52,11 +52,11 @@ const mainMenuItems: MenuItem[] = [
     icon: Users,
     href: "/communities",
   },
-  {
-    title: "Guides",
-    icon: BookOpen,
-    href: "/guides",
-  },
+  // {
+  //   title: "Guides",
+  //   icon: BookOpen,
+  //   href: "/guides",
+  // },
   {
     title: "Diversity Tracker",
     icon: Users2,
@@ -77,11 +77,11 @@ const subMenuGroups: SubMenuGroup[] = [
     title: "SI U SCHOLARS",
     items: [
       { title: "Sessions", icon: Video, href: "/scholars/sessions" },
-      {
-        title: "Web3 Natives",
-        icon: UserSquare2,
-        href: "/web3-natives",
-      },
+      // {
+      //   title: "Web3 Natives",
+      //   icon: UserSquare2,
+      //   href: "/web3-natives",
+      // },
       { title: "Ideas Lab", icon: Brain, href: "/ideas-lab" },
     ],
   },
@@ -96,12 +96,12 @@ const subMenuGroups: SubMenuGroup[] = [
       { title: "FIXX Playbook", icon: ScrollText, href: "/fixx/fixx-playbook" },
     ],
   },
-  {
-    title: "DEAI WEB3 PARTICIPANTS",
-    items: [
-      { title: "DEAI Web3 Sessions", icon: Video, href: "/deai-web3-sessions" },
-    ],
-  },
+  // {
+  //   title: "DEAI WEB3 PARTICIPANTS",
+  //   items: [
+  //     { title: "DEAI Web3 Sessions", icon: Video, href: "/deai-web3-sessions" },
+  //   ],
+  // },
 ];
 
 export function AppSidebar() {

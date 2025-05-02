@@ -17,7 +17,7 @@ export function Banner({ data }: BannerProps) {
 
   return (
     <section className="w-full ">
-      <div className="w-full min-h-[206px] flex relative z-10 rounded-lg">
+      <div className="w-full min-h-[206px] flex relative z-10 rounded-lg px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6">
         {backgroundImage && (
           <Image
             src={backgroundImage}

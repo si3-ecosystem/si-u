@@ -179,12 +179,12 @@ export function ProfileDiamond() {
             y2="22.6805"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0.0251" stop-color="#F93BA9" />
-            <stop offset="0.257" stop-color="#FA6EC3" />
-            <stop offset="0.4941" stop-color="#FB9CD9" />
-            <stop offset="0.7057" stop-color="#FBBDE9" />
-            <stop offset="0.8815" stop-color="#FCD1F3" />
-            <stop offset="1" stop-color="#FCD8F7" />
+            <stop offset="0.0251" stopColor="#F93BA9" />
+            <stop offset="0.257" stopColor="#FA6EC3" />
+            <stop offset="0.4941" stopColor="#FB9CD9" />
+            <stop offset="0.7057" stopColor="#FBBDE9" />
+            <stop offset="0.8815" stopColor="#FCD1F3" />
+            <stop offset="1" stopColor="#FCD8F7" />
           </linearGradient>
           <linearGradient
             id="paint1_linear_894_7448"
@@ -194,8 +194,8 @@ export function ProfileDiamond() {
             y2="29.0297"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#EE0384" />
-            <stop offset="1" stop-color="#DE0F7C" />
+            <stop stopColor="#EE0384" />
+            <stop offset="1" stopColor="#DE0F7C" />
           </linearGradient>
           <linearGradient
             id="paint2_linear_894_7448"
@@ -205,12 +205,12 @@ export function ProfileDiamond() {
             y2="21.5958"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#EE0384" />
-            <stop offset="0.1605" stop-color="#D00469" />
-            <stop offset="0.3302" stop-color="#B90553" />
-            <stop offset="0.5125" stop-color="#A90644" />
-            <stop offset="0.7144" stop-color="#9F063B" />
-            <stop offset="0.9749" stop-color="#9C0638" />
+            <stop stopColor="#EE0384" />
+            <stop offset="0.1605" stopColor="#D00469" />
+            <stop offset="0.3302" stopColor="#B90553" />
+            <stop offset="0.5125" stopColor="#A90644" />
+            <stop offset="0.7144" stopColor="#9F063B" />
+            <stop offset="0.9749" stopColor="#9C0638" />
           </linearGradient>
         </defs>
       </svg>
