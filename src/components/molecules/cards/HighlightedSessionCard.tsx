@@ -11,7 +11,7 @@ interface HighlightedSessionData {
   description: string;
   ctaLink: string;
   progress?: number;
-  status?: string;
+  status?: string | null;
   position?: string;
   community?: string;
   company?: string;

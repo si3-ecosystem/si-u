@@ -23,8 +23,10 @@ interface SessionFilterDropdownProps {
   setGlobalFilter: (value: string) => void;
   selectedCategory: string;
   setSelectedCategory: (value: string) => void;
-  selectedStatus: string;
-  setSelectedStatus: (value: string) => void;
+  selectedStatus: "in_progress" | "completed" | "not_started" | "all" | null;
+  setSelectedStatus: (
+    value: "in_progress" | "completed" | "not_started" | "all" | null
+  ) => void;
   selectedCommunity: string;
   setSelectedCommunity: (value: string) => void;
   dateRange: { start: string | null; end: string | null };
@@ -92,8 +94,8 @@ export function SessionFilterDropdown({
         <div className="space-y-2">
           <Label>Status</Label>
           <DropdownMenuRadioGroup
-            value={selectedStatus}
-            onValueChange={setSelectedStatus}
+            value={selectedStatus ?? undefined}
+            onValueChange={(value) => setSelectedStatus(value as any)}
           >
             {statusOptions.map((option) => (
               <DropdownMenuRadioItem key={option.value} value={option.value}>

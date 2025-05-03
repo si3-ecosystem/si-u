@@ -1,27 +1,26 @@
 "use client";
+import { Banner } from "@/components/organisms/scholars/ideas-lab/Banner";
+import { Highlights } from "@/components/organisms/scholars/ideas-lab/Highlights";
 import { useQuery } from "@tanstack/react-query";
-import { getIdeaLabsSessionData } from "@/lib/sanity/client";
-import { useIdeaLabs } from "@/hooks/useIdeaLabs";
-import type { IdeaLabsSession } from "@/types/idealabs_session";
+import { getScholarsIdeasLabSessionData } from "@/lib/sanity/client";
+import { useScholarsIdeasLab } from "@/hooks/useScholarsIdeasLab";
 import Loading from "@/app/loading";
-import { Banner } from "@/components/organisms/guides/ideas-lab/Banner";
-import { Highlights } from "@/components/organisms/guides/ideas-lab/Highlights";
 
-export default function IdeaLabsPage() {
-  const { data, isLoading, error } = useQuery<IdeaLabsSession>({
-    queryKey: ["idea-labs-session"],
-    queryFn: getIdeaLabsSessionData,
+export default function ScholarsIdeasLabPage() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["scholars-ideas-lab-session"],
+    queryFn: getScholarsIdeasLabSessionData,
   });
 
   const cards = data?.cards || [];
-  const ideaLabs = useIdeaLabs(cards);
+  const ideaLabs = useScholarsIdeasLab(cards);
 
   if (isLoading) return <Loading />;
 
   if (error || !data)
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        Error loading idea labs data.
+        Error loading scholars ideas lab data.
       </div>
     );
 
@@ -29,10 +28,10 @@ export default function IdeaLabsPage() {
     <div className="">
       <Banner data={data.banner ?? {}} />
       <Highlights
-        title={data.title}
-        description={data.description}
+        title={data.title ?? ""}
+        description={data.description ?? ""}
         categories={ideaLabs.categories}
-        activeTab={ideaLabs.activeTab}
+        activeTab={ideaLabs.activeTab ?? ""}
         setActiveTab={ideaLabs.setActiveTab}
         pageRows={ideaLabs.pageRows}
         pageCount={ideaLabs.pageCount}

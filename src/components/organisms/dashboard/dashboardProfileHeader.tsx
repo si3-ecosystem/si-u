@@ -32,7 +32,7 @@ export function DashboardProfileHeader({
   return (
     <div className="flex flex-col justify-between rounded-lg  p-6 min-h-[267px] relative">
       <Image
-        src={"/dashboardbg.svg"}
+        src={"/dashboardbg.png"}
         alt="background"
         fill
         className="w-full absolute inset-0 z-0 object-cover object-center"

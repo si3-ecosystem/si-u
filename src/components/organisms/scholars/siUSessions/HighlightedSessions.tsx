@@ -12,8 +12,10 @@ interface HighlightedSessionsProps {
   setGlobalFilter: (value: string) => void;
   selectedCategory: string;
   setSelectedCategory: (value: string) => void;
-  selectedStatus: string;
-  setSelectedStatus: (value: string) => void;
+  selectedStatus: "in_progress" | "completed" | "not_started" | "all" | null;
+  setSelectedStatus: (
+    value: "in_progress" | "completed" | "not_started" | "all" | null
+  ) => void;
   selectedCommunity: string;
   setSelectedCommunity: (value: string) => void;
   dateRange: { start: string | null; end: string | null };
@@ -65,6 +67,8 @@ export function HighlightedSessions({
         ) : (
           rows.map((row) => {
             const session = row.original;
+
+            console.log("session", session);
 
             return (
               <HighlightedSessionCard

@@ -82,7 +82,7 @@ const subMenuGroups: SubMenuGroup[] = [
       //   icon: UserSquare2,
       //   href: "/web3-natives",
       // },
-      { title: "Ideas Lab", icon: Brain, href: "/ideas-lab" },
+      { title: "Ideas Lab", icon: Brain, href: "/scholars/ideas-lab" },
     ],
   },
   {

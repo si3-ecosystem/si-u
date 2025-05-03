@@ -1,10 +1,21 @@
 import Image from "next/image";
 
-export function HeroSection({ title, description, publishedAt, image }: { title: string; description: string; publishedAt?: string; image?: any }) {
+export function HeroSection({
+  title,
+  description,
+  publishedAt,
+  image,
+}: {
+  title: string;
+  description: string;
+  publishedAt?: string;
+  image?: any;
+}) {
   return (
     <div className="max-w-[886px] mx-auto w-full ">
       <p className="text-brand text-base font-semibold leading-6 text-center mb-3">
-        Published {publishedAt ? new Date(publishedAt).toLocaleDateString() : ""}
+        Published{" "}
+        {publishedAt ? new Date(publishedAt).toLocaleDateString() : ""}
       </p>
       <h1 className="title text-[32px] leading-[120%] uppercase text-black text-center mb-4">
         {title}

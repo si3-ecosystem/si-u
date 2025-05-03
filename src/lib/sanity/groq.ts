@@ -337,3 +337,56 @@ export const allTopicsQuery = groq`
     slug
   }
 `;
+
+export const scholarsIdeasLabSessionQuery = groq`
+  *[_type == "sessionsIdeaLabsSession"][0] {
+    _id,
+    title,
+    description,
+    banner-> {
+      title,
+      description,
+      thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
+    "cards": ideaLabCards[]-> {
+      _id,
+      title,
+      description,
+      date,
+      ideaLabImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      videoUrl,
+      category-> {
+        _id,
+        title,
+        slug
+      },
+      body
+    }
+  }
+`;
+
+export const scholarsIdeasLabCardByIdQuery = groq`
+  *[_type == "sessionsIdeaLabCards" && _id == $id][0]{
+    ...,
+    _id,
+    title,
+    description,
+    publishedAt,
+    date,
+    ideaLabImage,
+    body
+  }
+`;

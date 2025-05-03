@@ -36,9 +36,24 @@ export default function SIUSession() {
     dateRange,
     setDateRange,
     categoryCounts,
-  } = useSessionTable(data || []);
-
-  console.log("data", data);
+  } = useSessionTable(
+    data || [],
+    "all",
+    "all"
+  ) as {
+    rows: any;
+    globalFilter: string;
+    setGlobalFilter: (value: string) => void;
+    selectedCategory: string;
+    setSelectedCategory: (value: string) => void;
+    selectedStatus: "in_progress" | "completed" | "not_started" | "all" | null;
+    setSelectedStatus: (value: "in_progress" | "completed" | "not_started" | "all" | null) => void;
+    selectedCommunity: string;
+    setSelectedCommunity: (value: string) => void;
+    dateRange: { start: string | null; end: string | null };
+    setDateRange: (value: { start: string | null; end: string | null }) => void;
+    categoryCounts: any;
+  };
 
   if (isLoading || isSessionPageLoading) return <Loading />;
 

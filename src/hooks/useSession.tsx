@@ -28,7 +28,7 @@ export function useSessionTable(
     { id: "lastActivity", desc: true },
   ]);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedStatus, setSelectedStatus] = useState(initialStatus);
+  const [selectedStatus, setSelectedStatus] = useState<"in_progress" | "completed" | "not_started" | "all" | null>(initialStatus as any);
   const [selectedCommunity, setSelectedCommunity] = useState("all");
   const [dateRange, setDateRange] = useState<{
     start: string | null;
@@ -43,7 +43,7 @@ export function useSessionTable(
 
     if (selectedCategory !== "all") {
       filteredSessions = filteredSessions.filter(
-        (session) => session.category === selectedCategory
+        (session) => session.topic?.slug?.current === selectedCategory
       );
     }
 
@@ -81,7 +81,7 @@ export function useSessionTable(
         cell: (info) => info.getValue() || "N/A",
       },
       {
-        accessorKey: "category",
+        accessorKey: "topic.title",
         header: "Category",
         cell: (info) => info.getValue(),
       },
@@ -126,7 +126,9 @@ export function useSessionTable(
 
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(
-      new Set(sessions?.map((session) => session.category))
+      new Set(
+        sessions?.map((session) => session.topic?.slug?.current).filter(Boolean)
+      )
     );
     return ["all", ...uniqueCategories];
   }, [sessions]);
@@ -134,7 +136,7 @@ export function useSessionTable(
   const categoryCounts = useMemo(() => {
     const countsMap = sessions.reduce(
       (acc: { [key: string]: number }, session) => {
-        const category = session.category;
+        const category = session.topic?.slug?.current || "Unknown";
         acc[category] = (acc[category] || 0) + 1;
         return acc;
       },

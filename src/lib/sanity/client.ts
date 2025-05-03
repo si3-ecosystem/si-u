@@ -19,6 +19,8 @@ import {
   communitiesQuery,
   COMMUNITY_BANNER_GROQ,
   allTopicsQuery,
+  scholarsIdeasLabSessionQuery,
+  scholarsIdeasLabCardByIdQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -157,4 +159,18 @@ export async function getAllTopics() {
     return (await client.fetch(allTopicsQuery)) || [];
   }
   return [];
+}
+
+export async function getScholarsIdeasLabSessionData() {
+  if (client) {
+    return (await client.fetch(scholarsIdeasLabSessionQuery)) || {};
+  }
+  return {};
+}
+
+export async function getScholarsIdeasLabCardById(id: string) {
+  if (client) {
+    return (await client.fetch(scholarsIdeasLabCardByIdQuery, { id })) || {};
+  }
+  return {};
 }

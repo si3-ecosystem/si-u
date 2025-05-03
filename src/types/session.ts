@@ -31,7 +31,7 @@ export interface Session {
   } | null;
   position: string;
   description: string;
-  category: "blockchain" | "nfts" | "cryptocurrency" | "defi";
+  category: "blockchain" | "nfts" | "cryptocurrency" | "defi" | null;
   topic: Topic | null;
   progress: number;
   overview: string;
@@ -41,7 +41,7 @@ export interface Session {
   }[];
   totalModules: number;
   lastActivity: string | null;
-  status: "in_progress" | "completed" | "not_started";
+  status: "in_progress" | "completed" | "not_started" | null;
   speakerName?: string;
   speakerImage: SanityImage | null;
 }
@@ -56,6 +56,10 @@ export interface Topic {
   description: string;
   categoryKey: string;
   icon: SanityImage;
+  slug?: {
+    current: string;
+    _type?: string;
+  };
 }
 
 export interface SessionBanner {
