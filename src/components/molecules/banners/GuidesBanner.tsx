@@ -1,21 +1,17 @@
 import { urlForImage } from "@/lib/sanity/image";
-import { cn } from "@/lib/utils";
 import { SiherGuidesSession } from "@/types/siherguides/session";
 import Image from "next/image";
 
 type Props = {
   data: SiherGuidesSession;
-  className?: string;
 };
 
-export function GuidesBanner({ data, className }: Props) {
-  const imageurl =
-    data?.banner?.thumbnail && urlForImage(data?.banner?.thumbnail)?.src;
+export function GuidesBanner({ data }: Props) {
   const backgroundImage =
     data?.banner?.background && urlForImage(data?.banner?.background)?.src;
 
   return (
-    <div className="w-full min-h-[206px] flex relative z-10 rounded-lg px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6">
+    <div className="w-full min-h-[306px] md:min-h-[389px] items-center flex px-8 lg:px-[115px] py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
       {backgroundImage && (
         <Image
           src={backgroundImage}
@@ -25,21 +21,12 @@ export function GuidesBanner({ data, className }: Props) {
         />
       )}
       <div className="w-full flex-1 flex flex-col h-full justify-center gap-2 z-10 lg:mt-6">
-        <h2 className="text-xl font-normal text-black font-clesmont uppercase ">
+        <h2 className="text-2xl md:text-[48px] font-normal text-black font-clesmont uppercase leading-normal max-w-[822px] ">
           {data.title || "title"}
         </h2>
-        <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">
+        <p className="text-base md:text-[20px] leading-[140%] text-[#3D3D3D] max-w-[571px]">
           {data.description || "Description"}
         </p>
-      </div>
-      <div className="hidden md:block z-10 lg:pr-14 ">
-        <Image
-          src={imageurl || "/placeholder.png"}
-          alt="placeholder banner"
-          width={400}
-          height={400}
-          className={cn(" w-full max-h-[182px] h-full", className)}
-        />
       </div>
     </div>
   );

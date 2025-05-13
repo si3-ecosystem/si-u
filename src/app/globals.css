@@ -156,5 +156,5 @@ body {
 }
 
 .layout {
-  @apply max-w-[1920px] mx-auto w-full bg-[#f6f6f6] p-6 min-h-screen md:!pr-20;
+  @apply max-w-[1920px] mx-auto !w-full bg-[#f6f6f6]  min-h-screen;
 }

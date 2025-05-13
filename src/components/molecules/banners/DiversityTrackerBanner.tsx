@@ -1,21 +1,17 @@
 import { urlForImage } from "@/lib/sanity/image";
-import { cn } from "@/lib/utils";
 import { DiversityTracker } from "@/types/diversityTracker";
 import Image from "next/image";
 
 type Props = {
   data: DiversityTracker;
-  className?: string;
 };
 
-export function DiversityTrackerBanner({ data, className }: Props) {
-  const imageurl =
-    data.banner?.thumbnail && urlForImage(data.banner?.thumbnail)?.src;
+export function DiversityTrackerBanner({ data }: Props) {
   const backgroundImage =
     data?.banner?.background && urlForImage(data.banner?.background)?.src;
 
   return (
-    <div className="w-full min-h-[206px] flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+    <div className="w-full min-h-[306px] md:min-h-[306px] px-8 lg:px-[115px] lg:min-h-[493px] flex  py-4 relative z-10 rounded-lg">
       {backgroundImage && (
         <Image
           src={backgroundImage}
@@ -24,25 +20,16 @@ export function DiversityTrackerBanner({ data, className }: Props) {
           className="w-full absolute inset-0 z-0  object-cover object-center"
         />
       )}
-      <div className="w-full flex-1 flex flex-col h-full justify-center gap-2 z-10 lg:mt-6">
-        <h2 className="text-xl font-normal text-black font-clesmont uppercase ">
+      <div className="w-full flex-1 flex flex-col h-full justify-center gap-4 z-10 lg:mt-6">
+        <h2 className="text-2xl md:text-[48px] font-normal max-w-[822px] text-black font-clesmont uppercase leading-normal">
           {data.banner.title || "title"}
         </h2>
-        <p className="text-base leading-[140%] text-[#3D3D3D] font-medium max-w-[571px]">
+        <p className="text-base md:text-[20px] leading-[140%] text-[#3D3D3D] max-w-[791px]">
           {data.banner.subTitle || "Description"}
         </p>
-        <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">
+        <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[791px]">
           {data.banner.description || "Description"}
         </p>
-      </div>
-      <div className="hidden md:block z-10 lg:pr-14 ">
-        <Image
-          src={imageurl || "/placeholder.png"}
-          alt="placeholder banner"
-          width={400}
-          height={400}
-          className={cn(" w-full max-h-[182px] h-full", className)}
-        />
       </div>
     </div>
   );

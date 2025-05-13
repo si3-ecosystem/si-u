@@ -48,7 +48,7 @@ export default function DiversityTrackerPage() {
   if (!data) return <div>No data found</div>;
 
   return (
-    <section className="layout flex flex-col gap-7">
+    <section className="layout flex flex-col gap-7 w-full">
       <DiversityTrackerBanner data={data} />
       <div className="bg-white w-full p-4 lg:p-10 rounded-lg flex flex-col gap-2 ">
         {!showChart && (

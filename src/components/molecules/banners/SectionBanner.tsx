@@ -30,8 +30,8 @@ export function SectionBanner({
         fill
         className="w-full absolute inset-0 z-0  object-cover object-center"
       />
-      <div className="w-full flex-1 flex flex-col h-full justify-center gap-2 z-10">
-        <h2 className="text-xl font-normal text-black font-clesmont uppercase ">
+      <div className="w-full flex-1 flex flex-col h-full justify-center gap-4 z-10">
+        <h2 className="text-xl font-normal text-black font-clesmont uppercase leading-normal max-w-[822px] ">
           {data.title || "title"}
         </h2>
         <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">

@@ -27,7 +27,7 @@ export default function CommunityPage() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="py-8 flex flex-col gap-10 lg:gap-11 ">
+    <div className=" flex flex-col gap-10 lg:gap-11 h-full ">
       <Banner />
       <CommunitiesSearchAndFilter
         search={search}
