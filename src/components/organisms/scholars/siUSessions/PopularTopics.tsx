@@ -4,10 +4,10 @@ import Image from "next/image";
 
 export function PopularTopics({
   data,
-  categoryCounts,
-}: {
+}: // categoryCounts,
+{
   data: SessionSchema;
-  categoryCounts: SessionCategoryCount[];
+  categoryCounts?: SessionCategoryCount[];
 }) {
   if (!data) return null;
 
@@ -41,7 +41,7 @@ export function PopularTopics({
                 <h3 className="text-xl font-medium leading-6 text-black">
                   {item.title}
                 </h3>
-                <p className="text-base font-medium opacity-50">
+                {/* <p className="text-base font-medium opacity-50">
                   {(() => {
                     const cat = categoryCounts?.find(
                       (c) => c.category === item.categoryKey
@@ -53,7 +53,7 @@ export function PopularTopics({
                       </span>
                     );
                   })()}
-                </p>
+                </p> */}
               </div>
             </div>
           );
