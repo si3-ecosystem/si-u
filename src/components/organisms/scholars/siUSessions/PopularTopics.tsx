@@ -25,33 +25,36 @@ export function PopularTopics({
           return (
             <div
               key={key}
-              className="flex flex-col gap-3 p-4 max-w-[228px] w-full rounded-lg bg-white"
+              className="flex flex-col max-w-[228px] w-full rounded-lg bg-white overflow-hidden"
             >
               {imageurl && (
-                <Image
-                  src={imageurl}
-                  alt={item.title}
-                  width={32}
-                  height={32}
-                  className="w-8 h-8"
-                />
+                <div className="relative w-full h-20 mb-2 overflow-hidden rounded-md">
+                  <Image
+                    src={imageurl}
+                    alt={item.title}
+                    fill
+                    className="object-cover object-center"
+                  />
+                </div>
               )}
-              <h3 className="text-xl font-medium leading-6 text-black">
-                {item.title}
-              </h3>
-              <p className="text-base font-medium opacity-50">
-                {(() => {
-                  const cat = categoryCounts?.find(
-                    (c) => c.category === item.categoryKey
-                  );
-                  const count = cat ? cat.count : 0;
-                  return (
-                    <span className="ml-2 text-brandGray">
-                      {count.toString().padStart(2, "0")} upcoming sessions
-                    </span>
-                  );
-                })()}
-              </p>
+              <div className="p-4">
+                <h3 className="text-xl font-medium leading-6 text-black">
+                  {item.title}
+                </h3>
+                <p className="text-base font-medium opacity-50">
+                  {(() => {
+                    const cat = categoryCounts?.find(
+                      (c) => c.category === item.categoryKey
+                    );
+                    const count = cat ? cat.count : 0;
+                    return (
+                      <span className=" text-brandGray">
+                        {count.toString().padStart(2, "0")} upcoming sessions
+                      </span>
+                    );
+                  })()}
+                </p>
+              </div>
             </div>
           );
         })}

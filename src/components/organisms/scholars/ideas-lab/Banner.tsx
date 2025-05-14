@@ -15,7 +15,7 @@ export function Banner({ data }: BannerProps) {
 
   return (
     <section className="w-full ">
-      <div className="w-full min-h-[389px] flex items-center relative z-10 rounded-lg px-8 lg:px-[115px] py-4 lg:pb-0 lg:pt-6">
+      <div className="w-full min-h-[204px] md:min-h-[240px] flex items-center relative z-10 rounded-lg px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6">
         {backgroundImage && (
           <Image
             src={backgroundImage}
@@ -24,11 +24,11 @@ export function Banner({ data }: BannerProps) {
             className="w-full absolute inset-0 z-0  object-cover object-center"
           />
         )}
-        <div className="w-full flex-1 flex flex-col h-full justify-center gap-4 z-10">
-          <h2 className="text-2xl md:text-[48px] font-normal text-black font-clesmont uppercase ">
+        <div className="w-full flex-1 flex flex-col h-full justify-center gap-2 z-10">
+          <h2 className="text-2xl font-normal text-black font-clesmont uppercase ">
             {data.title || "title"}
           </h2>
-          <p className="text-base md:text-[20px] leading-[140%] text-[#3D3D3D] max-w-[571px]">
+          <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">
             {data.description || "Description"}
           </p>
         </div>

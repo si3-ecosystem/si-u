@@ -20,7 +20,7 @@ export function SessionBanner({
   const backgroundImage = data?.background && urlForImage(data.background)?.src;
 
   return (
-    <div className="w-full min-h-[306px] md:min-h-[389px] items-center flex px-8 lg:px-[115px] py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+    <div className="w-full min-h-[204px] md:min-h-[240px] items-center flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
       {backgroundImage && (
         <Image
           src={backgroundImage}
@@ -29,11 +29,11 @@ export function SessionBanner({
           className="w-full absolute inset-0 z-0  object-cover object-center"
         />
       )}
-      <div className="w-full flex-1 flex flex-col h-full justify-center gap-4 z-10">
-        <h2 className=" text-2xl md:text-[48px] font-normal text-black font-clesmont uppercase ">
+      <div className="w-full flex-1 flex flex-col h-full justify-center gap-2 z-10">
+        <h2 className=" text-2xl font-normal text-black font-clesmont uppercase ">
           {data.title || "title"}
         </h2>
-        <p className="text-[20px] md:text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">
+        <p className="text-base leading-[140%] text-[#3D3D3D] max-w-[571px]">
           {data.description || "Description"}
         </p>
 
