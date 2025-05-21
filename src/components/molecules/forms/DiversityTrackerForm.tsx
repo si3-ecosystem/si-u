@@ -47,7 +47,7 @@ const formSchema = z.object({
   grant_provider: z.string().optional(),
   grant_round: z.string().optional(),
   suggestions: z.string().optional(),
-  active_grants_participated: z.enum(["yes", "no"]),
+  active_grants_participated: z.enum(["yes", "no"]).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -70,7 +70,7 @@ export function DiversityTrackerForm({ onSuccess }: { onSuccess: () => void }) {
       grant_provider: "",
       grant_round: "",
       suggestions: "",
-      active_grants_participated: "no",
+      active_grants_participated: undefined,
     },
   });
 
