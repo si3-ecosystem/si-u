@@ -27,6 +27,13 @@ export interface GuidesSession {
   rsvpChannelLink?: string;
   googleCalendarUrl?: string;
   allowCancel?: boolean;
+  pdfFile?: {
+    asset: {
+      url: string;
+      _type?: string;
+      _ref?: string;
+    };
+  };
 }
 
 export interface SiherGuidesSession {

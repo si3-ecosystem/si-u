@@ -16,17 +16,12 @@ export function useFixSessions() {
     }))
   );
 
-  const now = new Date("2025-05-01T13:50:46+06:00");
-
-  const upcoming = allCards.filter((card) => {
-    const cardDateTime = card.date ? new Date(card.date) : new Date(0);
-    return cardDateTime > now;
+  // For FIXX, we only show previous sessions (replays)
+  const previousSessions = allCards.sort((a, b) => {
+    const dateA = a.date ? new Date(a.date) : new Date(0);
+    const dateB = b.date ? new Date(b.date) : new Date(0);
+    return dateB.getTime() - dateA.getTime(); // Sort by most recent first
   });
 
-  const previous = allCards.filter((card) => {
-    const cardDateTime = card.date ? new Date(card.date) : new Date(0);
-    return cardDateTime <= now;
-  });
-
-  return { loading, upcoming, previous, sessions };
+  return { loading, sessions: previousSessions };
 }

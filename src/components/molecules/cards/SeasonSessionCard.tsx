@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowDownToLine } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export interface Session {
   id: string;
@@ -11,6 +12,12 @@ export interface Session {
   language: string;
   image?: string;
   guide: string;
+  pdfFile?: {
+    asset: {
+      url: string;
+    };
+  };
+  videoUrl?: string;
   partner: {
     name: string;
     logo: string | null;
@@ -25,6 +32,7 @@ interface SessionCardProps {
 }
 
 export function SeasonSessionCard({ session }: SessionCardProps) {
+  console.log("session", session);
   return (
     <Card className="p-4 w-full">
       <div className="flex flex-col md:flex-row gap-4">
@@ -41,10 +49,31 @@ export function SeasonSessionCard({ session }: SessionCardProps) {
         <div className="flex-1 ">
           <div className="flex items-center justify-between w-full gap-4">
             <h3 className="text-xl font-medium mb-10">{session.title}</h3>
-            <div>
-              <Button className="h-11 bg-black text-white rounded-lg">
-                <ArrowDownToLine /> Download PDF Guide
-              </Button>
+            <div className="flex gap-2">
+              {session?.pdfFile?.asset?.url && (
+                <a
+                  href={session?.pdfFile?.asset?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="inline-block"
+                >
+                  <Button
+                    className="h-11 bg-black text-white rounded-lg"
+                    variant="outline"
+                  >
+                    <ArrowDownToLine className="mr-2" /> Download PDF Guide
+                  </Button>
+                </a>
+              )}
+              <Link href={`/fixx/fixx-sessions/${session.id}`}>
+                <Button
+                  className="h-11 bg-primary text-white rounded-lg"
+                  variant="default"
+                >
+                  Learn More
+                </Button>
+              </Link>
             </div>
           </div>
 

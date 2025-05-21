@@ -269,6 +269,33 @@ export const ideaLabSessionByIdQuery = groq`
   }
 `;
 
+export const fixCardByIdQuery = (id: string) => `
+  *[_type == "fixCards" && _id == "${id}"][0]{
+    _id,
+    title,
+    description,
+    category->{_id, title, slug},
+    language,
+    date,
+    time,
+    fixImage{
+      asset->{url}
+    },
+    guideName,
+    guideImage{
+      asset->{url}
+    },
+    videoUrl,
+    body,
+    rsvpChannelLink,
+    googleCalendarUrl,
+    allowCancel,
+    partner->{_id, title, logo},
+    downloadPdf,
+    pdfFile{asset->{url}},
+  }
+`;
+
 export const fixSessionsQuery = groq`
   *[_type == "fixxSession"]{
     _id,
@@ -276,6 +303,7 @@ export const fixSessionsQuery = groq`
     description,
     banner->{_id, title, image},
     fixCards[]->{
+  pdfFile{asset->{url}},
       _id,
       title,
       description,

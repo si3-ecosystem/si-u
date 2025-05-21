@@ -21,6 +21,7 @@ import {
   allTopicsQuery,
   scholarsIdeasLabSessionQuery,
   scholarsIdeasLabCardByIdQuery,
+  fixCardByIdQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -30,7 +31,7 @@ if (!projectId) {
   );
 }
 
-const client = projectId
+export const client = projectId
   ? createClient({
       projectId,
       dataset,
@@ -173,4 +174,9 @@ export async function getScholarsIdeasLabCardById(id: string) {
     return (await client.fetch(scholarsIdeasLabCardByIdQuery, { id })) || {};
   }
   return {};
+}
+
+export async function getFixCardById(id: string) {
+  if (!client) throw new Error("Sanity client not configured");
+  return client.fetch(fixCardByIdQuery(id));
 }

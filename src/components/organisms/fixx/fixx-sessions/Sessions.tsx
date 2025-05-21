@@ -1,85 +1,56 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+
 "use client";
 import Loading from "@/app/loading";
-import { SeasonSessionCard } from "@/components/molecules/cards/SeasonSessionCard";
 import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
-import { Tabs } from "@/components/molecules/tabs/guideTabs";
 import { useFixSessions } from "@/hooks/useFixSessions";
-import React, { useState } from "react";
+import React from "react";
+
+interface SessionCard {
+  _id: string;
+  title?: string;
+  description?: string;
+  date?: string;
+  pdfFile?: string;
+  banner?: string;
+  sessionTitle?: string;
+  sessionDescription?: string;
+}
 
 export function Sessions() {
-  const [activeTab, setActiveTab] = useState("upcoming");
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const { loading, upcoming, previous } = useFixSessions();
-
-  const toggleDropdown = (id: string) => {
-    setOpenDropdownId(openDropdownId === id ? null : id);
-  };
+  const { loading, sessions } = useFixSessions();
 
   if (loading) return <Loading />;
 
-  const sessionsToShow = activeTab === "upcoming" ? upcoming : previous;
-
   return (
-    <>
-      <div className="w-full py-11">
-        <h1 className="text-2xl font-medium mb-1 text-black">Sessions</h1>
-        <p className="text-[#454545] mb-6 leading-[140%] ">
-          Sessions led by experts in the areas of diversity, inclusion, equity
-          and accessibility.
-        </p>
+    <div className="w-full py-11">
+      <h1 className="text-2xl font-medium mb-1 text-black">{sessions.title}</h1>
+      <p className="text-[#454545] mb-6 leading-[140%]">
+        {sessions.description}
+      </p>
 
-        <Tabs
-          tabs={[
-            { id: "upcoming", label: "Upcoming Sessions" },
-            { id: "previous", label: "Previous Sessions" },
-          ]}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-
-        <div className="mt-6">
-          <div className="grid gap-7">
-            {sessionsToShow.length === 0 ? (
-              <div className="text-gray-400">No sessions found.</div>
-            ) : (
-              sessionsToShow.map((session) =>
-                activeTab === "upcoming" ? (
-                  <SeasonSessionCard
-                    key={session._id}
-                    session={{
-                      id: session._id,
-                      title: session.title,
-                      date: session.date,
-                      time: session.time,
-                      language: session.language,
-                      image:
-                        session.fixImage?.asset?.url || "/card_placeholder.png",
-                      guide: session.guideName,
-                      partner: {
-                        name: session.category?.title || "",
-                        logo: null,
-                      },
-                    }}
-                    openDropdownId={openDropdownId}
-                    toggleDropdown={toggleDropdown}
-                    setOpenDropdownId={setOpenDropdownId}
-                  />
-                ) : (
-                  <PreviousSessionCard
-                    key={session._id}
-                    session={{
-                      ...session,
-                      description: session.description,
-                      date: session.date,
-                      title: session.title,
-                    }}
-                  />
-                )
-              )
-            )}
-          </div>
+      <div className="mt-6">
+        <div className="grid grid-cols-1 @[768px]/layout:grid-cols-2 @[1548px]/layout:grid-cols-3 gap-6">
+          {sessions.length === 0 ? (
+            <div className="text-gray-400">No sessions found.</div>
+          ) : (
+            sessions.map((session: SessionCard) => (
+              <PreviousSessionCard
+                key={session._id}
+                session={{
+                  pdfFile: session.pdfFile,
+                  ...session,
+                  description:
+                    session.sessionDescription || session.description || "",
+                  date: session.date || "",
+                  title: session.title || "",
+                }}
+              />
+            ))
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
