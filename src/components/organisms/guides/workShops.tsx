@@ -1,11 +1,11 @@
 "use client";
-import { PreviousSessionCard } from "@/components/molecules/cards/previousSessionCard";
 import { SessionCard } from "@/components/molecules/cards/sessionCard";
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
 import React, { useState } from "react";
 
 import { useSiherGuidesSessions } from "@/hooks/useSiherGuidesSessions";
 import { GuidesSession } from "@/types/siherguides/session";
+import { PreviousGuidesSessionCard } from "@/components/molecules/cards/PreviousGuidesSession";
 
 interface WorkShopsProps {
   guides: GuidesSession[];
@@ -55,12 +55,15 @@ export default function WorkShops({ guides }: WorkShopsProps) {
               )}
             </div>
           ) : (
-            <div className="flex flex-wrap gap-8">
+            <div className="flex flex-wrap gap-6">
               {previousSessions.length === 0 ? (
                 <div>No previous sessions.</div>
               ) : (
                 previousSessions.map((session) => (
-                  <PreviousSessionCard key={session._id} session={session} />
+                  <PreviousGuidesSessionCard
+                    key={session._id}
+                    session={session}
+                  />
                 ))
               )}
             </div>

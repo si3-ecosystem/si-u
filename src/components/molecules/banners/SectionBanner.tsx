@@ -1,9 +1,11 @@
+import { urlForImage } from "@/lib/sanity/image";
+import { SanityImage } from "@/types/diversityTracker";
 import { Search } from "lucide-react";
 import Image from "next/image";
 
 type Props = {
   data: {
-    background: string;
+    background: SanityImage;
     title: string;
     description: string;
   };
@@ -18,14 +20,18 @@ export function SectionBanner({
   globalFilter,
   setGlobalFilter,
 }: Props) {
+  const backgroundImage =
+    data?.background && urlForImage(data?.background)?.src;
   return (
     <div className="w-full min-h-[204px] md:min-h-[240px] items-center flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
-      <Image
-        src={data.background}
-        alt="background"
-        fill
-        className="w-full absolute inset-0 z-0  object-cover object-center"
-      />
+      {backgroundImage && (
+        <Image
+          src={backgroundImage}
+          alt="background"
+          fill
+          className="w-full absolute inset-0 z-0  object-cover object-center"
+        />
+      )}
       <div className="w-full flex-1 flex flex-col h-full justify-center gap-2 z-10">
         <h2 className="text-xl font-normal text-black font-clesmont uppercase max-w-[571px] ">
           {data.title || "title"}

@@ -26,6 +26,7 @@ export interface GuidesSession {
   featured?: boolean;
   rsvpChannelLink?: string;
   googleCalendarUrl?: string;
+  fixImage?: SanityImage;
   allowCancel?: boolean;
   pdfFile?: {
     asset: {

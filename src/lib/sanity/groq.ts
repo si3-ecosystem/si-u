@@ -301,7 +301,20 @@ export const fixSessionsQuery = groq`
     _id,
     title,
     description,
-    banner->{_id, title, image},
+     banner->{
+      title,
+      description,
+      thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
     fixCards[]->{
   pdfFile{asset->{url}},
       _id,

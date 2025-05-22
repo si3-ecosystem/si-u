@@ -30,17 +30,17 @@ export const kollabs: KollabItem[] = [
     description: "Explore Unlock Protocol",
     imageSrc: "/frame1.png",
   },
-  {
-    title: "Consensus with Coindesk",
-    description: "Attend the crypto most influential event!",
-    imageSrc: "/frame2.png",
-    isEvent: true,
-  },
-  {
-    title: "Open Campus",
-    description: "Start your OC journey",
-    imageSrc: "/frame3.png",
-  },
+  // {
+  //   title: "Consensus with Coindesk",
+  //   description: "Attend the crypto most influential event!",
+  //   imageSrc: "/frame2.png",
+  //   isEvent: true,
+  // },
+  // {
+  //   title: "Open Campus",
+  //   description: "Start your OC journey",
+  //   imageSrc: "/frame3.png",
+  // },
 ];
 
 export const suggestedKollaboards: KollaboardItem[] = [

@@ -16,7 +16,6 @@ import {
   // UserSquare2,
   Presentation,
   ScrollText,
-  Users2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -57,11 +56,11 @@ const mainMenuItems: MenuItem[] = [
   //   icon: BookOpen,
   //   href: "/guides",
   // },
-  {
-    title: "Diversity Tracker",
-    icon: Users2,
-    href: "/diversity-tracker",
-  },
+  // {
+  //   title: "Diversity Tracker",
+  //   icon: Users2,
+  //   href: "/diversity-tracker",
+  // },
 ];
 
 const subMenuGroups: SubMenuGroup[] = [
