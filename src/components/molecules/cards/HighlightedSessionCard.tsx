@@ -35,8 +35,8 @@ export function HighlightedSessionCard({
     : undefined;
 
   return (
-    <Card className=" flex h-full w-full flex-col gap-6 shadow-none border-none  p-5">
-      <div className="overflow-hidden rounded-2xl h-[144px] relative">
+    <Card className=" flex h-full w-full flex-col gap-[22px] shadow-none border-none  p-5">
+      <div className="overflow-hidden rounded-2xl h-[207px] relative">
         <Image
           src={imageUrl || "/icons/jpg/si_her_guides_heroimage.jpg"}
           fill
@@ -51,30 +51,35 @@ export function HighlightedSessionCard({
           )}
         </div>
       </div>
-      <div className="h-full flex flex-col justify-between gap-4 max-h-[220px]">
-        <div className="flex flex-row gap-4">
+      <div className="h-full flex flex-col justify-between gap-9 max-h-[220px]">
+        <div className="flex flex-row gap-5">
           <div className="flex flex-col flex-grow">
-            <div className="flex gap-4 justify-between w-full">
-              <div className="flex flex-col">
-                <h2 className="text-lg font-semibold">{data.title}</h2>
-                {data.community ? (
-                  <p className="text-base font-medium text-brand leading-5 mt-1">
+            <div className="flex gap-5 justify-between w-full">
+              <div className="flex flex-col gap-5">
+                <h2 className="text-2xl font-bold text-[#9F44D3]">
+                  {data.title}
+                </h2>
+                {/* {data.community ? (
+                  <p className="text-base font-semibold text-brand leading-5 mt-1">
                     {data.community}
                   </p>
                 ) : (
-                  <p className="text-base font-medium text-brand leading-5 mt-1">
+                  <p className="text-base font-semibold text-brand leading-5 mt-1">
                     {data.company}
                   </p>
-                )}
+                )} */}
                 {data.speakerName && (
-                  <p className="text-sm text-brandGray leading-5 mt-1">
+                  <p className="text-sm font-semibold text-brandGray leading-5 mt-1">
                     {data.speakerName}
-                    {data.position && `, ${data.position}`}
+                    <span className="text-sm font-normal text-[#00000099]">
+                      {" "}
+                      {data.position && `, ${data.position}`}
+                    </span>
                   </p>
                 )}
               </div>
               {speakerImageUrl && (
-                <div className="w-12 h-12 rounded-full overflow-hidden">
+                <div className="w-[115px] h-auto rounded-full overflow-hidden">
                   <Image
                     src={speakerImageUrl}
                     width={48}
