@@ -16,6 +16,8 @@ export default function SIUSession() {
     refetchOnWindowFocus: false,
   });
 
+  console.log("data", data);
+
   const { data: sessionPageData, isLoading: isSessionPageLoading } =
     useQuery<SessionSchema>({
       queryKey: ["getSessionsPageData"],
@@ -36,24 +38,16 @@ export default function SIUSession() {
     dateRange,
     setDateRange,
     categoryCounts,
-  } = useSessionTable(
-    data || [],
-    "all",
-    "all"
-  ) as {
-    rows: any;
-    globalFilter: string;
-    setGlobalFilter: (value: string) => void;
-    selectedCategory: string;
-    setSelectedCategory: (value: string) => void;
-    selectedStatus: "in_progress" | "completed" | "not_started" | "all" | null;
-    setSelectedStatus: (value: "in_progress" | "completed" | "not_started" | "all" | null) => void;
-    selectedCommunity: string;
-    setSelectedCommunity: (value: string) => void;
-    dateRange: { start: string | null; end: string | null };
-    setDateRange: (value: { start: string | null; end: string | null }) => void;
-    categoryCounts: any;
-  };
+    pageIndex,
+    pageCount,
+    canPreviousPage,
+    canNextPage,
+    previousPage,
+    nextPage,
+    gotoPage,
+  } = useSessionTable(data || [], "all", "all");
+
+  console.log("rows", rows);
 
   if (isLoading || isSessionPageLoading) return <Loading />;
 
@@ -117,6 +111,13 @@ export default function SIUSession() {
         setSelectedCommunity={setSelectedCommunity}
         dateRange={dateRange}
         setDateRange={setDateRange}
+        pageIndex={pageIndex}
+        pageCount={pageCount}
+        canPreviousPage={canPreviousPage}
+        canNextPage={canNextPage}
+        previousPage={previousPage}
+        nextPage={nextPage}
+        gotoPage={gotoPage}
       />
     </div>
   );

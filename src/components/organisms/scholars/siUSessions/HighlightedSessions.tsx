@@ -20,6 +20,13 @@ interface HighlightedSessionsProps {
   setSelectedCommunity: (value: string) => void;
   dateRange: { start: string | null; end: string | null };
   setDateRange: (value: { start: string | null; end: string | null }) => void;
+  pageIndex: number;
+  pageCount: number;
+  canPreviousPage: boolean;
+  canNextPage: boolean;
+  previousPage: () => void;
+  nextPage: () => void;
+  gotoPage: (page: number) => void;
 }
 
 export function HighlightedSessions({
@@ -36,6 +43,13 @@ export function HighlightedSessions({
   setSelectedCommunity,
   dateRange,
   setDateRange,
+  pageIndex,
+  pageCount,
+  canPreviousPage,
+  canNextPage,
+  previousPage,
+  nextPage,
+  gotoPage,
 }: HighlightedSessionsProps) {
   return (
     <div>
@@ -68,8 +82,6 @@ export function HighlightedSessions({
           rows.map((row) => {
             const session = row.original;
 
-            console.log("session", session);
-
             return (
               <HighlightedSessionCard
                 key={session._id}
@@ -97,6 +109,71 @@ export function HighlightedSessions({
           })
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {pageCount > 1 && (
+        <div className="flex items-center max-w-[400px] mx-auto w-full justify-between mt-8 gap-3">
+          <button
+            onClick={() => gotoPage(0)}
+            disabled={!canPreviousPage}
+            className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            First
+          </button>
+          <div className="flex items-center gap-2 ">
+            <button
+              onClick={previousPage}
+              disabled={!canPreviousPage}
+              className="px-3 py-1 rounded-md border border-gray-300 max-sm:hidden disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+
+            {Array.from({ length: Math.min(5, pageCount) }, (_, i) => {
+              // Show first page, last page, and pages around current page
+              let pageNumber: number;
+              if (pageCount <= 5) {
+                pageNumber = i;
+              } else if (pageIndex < 3) {
+                pageNumber = i; // First few pages
+              } else if (pageIndex > pageCount - 4) {
+                pageNumber = pageCount - 5 + i; // Last few pages
+              } else {
+                pageNumber = pageIndex - 2 + i; // Middle pages
+              }
+
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => gotoPage(pageNumber)}
+                  className={`w-9 h-9 rounded-md ${
+                    pageIndex === pageNumber
+                      ? "bg-brand text-white"
+                      : "border border-gray-300 hover:bg-gray-100"
+                  }`}
+                >
+                  {pageNumber + 1}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={nextPage}
+              disabled={!canNextPage}
+              className="px-3 py-1 rounded-md border max-sm:hidden border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+          <button
+            onClick={() => gotoPage(pageCount - 1)}
+            disabled={!canNextPage}
+            className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Last
+          </button>
+        </div>
+      )}
     </div>
   );
 }

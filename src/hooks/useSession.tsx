@@ -17,18 +17,49 @@ interface CategoryCount {
   count: number;
 }
 
+interface UseSessionTableReturn {
+  rows: any[];
+  globalFilter: string;
+  setGlobalFilter: (value: string) => void;
+  pageIndex: number;
+  pageCount: number;
+  canPreviousPage: boolean;
+  canNextPage: boolean;
+  previousPage: () => void;
+  nextPage: () => void;
+  gotoPage: (page: number) => void;
+  selectedCategory: string;
+  setSelectedCategory: (value: string) => void;
+  selectedStatus: "in_progress" | "completed" | "not_started" | "all" | null;
+  setSelectedStatus: (
+    value: "in_progress" | "completed" | "not_started" | "all" | null
+  ) => void;
+  selectedCommunity: string;
+  setSelectedCommunity: (value: string) => void;
+  dateRange: { start: string | null; end: string | null };
+  setDateRange: (value: { start: string | null; end: string | null }) => void;
+  sorting: any[];
+  setSorting: (value: any[]) => void;
+  categories: string[];
+  statuses: string[];
+  communities: string[];
+  categoryCounts: Array<{ category: string; count: number }>;
+}
+
 export function useSessionTable(
   sessions: Session[],
   initialCategory: string = "all",
   initialStatus: string = "all"
-) {
+): UseSessionTableReturn {
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([
     { id: "lastActivity", desc: true },
   ]);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedStatus, setSelectedStatus] = useState<"in_progress" | "completed" | "not_started" | "all" | null>(initialStatus as any);
+  const [selectedStatus, setSelectedStatus] = useState<
+    "in_progress" | "completed" | "not_started" | "all" | null
+  >(initialStatus as any);
   const [selectedCommunity, setSelectedCommunity] = useState("all");
   const [dateRange, setDateRange] = useState<{
     start: string | null;
@@ -172,6 +203,10 @@ export function useSessionTable(
     return ["all", ...uniqueCommunities];
   }, [sessions]);
 
+  const gotoPage = (page: number) => {
+    table.setPageIndex(page);
+  };
+
   return {
     rows: table.getRowModel().rows,
     globalFilter,
@@ -182,6 +217,7 @@ export function useSessionTable(
     canNextPage: table.getCanNextPage(),
     previousPage: table.previousPage,
     nextPage: table.nextPage,
+    gotoPage,
     selectedCategory,
     setSelectedCategory,
     selectedStatus,
@@ -196,5 +232,5 @@ export function useSessionTable(
     statuses,
     communities,
     categoryCounts,
-  };
+  } as const;
 }
