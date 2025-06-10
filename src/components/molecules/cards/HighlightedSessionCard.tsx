@@ -69,11 +69,10 @@ export function HighlightedSessionCard({
                   </p>
                 )} */}
                 {data.speakerName && (
-                  <p className="text-sm font-semibold text-brandGray leading-5 mt-1">
-                    {data.speakerName}
+                  <p className="text-sm font-semibold text-brandGray leading-5 mt-1 flex flex-col gap-2">
+                    <span> {data.speakerName}</span>
                     <span className="text-sm font-normal text-[#00000099]">
-                      {" "}
-                      {data.position && `, ${data.position}`}
+                      {data.position && ` ${data.position}`}
                     </span>
                   </p>
                 )}
