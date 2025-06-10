@@ -1,24 +1,26 @@
-import Link from "next/link";
 import { Session } from "@/types/session";
+import { useRouter } from "next/navigation";
 
 interface SessionHeaderProps {
   title: string;
   description: string;
-  community: Session["community"];
+  community?: Session["community"];
 }
 
 export default function SessionHeader({
   title,
   community,
 }: SessionHeaderProps) {
+  const router = useRouter();
+
   return (
     <div className="mb-6">
-      <Link
-        href="/scholars/sessions"
-        className="text-black hover:underline text-sm"
+      <span
+        onClick={() => router.back()}
+        className="text-black hover:underline text-sm cursor-pointer"
       >
         ← Back
-      </Link>
+      </span>
       <h1 className="text-[32px] font-medium text-black mt-4">{title}</h1>
       {community && (
         <p className="text-gray-600 mt-2">

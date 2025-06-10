@@ -101,6 +101,38 @@ export const sessionByIdQuery = groq`
   }
 `;
 
+export const guidesByIdQuery = groq`
+  *[_type == "guidesSession" && _id == $id][0] {
+  ...,
+      _id,
+    title,
+    description,
+    date,
+    time,
+    guideName,
+    guideImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    },
+    language,
+    partner->{
+      _id,
+      name,
+      logo {
+        ...,
+        "blurDataURL": asset->metadata.lqip
+      }
+    },
+    videoUrl,
+    featured,
+    rsvpChannelLink,
+    googleCalendarUrl,
+    allowCancel
+  }
+`;
+
 export const sessionSchemaByIdQuery = groq`
   *[_type == "sessionSchema" ][0] {
     _id,

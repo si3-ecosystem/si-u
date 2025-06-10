@@ -3,6 +3,7 @@ import { urlForImage } from "@/lib/sanity/image";
 import { GuidesSession } from "@/types/siherguides/session";
 import moment from "moment";
 import Image from "next/image";
+import Link from "next/link";
 
 export function PreviousGuidesSessionCard({
   session,
@@ -53,9 +54,11 @@ export function PreviousGuidesSessionCard({
               )}
             </div>
           </div>
-          <button className="w-full py-2 mt-4 text-center border border-gray-300 rounded-md text-sm font-medium hover:bg-black hover:text-white transition-colors">
-            Watch Now
-          </button>
+          <Link href={`/guides/sessions/${session._id}`}>
+            <button className="w-full py-2 mt-4 text-center border border-gray-300 rounded-md text-sm font-medium hover:bg-black hover:text-white transition-colors">
+              Watch Replay
+            </button>
+          </Link>
         </div>
       </Card>
     </>
