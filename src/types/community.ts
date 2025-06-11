@@ -2,6 +2,7 @@ import { SanityImage } from "./diversityTracker";
 
 export interface Community {
   _id: string;
+  linkedXHandle: string;
   published: boolean;
   order: number;
   background: SanityImage;

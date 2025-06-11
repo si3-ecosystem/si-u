@@ -101,7 +101,7 @@ export function CollabCard({ item }: { item: Community }) {
                 </li>
               )}
 
-              {item?.linkedIn && (
+              {item?.linkedXHandle && (
                 <li className="flex items-center gap-2">
                   <LinkedinIcon className="text-brand size-5" />
                   <Link
@@ -109,7 +109,7 @@ export function CollabCard({ item }: { item: Community }) {
                     href={`https://warpcast.com/${item.linkedIn}`}
                     className="text-brand"
                   >
-                    {item.linkedIn}
+                    {item.linkedXHandle}
                   </Link>
                 </li>
               )}
