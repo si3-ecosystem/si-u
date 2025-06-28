@@ -73,11 +73,13 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
 
   return (
     <button
-      className="flex w-full cursor-pointer items-center gap-4 rounded-lg border bg-gray-100 p-2 px-4 py-2 hover:bg-gray-200"
+      className="flex w-full cursor-pointer items-center justify-center gap-4 rounded-lg border bg-gray-100 p-2 px-4 py-2 hover:bg-gray-200"
       onClick={handleClick}
     >
       <Image src={src} alt={alt} width={20} height={20} />
-      <span className="text-base font-semibold">{alt}</span>
+      <span className="text-sm font-medium md:text-base">
+        {connector.id === "walletConnect" ? "Continue With WalletConnect" : alt}
+      </span>
     </button>
   );
 };

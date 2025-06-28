@@ -76,18 +76,25 @@ const EtherMail = () => {
         style.textContent = `
           .ethermail-login-button {
             display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
             width: 100% !important;
             cursor: pointer !important;
-            align-items: center !important;
             border-radius: 0.5rem !important;
             border: 1px solid #f3f4f6 !important;
             background-color: #f3f4f6 !important;
             padding: 0.5rem 1rem !important;
             transition: background-color 0.3s !important;
             color: #000 !important;
-            justify-content: start !important;
-            font-weight: bold !important;
+            font-weight: 500 !important;
             font-size: 1rem !important;
+            margin-left: -1rem !important;
+          }
+
+          @media (max-width: 748px) {
+            .ethermail-login-button {
+              font-size: 0.875rem !important;
+            }
           }
 
           .ethermail-login-button:hover {
@@ -124,7 +131,7 @@ const EtherMail = () => {
         type="wallet"
         permissions="write"
         on-mounted="setStyle"
-        label="Ethermail"
+        label="Continue With Ethermail "
       ></ethermail-login>
     </div>
   );
