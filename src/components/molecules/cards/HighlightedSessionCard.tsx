@@ -35,7 +35,7 @@ export function HighlightedSessionCard({
     : undefined;
 
   return (
-    <Card className=" flex h-full w-full flex-col gap-[22px] shadow-none border-none  p-5">
+    <Card className=" flex h-full w-full flex-col gap-[22px] shadow-none border-none overflow-hidden p-5">
       <div className="overflow-hidden rounded-2xl h-[207px] relative">
         <Image
           src={imageUrl || "/icons/jpg/si_her_guides_heroimage.jpg"}
@@ -51,12 +51,12 @@ export function HighlightedSessionCard({
           )}
         </div>
       </div>
-      <div className="h-full flex flex-col justify-between gap-9 max-h-[220px]">
+      <div className="h-full flex flex-col justify-between gap-9 max-h-[240px]">
         <div className="flex flex-row gap-5">
           <div className="flex flex-col flex-grow">
             <div className="flex gap-5 justify-between w-full">
               <div className="flex flex-col gap-5">
-                <h2 className="text-2xl font-bold text-[#9F44D3]">
+                <h2 className="text-2xl line-clamp-2 font-bold text-[#9F44D3]">
                   {data.title}
                 </h2>
                 {/* {data.community ? (

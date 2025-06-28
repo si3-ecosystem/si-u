@@ -9,9 +9,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function PopularTopics({
   data,
+  setSelectedCategory,
 }: {
   data: SessionSchema;
   categoryCounts?: SessionCategoryCount[];
+  setSelectedCategory: (value: string) => void;
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -19,6 +21,7 @@ export function PopularTopics({
     loop: false,
     dragFree: true,
   });
+
 
   const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
@@ -58,11 +61,14 @@ export function PopularTopics({
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex gap-6">
             {data?.topics?.map((item: Topic, key) => {
+              const value = item.title 
               const imageurl = item.icon && urlForImage(item.icon)?.src;
               return (
                 <div
                   key={key}
                   className="flex-shrink-0 flex flex-col max-w-[228px] w-full rounded-lg bg-white overflow-hidden"
+                  onClick={() => setSelectedCategory(value)}
+                  style={{ cursor: 'pointer' }}
                 >
                   {imageurl && (
                     <div className="relative w-full h-20 mb-2 overflow-hidden rounded-md">

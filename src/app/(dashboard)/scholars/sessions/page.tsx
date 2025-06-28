@@ -1,5 +1,27 @@
 "use client";
 
+const fallbackSessionPageData = {
+  _id: "",
+  title: "",
+  description: "",
+  topics: [],
+  siutitle: "",
+  siudescription: "",
+  siusessions: [],
+  banner: {
+    title: "",
+    description: "",
+    thumbnail: {
+      _type: "image",
+      asset: { _ref: "", _type: "reference" },
+    },
+    background: {
+      _type: "image",
+      asset: { _ref: "", _type: "reference" },
+    },
+  },
+};
+
 import Loading from "@/app/loading";
 import { Banner } from "@/components/organisms/scholars/siUSessions/Banner";
 import { HighlightedSessions } from "@/components/organisms/scholars/siUSessions/HighlightedSessions";
@@ -47,8 +69,6 @@ export default function SIUSession() {
     gotoPage,
   } = useSessionTable(data || [], "all", "all");
 
-  console.log("rows", rows);
-
   if (isLoading || isSessionPageLoading) return <Loading />;
 
   return (
@@ -73,29 +93,8 @@ export default function SIUSession() {
       />
       <PopularTopics
         categoryCounts={categoryCounts}
-        data={
-          sessionPageData ?? {
-            _id: "",
-            title: "",
-            description: "",
-            topics: [],
-            siutitle: "",
-            siudescription: "",
-            siusessions: [],
-            banner: {
-              title: "",
-              description: "",
-              thumbnail: {
-                _type: "image",
-                asset: { _ref: "", _type: "reference" },
-              },
-              background: {
-                _type: "image",
-                asset: { _ref: "", _type: "reference" },
-              },
-            },
-          }
-        }
+        data={sessionPageData ?? fallbackSessionPageData}
+        setSelectedCategory={setSelectedCategory}
       />
       <HighlightedSessions
         title={sessionPageData?.siutitle ?? "Highlighted Sessions"}

@@ -75,7 +75,8 @@ export function useSessionTable(
 
     if (selectedCategory !== "all") {
       filteredSessions = filteredSessions.filter(
-        (session) => session.topic?.slug?.current === selectedCategory
+        (session) =>
+          session.topic?.title?.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
@@ -151,7 +152,7 @@ export function useSessionTable(
     getSortedRowModel: getSortedRowModel(),
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageSize: 12,
       },
     },
   });
