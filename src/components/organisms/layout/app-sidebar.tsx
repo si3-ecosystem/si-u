@@ -69,7 +69,7 @@ const subMenuGroups: SubMenuGroup[] = [
     items: [
       { title: "Sessions", icon: Video, href: "/guides/sessions" },
       { title: "Ideas Lab", icon: Brain, href: "/guides/ideas-lab" },
-      // { title: "Kollaborator", icon: Share2, href: "/guides/kollaborator" },
+      { title: "Go Live (Coming Soon) ", icon: Share2, href: "/#" },
     ],
   },
   {
