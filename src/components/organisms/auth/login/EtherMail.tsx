@@ -82,11 +82,11 @@ const EtherMail = () => {
             cursor: pointer !important;
             border-radius: 0.5rem !important;
             border: 1px solid #f3f4f6 !important;
-            background-color: #f3f4f6 !important;
+            background-color: #fff !important;
             padding: 0.5rem 1rem !important;
             transition: background-color 0.3s !important;
             color: #000 !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
             font-size: 1rem !important;
             margin-left: -1rem !important;
           }
@@ -98,7 +98,7 @@ const EtherMail = () => {
           }
 
           .ethermail-login-button:hover {
-            background-color: #e5e7eb !important;
+            background-color: #f9fafb !important;
           }
 
           .ethermail-login-button img {

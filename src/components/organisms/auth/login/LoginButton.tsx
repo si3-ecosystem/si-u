@@ -16,6 +16,8 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  console.log(connector);
+
   const { connect } = useConnect();
   const { status, address } = useAccount();
 
@@ -57,9 +59,9 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
       case "metaMaskSDK":
         src = "/login/metamask-logo.svg";
         break;
-      // case "coinbaseWallet":
-      //   src = "/login//coinbase-logo.svg";
-      //   break;
+      case "coinbaseWalletSDK":
+        src = "/login/coinbase-logo.svg";
+        break;
       case "walletConnect":
         src = "/login/wallet-connect-logo.svg";
         break;
