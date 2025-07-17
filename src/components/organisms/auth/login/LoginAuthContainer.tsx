@@ -1,0 +1,55 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+
+import LoginFooter from "./LoginFooter";
+
+import Logo from "@/components/atoms/Logo";
+
+const LoginAuthContainer = ({
+  title,
+  description,
+  description2,
+  children,
+}: {
+  title: string;
+  description: string;
+  description2: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <section className="hide-scroll z-50 mx-auto flex max-w-xl flex-col justify-between space-y-6 bg-white px-12 py-12 max-sm:rounded-l-[126px] sm:space-y-8 sm:rounded-t-[172px] sm:pt-14 sm:pb-16 md:min-w-[560px]">
+      <div className="space-y-6 bg-white md:space-y-8">
+        <div className="flex flex-col items-center justify-center gap-5 sm:gap-14">
+          <Link href="/" className="">
+            <Logo
+              src="/login/loginlogo.png"
+              className="h-[70px] w-[70px] sm:h-24 sm:w-24"
+            />
+          </Link>
+
+          <div className="space-y-2.5">
+            <h1 className="self-stretch text-center text-2xl font-medium md:text-[40px]">
+              {title}
+            </h1>
+
+            <p className="text-center text-xs font-medium text-[#00000082] md:text-sm">
+              {description}
+            </p>
+
+            <p className="text-center text-sm font-medium md:text-lg">
+              {description2}
+            </p>
+          </div>
+        </div>
+
+        {children}
+      </div>
+
+      <LoginFooter />
+    </section>
+  );
+};
+
+export default LoginAuthContainer;

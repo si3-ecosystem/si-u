@@ -4,8 +4,7 @@ import LoginMain from "./LoginMain";
 
 const LoginLeft = () => {
   return (
-    <div className="no-scrollbar min-h-screen overflow-y-scroll pt-[65px] pl-6 max-sm:pb-[65px] sm:pt-18 md:pl-[120px]">
-      {/* <RedirectBack /> */}
+    <div className="h-screen absolute justify-center sm:-translate-y-0 sm:bottom-5 sm:left-6 lg:left-32 flex flex-col sm:justify-end">
       <LoginMain />
     </div>
   );

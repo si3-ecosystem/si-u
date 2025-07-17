@@ -77,7 +77,7 @@ export function DiversityTrackerForm({ onSuccess }: { onSuccess: () => void }) {
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/mail/diversity-tracker`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/mail/diversity-tracker`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { FC, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import { Connector, useAccount, useConnect } from "wagmi";
 
 import { setAddress, setConnected } from "@/redux/slice/userSlice";
@@ -15,8 +15,9 @@ interface LoginButtonProps {
 const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { status, address } = useAccount();
+
   const { connect } = useConnect();
+  const { status, address } = useAccount();
 
   useEffect(() => {
     if (status === "connected" && address) {
@@ -77,6 +78,7 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
       onClick={handleClick}
     >
       <Image src={src} alt={alt} width={20} height={20} />
+
       <span className="text-sm font-medium md:text-base">
         {connector.id === "walletConnect" ? "Continue With WalletConnect" : alt}
       </span>

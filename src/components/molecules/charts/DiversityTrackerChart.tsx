@@ -72,7 +72,7 @@ export function DiversityTrackerChart() {
     queryKey: ["diversityTrackerSummary"],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/diversity-tracker/summary`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/diversity-tracker/summary`
       );
       return response.data;
     },
