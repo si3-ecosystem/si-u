@@ -12,7 +12,6 @@ import {
   Brain,
   Share2,
   Settings,
-  LogOut,
   // UserSquare2,
   Presentation,
   ScrollText,
@@ -26,6 +25,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import LogoutButton from "../auth/LogoutButton";
 
 // Define types for menu items
 interface MenuItem {
@@ -85,14 +85,18 @@ const subMenuGroups: SubMenuGroup[] = [
     ],
   },
   {
-    title: "FIXX PARTICIPANTS",
+    title: "Grow3dge",
     items: [
       {
-        title: "FIXX Sessions",
+        title: "Grow3dge Sessions",
         icon: Presentation,
-        href: "/fixx/fixx-sessions",
+        href: "/grow3dge/grow3dge-sessions",
       },
-      { title: "FIXX Playbook", icon: ScrollText, href: "/fixx/fixx-playbook" },
+      {
+        title: "Grow3dge Playbook",
+        icon: ScrollText,
+        href: "/grow3dge/grow3dge-playbook",
+      },
     ],
   },
   // {
@@ -199,13 +203,8 @@ export function AppSidebar() {
               Settings
             </Button>
           </Link>
-          <Button
-            variant="ghost"
-            className="w-full justify-start h-11 text-red-500 !px-2.5"
-          >
-            <LogOut className="mr-2 h-6 w-6" />
-            Logout
-          </Button>
+
+          <LogoutButton />
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>

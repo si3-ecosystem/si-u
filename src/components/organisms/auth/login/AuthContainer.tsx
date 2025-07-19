@@ -147,7 +147,7 @@ const AuthContainer = () => {
   const handleAuthSuccess = useCallback((data: AuthData) => {
     // Store token in localStorage
     if (data.token) {
-      localStorage.setItem("si3-token", data.token);
+      localStorage.setItem("si3-jwt", data.token);
     }
   }, []);
 
