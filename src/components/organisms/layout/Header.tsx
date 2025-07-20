@@ -9,6 +9,8 @@ import {
   Notification,
   NotificationPopover,
 } from "@/components/molecules/popovers/NotificationPopover";
+import { useAuth } from "@/hooks/useAuth";
+import { ClientOnly } from "@/components/atoms/ClientOnly";
 
 const profileMenuItems = [
   {
@@ -61,9 +63,14 @@ const notifications: Notification[] = [
 
 export function Header() {
   const { open } = useSidebar();
-  const handleLogout = () => {
-    console.log("Logging out...");
-    // Add your logout logic here
+  const { user, getDisplayName, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const handleMarkAllRead = () => {
@@ -92,13 +99,23 @@ export function Header() {
           onMarkAllRead={handleMarkAllRead}
           onReadAll={handleReadAll}
         />
-        <ProfileDropdown
-          username="annabanana.edu"
-          subtext="annabanana.siher.eth"
-          avatarUrl="/placeholder.png"
-          menuItems={profileMenuItems}
-          onLogout={handleLogout}
-        />
+        <ClientOnly fallback={
+          <ProfileDropdown
+            username="Loading..."
+            subtext="Loading..."
+            avatarUrl="/placeholder.png"
+            menuItems={profileMenuItems}
+            onLogout={handleLogout}
+          />
+        }>
+          <ProfileDropdown
+            username={user?.username || user?.email || getDisplayName()}
+            subtext={user?.website || `${getDisplayName().toLowerCase().replace(' ', '')}.siher.eth`}
+            avatarUrl={user?.avatar || "/placeholder.png"}
+            menuItems={profileMenuItems}
+            onLogout={handleLogout}
+          />
+        </ClientOnly>
       </div>
     </header>
   );

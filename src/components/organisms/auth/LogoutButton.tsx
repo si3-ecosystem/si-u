@@ -11,9 +11,11 @@ import {
   DialogFooter,
   DialogContent,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/useAuth";
 
 const LogoutButton = () => {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -25,31 +27,12 @@ const LogoutButton = () => {
   const handleConfirmLogout = async () => {
     try {
       setIsLoading(true);
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.ok) {
-        setShowConfirmDialog(false);
-
-        router.refresh();
-        router.push("/login");
-      } else {
-        throw new Error("Logout failed");
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
       setShowConfirmDialog(false);
 
-      router.refresh();
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Even if logout fails, redirect to login
       router.push("/login");
     } finally {
       setIsLoading(false);

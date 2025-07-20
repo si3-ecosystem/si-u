@@ -362,7 +362,7 @@ const LoginOTP: React.FC<LoginOTPProps> = ({ email, onBack, onSuccess }) => {
       onSuccess?.(response.data);
 
       setIsRedirecting(true);
-      setTimeout(() => router.push("/"), 1000);
+      setTimeout(() => router.push("/dashboard"), 1000);
     } catch (error: any) {
       setError(error.message || "Invalid verification code. Please try again.");
       resetOtp();

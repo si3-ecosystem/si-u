@@ -112,6 +112,9 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/redux/store";
+import { setUser, setAddress, setConnected } from "@/redux/slice/userSlice";
 
 import EtherMail from "./EtherMail";
 import LoginAuthContainer from "./LoginAuthContainer";
@@ -122,6 +125,8 @@ import LoginMail from "./email/LoginMail";
 import InjectedWallet from "./wallet/InjectedWallet";
 import WalletSignature from "./wallet/WalletSignature";
 
+import type { User } from "@/types/auth";
+
 type AuthState = "initial" | "otp" | "wallet_signature";
 
 interface WalletData {
@@ -131,10 +136,13 @@ interface WalletData {
 
 interface AuthData {
   token?: string;
-  user?: any;
+  user?: User;
 }
 
 const AuthContainer = () => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
   const [userEmail, setUserEmail] = useState<string>("");
   const [authState, setAuthState] = useState<AuthState>("initial");
   const [walletData, setWalletData] = useState<WalletData | null>(null);
@@ -149,7 +157,21 @@ const AuthContainer = () => {
     if (data.token) {
       localStorage.setItem("si3-jwt", data.token);
     }
-  }, []);
+
+    // Store user data in Redux
+    if (data.user) {
+      dispatch(setUser(data.user));
+      dispatch(setConnected(true));
+
+      // If user has wallet address, store it
+      if (data.user.wallet_address) {
+        dispatch(setAddress(data.user.wallet_address));
+      }
+
+      // Redirect to dashboard
+      router.push("/dashboard");
+    }
+  }, [dispatch, router]);
 
   const handleWalletConnected = useCallback((address: string, name: string) => {
     setWalletData({ address, name });

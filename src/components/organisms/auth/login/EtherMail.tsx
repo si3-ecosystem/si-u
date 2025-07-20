@@ -5,13 +5,14 @@
 
 import jwt from "jsonwebtoken";
 import { useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/redux/store";
 import { setAddress, setConnected, setUser } from "@/redux/slice/userSlice";
+import type { User } from "@/types/auth";
 
 const EtherMail = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stylesAppliedRef = useRef(false);
 
   useEffect(() => {
@@ -19,13 +20,34 @@ const EtherMail = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     window.addEventListener("EtherMailSignInOnSuccess", (event: any) => {
       const __loginEvent = event;
-      const ethermailUser = jwt.decode(__loginEvent.detail.token);
+      const ethermailUser = jwt.decode(__loginEvent.detail.token) as any;
 
-      dispatch(setUser(ethermailUser));
+      // Store token in localStorage
+      if (__loginEvent.detail.token) {
+        localStorage.setItem("si3-jwt", __loginEvent.detail.token);
+      }
+
+      // Transform EtherMail user data to our User type
+      const userData: User = {
+        _id: ethermailUser.sub || ethermailUser.id,
+        email: ethermailUser.email,
+        isVerified: true,
+        roles: ethermailUser.roles || ['user'],
+        lastLogin: new Date().toISOString(),
+        createdAt: ethermailUser.iat ? new Date(ethermailUser.iat * 1000).toISOString() : new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        wallet_address: ethermailUser.wallet,
+        newsletter: false,
+        interests: [],
+        personalValues: [],
+        digitalLinks: [],
+      };
+
+      dispatch(setUser(userData));
       dispatch(setConnected(true));
       dispatch(setAddress(ethermailUser.wallet));
 
-      router.replace("/");
+      router.replace("/dashboard");
     });
 
     // Load EtherMail script

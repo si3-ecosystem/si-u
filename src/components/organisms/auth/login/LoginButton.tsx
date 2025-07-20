@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import { FC, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { Connector, useAccount, useConnect } from "wagmi";
-
+import { useAppDispatch } from "@/redux/store";
 import { setAddress, setConnected } from "@/redux/slice/userSlice";
 
 interface LoginButtonProps {
@@ -14,7 +13,7 @@ interface LoginButtonProps {
 
 const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   console.log(connector);
 
@@ -25,14 +24,14 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
     if (status === "connected" && address) {
       dispatch(setConnected(true));
       dispatch(setAddress(address));
-      router.push("/");
+      router.push("/dashboard");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   const handleClick = async () => {
     if (status === "connected") {
-      router.push("/");
+      router.push("/dashboard");
       return;
     }
 

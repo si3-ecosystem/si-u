@@ -7,6 +7,8 @@ import { LearningProgress } from "@/components/organisms/dashboard/dashboardLear
 import { DashboardProfileHeader } from "@/components/organisms/dashboard/dashboardProfileHeader";
 
 import { UpcomingSessions } from "@/components/organisms/dashboard/dashboardUpcomingSessions";
+import { useAuth } from "@/hooks/useAuth";
+import { ClientOnly } from "@/components/atoms/ClientOnly";
 
 const statsData = [
   {
@@ -72,10 +74,12 @@ const sessionsData = [
 ];
 
 export default function DashboardPage() {
+  const { user, getDisplayName } = useAuth();
+
   const profileData = {
-    username: "annabanana.edu",
-    subtext: "annabanana.siher.eth",
-    avatarUrl: "/placeholder.png",
+    username: user?.username || user?.email || `${getDisplayName().toLowerCase().replace(' ', '')}.edu`,
+    subtext: user?.website || `${getDisplayName().toLowerCase().replace(' ', '')}.siher.eth`,
+    avatarUrl: user?.avatar || "/placeholder.png",
   };
 
   const handleShareProfile = () => {
@@ -95,14 +99,25 @@ export default function DashboardPage() {
   };
   return (
     <div className="min-h-screen w-full bg-[#f6f6f6]">
-      <DashboardProfileHeader
-        username={profileData.username}
-        subtext={profileData.subtext}
-        avatarUrl={profileData.avatarUrl}
-        onShare={handleShareProfile}
-        onEdit={handleEditProfile}
-        statsData={statsData}
-      />
+      <ClientOnly fallback={
+        <DashboardProfileHeader
+          username="Loading..."
+          subtext="Loading..."
+          avatarUrl="/placeholder.png"
+          onShare={handleShareProfile}
+          onEdit={handleEditProfile}
+          statsData={statsData}
+        />
+      }>
+        <DashboardProfileHeader
+          username={profileData.username}
+          subtext={profileData.subtext}
+          avatarUrl={profileData.avatarUrl}
+          onShare={handleShareProfile}
+          onEdit={handleEditProfile}
+          statsData={statsData}
+        />
+      </ClientOnly>
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <LearningProgress courses={coursesData} onLearnMore={handleLearnMore} />

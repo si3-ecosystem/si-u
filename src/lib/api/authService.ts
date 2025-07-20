@@ -179,7 +179,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 // Helper to get token from localStorage
 const getStoredToken = (): string | null => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("si3-token");
+    return localStorage.getItem("si3-jwt");
   }
   return null;
 };
@@ -187,14 +187,14 @@ const getStoredToken = (): string | null => {
 // Helper to set token in localStorage
 const setStoredToken = (token: string): void => {
   if (typeof window !== "undefined") {
-    localStorage.setItem("si3-token", token);
+    localStorage.setItem("si3-jwt", token);
   }
 };
 
 // Helper to remove token from localStorage
 const removeStoredToken = (): void => {
   if (typeof window !== "undefined") {
-    localStorage.removeItem("si3-token");
+    localStorage.removeItem("si3-jwt");
   }
 };
 
@@ -386,12 +386,28 @@ class AuthService {
 
   isAuthenticated(): boolean {
     const token = getStoredToken();
-    if (!token) return false;
+    console.log('authService.isAuthenticated: Token check:', {
+      hasToken: !!token,
+      tokenLength: token?.length,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : 'null'
+    });
+
+    if (!token) {
+      console.log('authService.isAuthenticated: No token found');
+      return false;
+    }
 
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.exp > Date.now() / 1000;
-    } catch {
+      const isValid = payload.exp > Date.now() / 1000;
+      console.log('authService.isAuthenticated: Token validation:', {
+        exp: payload.exp,
+        now: Date.now() / 1000,
+        isValid
+      });
+      return isValid;
+    } catch (error) {
+      console.log('authService.isAuthenticated: Token parsing failed:', error);
       removeStoredToken();
       return false;
     }

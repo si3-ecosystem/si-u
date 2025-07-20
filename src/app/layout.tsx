@@ -6,6 +6,7 @@ import "./globals.css";
 import ReduxProvider from "@/providers/ReduxProvider";
 import WalletProvider from "@/providers/WagmiProvider";
 import { TanstackClientProvider } from "@/providers/TanstackClientProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,10 +25,12 @@ export default function RootLayout({
       >
         <WalletProvider>
           <ReduxProvider>
-            <TanstackClientProvider>
-              {children}
-              <Toaster />
-            </TanstackClientProvider>
+            <AuthProvider>
+              <TanstackClientProvider>
+                {children}
+                <Toaster />
+              </TanstackClientProvider>
+            </AuthProvider>
           </ReduxProvider>
         </WalletProvider>
       </body>
