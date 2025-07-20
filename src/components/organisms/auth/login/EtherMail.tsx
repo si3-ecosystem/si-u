@@ -22,9 +22,14 @@ const EtherMail = () => {
       const __loginEvent = event;
       const ethermailUser = jwt.decode(__loginEvent.detail.token) as any;
 
-      // Store token in localStorage
+      // Store token in both localStorage and cookie
       if (__loginEvent.detail.token) {
         localStorage.setItem("si3-jwt", __loginEvent.detail.token);
+
+        // Set client-accessible cookie for immediate auth checks
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+        document.cookie = `si3-jwt=${__loginEvent.detail.token}; expires=${expires.toUTCString()}; path=/; SameSite=Strict`;
       }
 
       // Transform EtherMail user data to our User type

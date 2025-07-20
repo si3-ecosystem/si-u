@@ -33,7 +33,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         dispatch(setLoading(true));
 
         const isAuth = authService.isAuthenticated();
-       
+
         if (typeof window !== 'undefined' && isAuth) {
           try {
             const response = await authService.checkAuth();

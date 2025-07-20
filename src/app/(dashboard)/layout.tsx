@@ -10,7 +10,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthGuard requireAuth={true} requireVerification={true}>
+    <AuthGuard requireAuth={false} requireVerification={false}>
       <SidebarProvider className="flex w-full @container/layout">
         <AppSidebar />
         <SidebarInset className="w-full flex-1 bg-[#f6f6f6]">

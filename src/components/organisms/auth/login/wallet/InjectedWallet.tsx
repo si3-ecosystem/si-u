@@ -370,7 +370,7 @@ function InjectedWallet({ onWalletConnected }: InjectedWalletProps) {
         <div className="flex h-6 w-6 items-center justify-center">
           <WalletIcon />
         </div>
-        <span className="text-base font-semibold">{buttonText}</span>
+        <span className="!text-base !font-bold">{buttonText}</span>
       </Button>
 
       <WalletDialog
