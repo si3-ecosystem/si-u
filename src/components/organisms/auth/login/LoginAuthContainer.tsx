@@ -21,7 +21,7 @@ const LoginAuthContainer: React.FC<LoginAuthContainerProps> = ({
   children,
 }) => {
   return (
-    <section className="hide-scroll z-50 mx-auto flex max-w-xl flex-col justify-between space-y-6 bg-white px-12 py-12 max-sm:rounded-l-[126px] sm:space-y-8 sm:rounded-t-[172px] sm:pt-14 sm:pb-16 md:min-w-[560px]">
+    <section className="hide-scroll z-50 mx-auto flex max-w-xl flex-col justify-between space-y-6 bg-white px-12 py-12 max-sm:rounded-l-[126px] sm:space-y-8 sm:rounded-t-[172px] sm:pt-46 sm:pb-16 md:min-w-[560px]">
       <div className="space-y-6 bg-white md:space-y-8">
         <header className="flex flex-col items-center justify-center gap-5 sm:gap-14">
           <Link href="/" className="" aria-label="Go to homepage">
