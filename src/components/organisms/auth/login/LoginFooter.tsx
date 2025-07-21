@@ -8,7 +8,7 @@ const LoginFooter: React.FC = () => {
       <p className="mx-auto mt-2 max-w-[288px] text-center text-base text-gray-500">
         By continuing, you agree to {"SI<3>'s"}{" "}
         <Link
-          href="/policy/membersPolicy"
+          href="https://www.si3.space/policy/membersPolicy"
           className="font-medium underline hover:text-purple-500 focus:text-purple-500 focus:outline-none"
           aria-label="Read Member Policy"
         >
@@ -16,7 +16,7 @@ const LoginFooter: React.FC = () => {
         </Link>{" "}
         and{" "}
         <Link
-          href="/policy/privacy"
+          href="https://www.si3.space/policy/privacy"
           className="font-medium underline hover:text-purple-500 focus:text-purple-500 focus:outline-none"
           aria-label="Read Privacy Policy"
         >
