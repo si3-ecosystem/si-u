@@ -4,50 +4,66 @@ import { useQuery } from "@tanstack/react-query";
 import { getScholarsIdeasLabCardById } from "@/lib/sanity/client";
 import { PortableText as PortableTextComponent } from "@portabletext/react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import Loading from "@/app/loading";
-import { HeroSection } from "@/components/organisms/scholars/ideas-lab/details/HeroSection";
+import { ContentDetailLayout } from "@/components/templates/ContentDetailLayout";
+import { ContentHero } from "@/components/molecules/content/ContentHero";
 
-export default function ScholarsIdeasLabDetailsPage() {
+import { CommentNotifications } from "@/components/molecules/comment/CommentNotifications";
+
+export default function ScholarsIdeaLabDetail() {
   const params = useParams();
   const id = params?.id as string;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["scholars-ideas-lab-session", id],
+    queryKey: ["scholars-idea-lab-detail", id],
     queryFn: () => getScholarsIdeasLabCardById(id),
     enabled: !!id,
   });
 
-  console.log("data", data);
-
   if (isLoading) return <Loading />;
 
-  if (error || !data)
+  if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        Error loading scholars ideas lab card.
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Content Not Found</h1>
+        <p className="text-gray-600">The requested idea lab content could not be found.</p>
       </div>
     );
+  }
 
   return (
-    <div className="pb-16 pt-4  px-4 lg:px-14">
-      <Link
-        href="/scholars/ideas-lab"
-        className="text-black hover:underline text-sm"
+    <>
+      <ContentDetailLayout
+        backHref="/scholars/ideas-lab"
+        backLabel="← Back to Ideas Lab"
+        contentId={data._id}
+        contentType="scholar_ideas_lab"
+        userRole="scholar" // TODO: Get from auth context
+        enableComments={true}
+        maxWidth="xl"
       >
-        ← Back
-      </Link>
-      <div className=" max-w-4xl mx-auto w-full mt-8 lg:mt-16">
-        <HeroSection
-          title={data.title}
-          description={data.description}
-          publishedAt={data.date}
-          image={data.ideaLabImage}
-        />
-        <div className="max-w-[886px] mx-auto w-full prose prose-p:text-black">
-          <PortableTextComponent value={data.body} />
+        {/* Hero Section */}
+        <div className="p-6 lg:p-8">
+          <ContentHero
+            title={data.title}
+            description={data.description}
+            publishedAt={data.date}
+            category={data.category}
+            image={data.ideaLabImage}
+            variant="default"
+          />
         </div>
-      </div>
-    </div>
+
+        {/* Content Body */}
+        <div className="px-6 lg:px-8 pb-8">
+          <div className="max-w-4xl mx-auto prose prose-lg prose-gray">
+            <PortableTextComponent value={data.body} />
+          </div>
+        </div>
+      </ContentDetailLayout>
+
+      {/* Global notifications */}
+      <CommentNotifications />
+    </>
   );
 }
