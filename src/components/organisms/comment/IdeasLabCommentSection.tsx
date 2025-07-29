@@ -20,6 +20,8 @@ export function IdeasLabCommentSection({
 }: IdeasLabCommentSectionProps) {
   // Get user role from Redux store (you may need to adjust this based on your auth implementation)
   const user = useAppSelector(state => state.user);
+
+  console.log("user",user)
   const userRole: UserRole = user?.roles?.[0] || 'scholar';
 
   // Determine content type based on the current path or user role

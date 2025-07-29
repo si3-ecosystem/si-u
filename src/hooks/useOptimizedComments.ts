@@ -81,7 +81,22 @@ export function useOptimizedComments(options: UseOptimizedCommentsOptions): UseO
 
   // Get current user from Redux store
   const currentUser = useAppSelector(state => state.user);
-  const currentUserId = currentUser?.user?._id || currentUser?.user?.id || 'anonymous';
+
+  // Handle different user data structures
+  const getCurrentUserId = () => {
+    // Check if user data is nested under 'user' property
+    if (currentUser?.user) {
+      return currentUser.user._id || currentUser.user.id;
+    }
+    // Check if user data is directly on the currentUser object
+    if (currentUser?._id || currentUser?.id) {
+      return currentUser._id || currentUser.id;
+    }
+    // Fallback to anonymous
+    return 'anonymous';
+  };
+
+  const currentUserId = getCurrentUserId();
 
   // Query keys
   const commentsQueryKey = OptimizedCommentService.getQueryKeys().threaded(contentId, contentType, page);

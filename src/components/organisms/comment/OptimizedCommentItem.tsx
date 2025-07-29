@@ -73,6 +73,8 @@ export function OptimizedCommentItem({
   isDeleting = false,
   className = '',
 }: OptimizedCommentItemProps) {
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
@@ -102,11 +104,12 @@ export function OptimizedCommentItem({
   const canDelete = useMemo(() => comment.userId === currentUserId && !!onDelete, [comment.userId, currentUserId, onDelete]);
 
   // Handle edit
-  const handleEdit = async () => {
-    if (!onEdit || !editContent.trim()) return;
-    
+  const handleEdit = async (newContent: string) => {
+    if (!onEdit || !newContent.trim()) return;
+
     try {
-      await onEdit(comment._id, editContent.trim());
+      await onEdit(comment._id, newContent.trim());
+      setEditContent(newContent.trim()); // Update local state
       setIsEditing(false);
     } catch (error) {
       console.error('Failed to edit comment:', error);
@@ -146,6 +149,8 @@ export function OptimizedCommentItem({
 
   // Indentation based on depth
   const indentationClass = depth > 0 ? `ml-${Math.min(depth * 4, 16)}` : '';
+
+
 
   return (
     <motion.div
@@ -196,16 +201,16 @@ export function OptimizedCommentItem({
             {/* Actions dropdown - only show for comment author */}
             {(canEdit || canDelete) && (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    disabled={isUpdating || isDeleting}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 opacity-60 hover:opacity-100 transition-opacity"
+                      disabled={isUpdating || isDeleting}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {canEdit && (
                     <DropdownMenuItem
