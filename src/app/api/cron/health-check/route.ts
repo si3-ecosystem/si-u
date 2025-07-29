@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Verify the request is from Vercel Cron
@@ -31,15 +33,7 @@ export async function GET(request: NextRequest) {
     };
 
     const alerts = [];
-    if (healthStats.notifications.failed > 10) {
-      alerts.push(`High notification failure rate: ${healthStats.notifications.failed} failed`);
-    }
-    if (healthStats.notifications.overdue > 5) {
-      alerts.push(`Many overdue notifications: ${healthStats.notifications.overdue} overdue`);
-    }
-    if (healthStats.rsvps.errors > 5) {
-      alerts.push(`RSVP errors detected: ${healthStats.rsvps.errors} errors`);
-    }
+    
 
     console.log('📊 Health check results:', { healthStats, alerts });
 

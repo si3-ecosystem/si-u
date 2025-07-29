@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { RSVPStatusBadge } from '@/components/atoms/rsvp/RSVPStatusBadge';
 import { AdminRSVPData } from '@/types/admin';
 import { Mail, Trash2, Download } from 'lucide-react';

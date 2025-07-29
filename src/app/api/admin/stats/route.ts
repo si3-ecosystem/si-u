@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {  NextResponse } from 'next/server';
 import { AdminDashboardStats, CronJobStatus } from '@/types/admin';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Mock authentication check
     // const user = await getCurrentUser(request);

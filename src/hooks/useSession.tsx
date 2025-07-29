@@ -98,7 +98,6 @@ export function useSessionTable(
     selectedCategory,
     selectedStatus,
     selectedCommunity,
-    dateRange,
   ]);
 
   const columns = useMemo(

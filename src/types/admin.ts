@@ -2,7 +2,7 @@
  * Admin Dashboard Types
  */
 
-import { RSVPStatus, SessionWithRSVP } from './rsvp';
+import { RSVPStatus } from './rsvp';
 
 export interface AdminUser {
   id: string;

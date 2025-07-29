@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { AdminRSVPData, AdminDashboardStats, CronJobStatus, ReminderRequest, BulkAction } from '@/types/admin';
+import { AdminDashboardStats, CronJobStatus, ReminderRequest, BulkAction } from '@/types/admin';
 
 /**
  * Hook for admin dashboard data and operations

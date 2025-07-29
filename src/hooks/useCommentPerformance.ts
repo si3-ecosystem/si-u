@@ -42,10 +42,11 @@ export function useCommentPerformance(
   useEffect(() => {
     if (!enabled) return;
 
-    startTimeRef.current = performance.now();
+    const startTime = performance.now();
+    startTimeRef.current = startTime;
     
     return () => {
-      const loadTime = performance.now() - startTimeRef.current;
+      const loadTime = performance.now() - startTime;
       metricsRef.current.loadTime = loadTime;
       
       if (logToConsole) {

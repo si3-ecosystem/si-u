@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 // import { notificationService } from '../../../services/notificationService';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Verify the request is from Vercel Cron

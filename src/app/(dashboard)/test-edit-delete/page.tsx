@@ -10,7 +10,7 @@ export default function TestEditDeletePage() {
   const dispatch = useAppDispatch();
 
   // Simulate different user scenarios
-  const simulateUser1 = () => {
+  const simulateUser1 = React.useCallback(() => {
     dispatch(setUser({
       user: {
         _id: 'user-1',
@@ -22,9 +22,9 @@ export default function TestEditDeletePage() {
       }
     }));
     dispatch(setConnected(true));
-  };
+  }, [dispatch]);
 
-  const simulateUser2 = () => {
+  const simulateUser2 = React.useCallback(() => {
     dispatch(setUser({
       user: {
         _id: 'user-2', 
@@ -36,9 +36,9 @@ export default function TestEditDeletePage() {
       }
     }));
     dispatch(setConnected(true));
-  };
+  }, [dispatch]);
 
-  const simulateUserWithDifferentStructure = () => {
+  const simulateUserWithDifferentStructure = React.useCallback(() => {
     dispatch(setUser({
       _id: 'user-3',
       id: 'user-3', 
@@ -48,17 +48,17 @@ export default function TestEditDeletePage() {
       lastName: 'Johnson',
     }));
     dispatch(setConnected(true));
-  };
+  }, [dispatch]);
 
-  const clearUser = () => {
+  const clearUser = React.useCallback(() => {
     dispatch(setUser({}));
     dispatch(setConnected(false));
-  };
+  }, [dispatch]);
 
   // Set default user on mount
   useEffect(() => {
     simulateUser1();
-  }, []);
+  }, [simulateUser1]);
 
   return (
     <div className="max-w-4xl mx-auto p-6">

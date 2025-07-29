@@ -55,6 +55,9 @@ export class OptimizedCommentService extends BaseService {
       const response = await this.get<ThreadedCommentsResponse>(
         `/api/comments/content/threaded?${queryString}`
       );
+      if (!response.data) {
+        throw new Error('No data received from server');
+      }
       return response.data;
     } catch (error) {
       this.logError('getThreadedComments', error);
@@ -74,6 +77,9 @@ export class OptimizedCommentService extends BaseService {
       const response = await this.get<CommentStatsResponse>(
         `/api/comments/content/stats?${queryString}`
       );
+      if (!response.data) {
+        throw new Error('No data received from server');
+      }
       return response.data;
     } catch (error) {
       this.logError('getCommentStats', error);
@@ -89,6 +95,9 @@ export class OptimizedCommentService extends BaseService {
     
     try {
       const response = await this.post<{ comment: Comment }>('/api/comments', data);
+      if (!response.data?.comment) {
+        throw new Error('No comment data received from server');
+      }
       return response.data.comment;
     } catch (error) {
       this.logError('createComment', error);
@@ -104,6 +113,9 @@ export class OptimizedCommentService extends BaseService {
     
     try {
       const response = await this.put<{ comment: Comment }>(`/api/comments/${commentId}`, data);
+      if (!response.data?.comment) {
+        throw new Error('No comment data received from server');
+      }
       return response.data.comment;
     } catch (error) {
       this.logError('updateComment', error);
@@ -139,6 +151,9 @@ export class OptimizedCommentService extends BaseService {
         `/api/comments/${commentId}/react`,
         data
       );
+      if (!response.data) {
+        throw new Error('No response data received from server');
+      }
       return response.data;
     } catch (error) {
       this.logError('reactToComment', error);
@@ -154,6 +169,9 @@ export class OptimizedCommentService extends BaseService {
     
     try {
       const response = await this.delete<{ comment: Comment }>(`/api/comments/${commentId}/react`);
+      if (!response.data?.comment) {
+        throw new Error('No comment data received from server');
+      }
       return response.data.comment;
     } catch (error) {
       this.logError('removeReaction', error);
@@ -171,6 +189,9 @@ export class OptimizedCommentService extends BaseService {
       const response = await this.get<{ userReaction: string | null }>(
         `/api/comments/${commentId}/my-reaction`
       );
+      if (!response.data) {
+        throw new Error('No response data received from server');
+      }
       return response.data;
     } catch (error) {
       this.logError('getUserReaction', error);
@@ -186,6 +207,9 @@ export class OptimizedCommentService extends BaseService {
     
     try {
       const response = await this.get<{ comment: Comment }>(`/api/comments/${commentId}`);
+      if (!response.data?.comment) {
+        throw new Error('No comment data received from server');
+      }
       return response.data.comment;
     } catch (error) {
       this.logError('getCommentById', error);

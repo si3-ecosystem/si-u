@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AdminRSVPData } from '@/types/admin';
 
+export const dynamic = 'force-dynamic';
+
 // Mock data - replace with actual database queries
 const generateMockRSVPs = (): AdminRSVPData[] => {
   const statuses = ['attending', 'maybe', 'not_attending'] as const;

@@ -30,9 +30,8 @@ export function useSiherGuidesSessions(
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const now = new Date();
-
   const { upcomingSessions, previousSessions } = useMemo(() => {
+    const now = new Date();
     const upcoming: GuidesSession[] = [];
     const previous: GuidesSession[] = [];
 
@@ -58,7 +57,7 @@ export function useSiherGuidesSessions(
         new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
     );
     return { upcomingSessions: upcoming, previousSessions: previous };
-  }, [guides, now]);
+  }, [guides]);
 
   const columns = useMemo(
     () => [

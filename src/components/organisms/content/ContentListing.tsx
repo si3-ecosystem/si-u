@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Tabs } from '@/components/molecules/tabs/guideTabs';
 import { HighlightCard } from '@/components/molecules/cards/highlightCard';
 import { Button } from '@/components/ui/button';
@@ -108,14 +109,16 @@ export function ContentListing({
           <div className="flex gap-4">
             {/* Thumbnail */}
             <div className="flex-shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={
-                  urlForImage(item.ideaLabImage || item.image)?.src || 
-                  "/card_placeholder.png"
-                }
-                alt={item.title}
-                className="w-full h-full object-cover"
-              />
+              <Image
+              src={
+                urlForImage(item.ideaLabImage || item.image)?.src || 
+                "/card_placeholder.png"
+              }
+              alt={item.title}
+              fill
+              className="object-cover"
+              sizes="96px"
+            />
             </div>
             
             {/* Content */}

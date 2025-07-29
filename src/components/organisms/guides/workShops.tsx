@@ -1,5 +1,5 @@
 "use client";
-import { SessionCard } from "@/components/molecules/cards/sessionCard";
+
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
 import React, { useState } from "react";
 
@@ -16,11 +16,11 @@ interface WorkShopsProps {
 // Helper function to convert GuidesSession to SessionWithRSVP
 const convertToSessionWithRSVP = (session: GuidesSession): SessionWithRSVP => ({
   id: session._id,
-  title: session.title,
-  description: session.description,
-  startTime: session.date,
-  endTime: session.date, // Assuming same date for now
-  location: session.location || 'Online',
+  title: session.title || '',
+  description: session.description || '',
+  startTime: session.date ? new Date(session.date).toISOString() : new Date().toISOString(),
+  endTime: session.date ? new Date(session.date).toISOString() : new Date().toISOString(), // Assuming same date for now
+  location: (session as any).location || 'Online',
   maxAttendees: undefined,
   currentAttendees: 0,
   userRSVP: undefined,
@@ -33,12 +33,10 @@ const convertToSessionWithRSVP = (session: GuidesSession): SessionWithRSVP => ({
 
 export default function WorkShops({ guides }: WorkShopsProps) {
   const [activeTab, setActiveTab] = useState("upcoming");
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+
   const { upcomingSessions, previousSessions } = useSiherGuidesSessions(guides);
 
-  const toggleDropdown = (id: string) => {
-    setOpenDropdownId(openDropdownId === id ? null : id);
-  };
+
 
   return (
     <>

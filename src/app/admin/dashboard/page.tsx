@@ -6,14 +6,13 @@ import { RSVPTable } from '@/components/molecules/admin/RSVPTable';
 import { CronJobStatus } from '@/components/molecules/admin/CronJobStatus';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { AdminRSVPData } from '@/types/admin';
-import { 
-  Users, 
-  Calendar, 
-  Mail, 
-  Activity, 
+import {
+  Calendar,
+  Users,
+  Activity,
+  Mail,
   RefreshCw,
-  Filter,
-  Search
+  Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,12 +41,7 @@ export default function AdminDashboard() {
     search: '',
   });
 
-  // Load RSVPs on component mount
-  useEffect(() => {
-    loadRSVPs();
-  }, []);
-
-  const loadRSVPs = async () => {
+  const loadRSVPs = React.useCallback(async () => {
     setIsLoadingRSVPs(true);
     try {
       const response = await fetchRSVPs({
@@ -63,17 +57,22 @@ export default function AdminDashboard() {
     } finally {
       setIsLoadingRSVPs(false);
     }
-  };
+  }, [filters.status, filters.sessionId, fetchRSVPs]);
+
+  // Load RSVPs on component mount
+  useEffect(() => {
+    loadRSVPs();
+  }, [loadRSVPs]);
 
   const handleSendReminder = (rsvpIds: string[]) => {
     if (rsvpIds.length === 0) return;
     
     // Get unique session IDs from selected RSVPs
-    const sessionIds = [...new Set(
-      rsvps
-        .filter(rsvp => rsvpIds.includes(rsvp.id))
-        .map(rsvp => rsvp.sessionId)
-    )];
+        const sessionIds = Array.from(new Set(
+          rsvps
+            .filter(rsvp => rsvpIds.includes(rsvp.id))
+            .map(rsvp => rsvp.sessionId)
+        ));
 
     // For simplicity, send reminder for the first session
     // In a real app, you might want to group by session or ask user to select
