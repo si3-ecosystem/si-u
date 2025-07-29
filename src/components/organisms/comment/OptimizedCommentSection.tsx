@@ -274,8 +274,7 @@ export function OptimizedCommentSection({
               >
                 <div
                   className={cn(
-                    "bg-white border border-gray-200 rounded-lg",
-                    isSmallMobile ? "p-3" : "p-4"
+                    "bg-white rounded-lg",
                   )}
                 >
                   <OptimizedCommentForm

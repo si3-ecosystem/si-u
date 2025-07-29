@@ -16,7 +16,6 @@ import {
   ChevronDown,
   ChevronRight,
   Loader2,
-  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,16 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+
 import { CommentAvatar } from '@/components/atoms/comment/CommentAvatar';
 import { CommentTimestamp } from '@/components/atoms/comment/CommentTimestamp';
 import { useOptimizedCommentReactions } from '@/hooks/useOptimizedCommentReactions';
@@ -80,7 +70,6 @@ export function OptimizedCommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
 
   const {
@@ -119,7 +108,6 @@ export function OptimizedCommentItem({
     
     try {
       await onDelete(comment._id);
-      setShowDeleteDialog(false);
     } catch (error) {
       console.error('Failed to delete comment:', error);
     }
@@ -160,7 +148,7 @@ export function OptimizedCommentItem({
       )}
     >
       <div className={cn(
-        "flex gap-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow",
+        "flex gap-3 bg-white  rounded-lg hover:shadow-sm transition-shadow",
         isSmallMobile ? "p-2" : "p-4"
       )}>
         <div className="flex-shrink-0">
@@ -169,7 +157,7 @@ export function OptimizedCommentItem({
 
         <div className="flex-1 min-w-0">
           <div className={cn(
-            "flex items-center mb-2",
+            "flex items-center justify-between mb-2",
             isSmallMobile ? "flex-col items-start gap-1" : "gap-2 flex-wrap"
           )}>
             <div className="flex items-center gap-2 flex-wrap">
@@ -189,7 +177,7 @@ export function OptimizedCommentItem({
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center  gap-2">
               <CommentTimestamp
                 createdAt={comment.createdAt}
                 updatedAt={comment.updatedAt}
@@ -222,7 +210,7 @@ export function OptimizedCommentItem({
                     <>
                       {canEdit && <DropdownMenuSeparator />}
                       <DropdownMenuItem
-                        onClick={() => setShowDeleteDialog(true)}
+                        onClick={handleDelete}
                         className="text-red-600 focus:text-red-600"
                         disabled={isUpdating || isDeleting}
                       >
@@ -274,7 +262,7 @@ export function OptimizedCommentItem({
                 className={cn(
                   'transition-colors',
                   isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
-                  hasLiked && 'text-blue-600 bg-blue-50 hover:bg-blue-100',
+                  hasLiked && 'text-blue-600 ',
                   (isReacting || isUpdating || isDeleting) && 'opacity-50 cursor-not-allowed'
                 )}
               >
@@ -294,7 +282,7 @@ export function OptimizedCommentItem({
                 className={cn(
                   'transition-colors',
                   isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
-                  hasDisliked && 'text-red-600 bg-red-50 hover:bg-red-100',
+                  hasDisliked && 'text-red-600 ',
                   (isReacting || isUpdating || isDeleting) && 'opacity-50 cursor-not-allowed'
                 )}
               >
@@ -390,7 +378,7 @@ export function OptimizedCommentItem({
         </div>
       </div>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -405,7 +393,7 @@ export function OptimizedCommentItem({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
               disabled={isDeleting}
             >
               {isDeleting ? (
@@ -419,7 +407,7 @@ export function OptimizedCommentItem({
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </motion.div>
   );
 }
