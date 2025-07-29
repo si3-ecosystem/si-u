@@ -24,6 +24,8 @@ const getImageDimensions = (value) => {
   };
 };
 
+import Image from 'next/image';
+
 const ImageComponent = ({ value }) => {
   const { width, height } = getImageDimensions(value);
   const imageUrl = urlForImage(value);
@@ -33,14 +35,14 @@ const ImageComponent = ({ value }) => {
   }
 
   return (
-    <img
+    <Image
       src={imageUrl.src}
       alt={value.alt || " "}
+      width={width}
+      height={height}
+      className="w-full h-auto rounded-lg"
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
       loading="lazy"
-      style={{
-        display: "inline-block",
-        aspectRatio: width / height,
-      }}
     />
   );
 };

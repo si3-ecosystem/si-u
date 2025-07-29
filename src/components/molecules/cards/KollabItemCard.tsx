@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export interface KollabItemCardProps {
@@ -48,10 +49,12 @@ export function KollabItemCard({
             </div>
           </div>
         ) : (
-          <img
+          <Image
             src={imageSrc}
             alt={title}
-            className="object-cover h-full w-full"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
       </div>

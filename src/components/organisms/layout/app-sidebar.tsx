@@ -7,6 +7,7 @@ import {
   Share2,
   Settings,
   ScrollText,
+  Shield,
   Presentation,
   LayoutDashboard,
 } from "lucide-react";
@@ -50,6 +51,11 @@ const mainMenuItems: MenuItem[] = [
     title: "Communities",
     icon: Users,
     href: "/communities",
+  },
+  {
+    title: "Admin Dashboard",
+    icon: Shield,
+    href: "/admin/dashboard",
   },
   // {
   //   title: "Guides",

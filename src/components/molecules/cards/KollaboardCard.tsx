@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export interface KollaboardCardProps {
@@ -23,10 +24,12 @@ export function KollaboardCard({
   return (
     <div className={`flex items-center justify-between border rounded-lg p-4 bg-white ${className}`}>
       <div className="flex items-center gap-4">
-        <img
+        <Image
           src={imageSrc || "/frame11.png"}
           alt={title}
-          className="object-cover w-12 h-12"
+          width={48}
+          height={48}
+          className="object-cover rounded"
         />
         <div>
           <h3 className="font-bold font-roobert">{title}</h3>
