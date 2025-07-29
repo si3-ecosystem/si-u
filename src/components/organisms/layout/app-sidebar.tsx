@@ -15,6 +15,7 @@ import {
   // UserSquare2,
   Presentation,
   ScrollText,
+  Shield,
 } from "lucide-react";
 import {
   Sidebar,
@@ -50,6 +51,11 @@ const mainMenuItems: MenuItem[] = [
     title: "Communities",
     icon: Users,
     href: "/communities",
+  },
+  {
+    title: "Admin Dashboard",
+    icon: Shield,
+    href: "/admin/dashboard",
   },
   // {
   //   title: "Guides",
