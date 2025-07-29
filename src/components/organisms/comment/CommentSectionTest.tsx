@@ -11,10 +11,6 @@ interface CommentSectionTestProps {
   userRole: 'scholar' | 'guide' | 'admin';
 }
 
-/**
- * Test component for the comment system with mock data
- * This helps test error handling and UI components without needing a real API
- */
 export function CommentSectionTest({ 
   contentId, 
   contentType, 
@@ -23,10 +19,9 @@ export function CommentSectionTest({
   const { setComments, setStats } = useReduxComments(contentId);
 
   useEffect(() => {
-    // Load mock data for testing
     const mockComments = [
       ...generateMockComments(contentId, 3),
-      generateCommentWithMissingUser(contentId), // Test error handling
+      generateCommentWithMissingUser(contentId),
     ];
     
     const mockStats = generateMockCommentStats(contentId);

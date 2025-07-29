@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
-import { CommentItem } from './CommentItem';
-import { CommentForm } from '@/components/molecules/comment/CommentForm';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { useComments } from '@/hooks/useComments';
-import { useReduxComments } from '@/hooks/useReduxComments';
-import { CommentSectionProps } from '@/types/comment';
-import { useAppSelector } from '@/redux/store';
-import { CommentDebugger } from './CommentDebugger';
+import React, { useEffect, useState } from "react";
+import { CommentItem } from "./CommentItem";
+import { CommentForm } from "@/components/molecules/comment/CommentForm";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { useComments } from "@/hooks/useComments";
+import { useReduxComments } from "@/hooks/useReduxComments";
+import { CommentSectionProps } from "@/types/comment";
+import { useAppSelector } from "@/redux/store";
+import { CommentDebugger } from "./CommentDebugger";
 
 export function CommentSection({
   contentId,
@@ -21,10 +21,11 @@ export function CommentSection({
   maxDepth = 3,
   pageSize = 20,
 }: CommentSectionProps) {
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "popular">(
+    "newest"
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Use both hooks - React Query for API operations and Redux for state management
   const {
     comments: apiComments,
     stats: apiStats,
@@ -46,7 +47,6 @@ export function CommentSection({
     autoRefresh,
   });
 
-  // Redux state management
   const {
     comments: reduxComments,
     threadedComments,
@@ -60,64 +60,58 @@ export function CommentSection({
     toggleExpanded,
   } = useReduxComments(contentId, sortBy);
 
-  // Sync API data with Redux - always use fresh API data as source of truth
-  React.useEffect(() => {
+  useEffect(() => {
     if (apiComments.length > 0) {
-      console.log('CommentSection: Syncing API comments to Redux');
       setComments(apiComments);
 
-      // Update stats if available
       if (apiStats) {
         setStats(apiStats);
       }
     }
   }, [apiComments, apiStats, setComments, setStats]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (apiStats) {
       setStats(apiStats);
     }
   }, [apiStats, setStats]);
 
-  // Use Redux data for rendering, API hooks for operations
-  // Always prefer threaded comments when available, fall back to flat comments
-  const comments = threadedComments.length > 0 ? threadedComments :
-                   reduxComments.length > 0 ? reduxComments :
-                   apiComments;
+  const comments =
+    threadedComments.length > 0
+      ? threadedComments
+      : reduxComments.length > 0
+      ? reduxComments
+      : apiComments;
   const stats = commentStats || apiStats;
 
-  // Debug logging (can be removed in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('CommentSection Debug:', {
+  if (process.env.NODE_ENV === "development") {
+    console.log("CommentSection Debug:", {
       reduxCommentsCount: reduxComments.length,
       threadedCommentsCount: threadedComments.length,
       apiCommentsCount: apiComments.length,
       finalCommentsCount: comments.length,
       sortBy,
-      threadedComments: threadedComments.map(c => ({
+      threadedComments: threadedComments.map((c) => ({
         id: c._id,
         content: c.content.substring(0, 30),
         repliesCount: c.replies?.length || 0,
         isReply: c.isReply,
-        parentId: c.parentCommentId
-      }))
+        parentId: c.parentCommentId,
+      })),
     });
   }
 
-  // Use Redux expanded state, default to true if not set
   const isExpanded = isReduxExpanded !== undefined ? isReduxExpanded : true;
 
-  // Get current user ID from Redux auth state
-  const currentUser = useAppSelector(state => state.user);
-  const currentUserId = currentUser?._id || currentUser?.id || '';
+  const currentUser = useAppSelector((state) => state.user);
+  const currentUserId = currentUser?._id || currentUser?.id || "";
 
-  // Check if user can access this content type
   const canAccess = () => {
     const accessMap = {
-      guide_session: ['guide', 'admin'],
-      guide_ideas_lab: ['guide', 'admin'],
-      scholar_session: ['scholar', 'admin'],
-      scholar_ideas_lab: ['scholar', 'admin'],
+      guide_session: ["guide", "admin"],
+      guide_ideas_lab: ["guide", "admin"],
+      scholar_session: ["scholar", "admin"],
+      scholar_ideas_lab: ["scholar", "admin"],
     };
     return accessMap[contentType]?.includes(userRole);
   };
@@ -125,31 +119,35 @@ export function CommentSection({
   const handleCreateComment = async (content: string) => {
     const newComment = await apiCreateComment(content);
     if (newComment) {
-      console.log('handleCreateComment: Comment created successfully, refreshing comments');
-      // Force refresh to get updated data with proper counts from backend
+      console.log(
+        "handleCreateComment: Comment created successfully, refreshing comments"
+      );
       refresh();
     }
   };
 
   const handleReply = async (content: string, parentCommentId: string) => {
     if (isSubmitting) {
-      console.log('handleReply: Already submitting, ignoring duplicate call');
+      console.log("handleReply: Already submitting, ignoring duplicate call");
       return;
     }
 
-    console.log('handleReply: Creating reply', { content, parentCommentId });
+    console.log("handleReply: Creating reply", { content, parentCommentId });
     setIsSubmitting(true);
 
     try {
       const newComment = await apiCreateComment(content, parentCommentId);
       if (newComment) {
-        console.log('handleReply: Reply created successfully, refreshing comments');
-        // Force immediate refresh to get updated data with proper counts from backend
+        console.log(
+          "handleReply: Reply created successfully, refreshing comments"
+        );
         await refresh();
-        console.log('handleReply: Comments refreshed, reply should now be visible');
+        console.log(
+          "handleReply: Comments refreshed, reply should now be visible"
+        );
       }
     } catch (error) {
-      console.error('handleReply: Failed to create reply', error);
+      console.error("handleReply: Failed to create reply", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -199,20 +197,21 @@ export function CommentSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Discussion
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Discussion</h3>
 
             {showStats && stats && (
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
                   <MessageCircle className="h-4 w-4" />
-                  {totalComments} {totalComments === 1 ? 'comment' : 'comments'}
+                  {totalComments} {totalComments === 1 ? "comment" : "comments"}
                 </span>
 
                 {stats.uniqueUserCount > 0 && (
                   <span>
-                    {stats.uniqueUserCount} {stats.uniqueUserCount === 1 ? 'participant' : 'participants'}
+                    {stats.uniqueUserCount}{" "}
+                    {stats.uniqueUserCount === 1
+                      ? "participant"
+                      : "participants"}
                   </span>
                 )}
               </div>
@@ -225,7 +224,9 @@ export function CommentSection({
               <span className="text-sm text-gray-600">Sort by:</span>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'popular')}
+                onChange={(e) =>
+                  setSortBy(e.target.value as "newest" | "oldest" | "popular")
+                }
                 className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="newest">Newest</option>
@@ -277,10 +278,10 @@ export function CommentSection({
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Sort by:</span>
               <div className="flex gap-1">
-                {(['newest', 'oldest', 'popular'] as const).map((option) => (
+                {(["newest", "oldest", "popular"] as const).map((option) => (
                   <Button
                     key={option}
-                    variant={sortBy === option ? 'default' : 'ghost'}
+                    variant={sortBy === option ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setSortBy(option)}
                     className="h-7 px-3 text-xs"
@@ -337,7 +338,7 @@ export function CommentSection({
                         Loading...
                       </>
                     ) : (
-                      'Load More Comments'
+                      "Load More Comments"
                     )}
                   </Button>
                 </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-// Simple fallback for framer-motion
 const motion = {
   div: ({ children, className, ...props }: any) => (
     <div className={className} {...props}>
@@ -53,7 +52,6 @@ export function OptimizedCommentSection({
   autoRefresh = false,
   refreshInterval = 30000,
 }: OptimizedCommentSectionProps) {
-  // Responsive hook
   const { isSmallMobile } = useResponsive();
 
   const [isExpanded, setIsExpanded] = useState(true);
@@ -61,26 +59,20 @@ export function OptimizedCommentSection({
     "newest"
   );
 
-  // Get current user from Redux store
   const currentUser = useAppSelector((state) => state.user);
 
-  // Handle different user data structures
   const getCurrentUserId = () => {
-    // Check if user data is nested under 'user' property
     if (currentUser?.user) {
       return currentUser.user._id || currentUser.user.id;
     }
-    // Check if user data is directly on the currentUser object
     if (currentUser?._id || currentUser?.id) {
       return currentUser._id || currentUser.id;
     }
-    // Fallback to anonymous
     return "anonymous";
   };
 
   const currentUserId = getCurrentUserId();
 
-  // Use optimized comments hook
   const {
     comments,
     stats,
@@ -105,7 +97,6 @@ export function OptimizedCommentSection({
     staleTime: autoRefresh ? refreshInterval : 5 * 60 * 1000,
   });
 
-  // Permission check
   const canAccess = useMemo(() => {
     const accessMap = {
       guide_session: ["guide", "admin"],
@@ -116,7 +107,6 @@ export function OptimizedCommentSection({
     return accessMap[contentType]?.includes(userRole);
   }, [contentType, userRole]);
 
-  // Sorted comments
   const sortedComments = useMemo(() => {
     if (!comments.length) return [];
 
@@ -139,7 +129,6 @@ export function OptimizedCommentSection({
     return sorted;
   }, [comments, sortBy]);
 
-  // Handle comment creation
   const handleCreateComment = async (content: string) => {
     try {
       await createComment({ content });
@@ -148,7 +137,6 @@ export function OptimizedCommentSection({
     }
   };
 
-  // Handle comment reply
   const handleReply = async (content: string, parentCommentId: string) => {
     try {
       await createComment({ content, parentCommentId });
@@ -157,7 +145,6 @@ export function OptimizedCommentSection({
     }
   };
 
-  // Handle comment edit
   const handleEdit = async (commentId: string, content: string) => {
     try {
       await updateComment(commentId, { content });
@@ -166,7 +153,6 @@ export function OptimizedCommentSection({
     }
   };
 
-  // Handle comment delete
   const handleDelete = async (commentId: string) => {
     try {
       await deleteComment(commentId);
@@ -175,7 +161,6 @@ export function OptimizedCommentSection({
     }
   };
 
-  // Permission denied view
   if (!canAccess) {
     return (
       <div
@@ -192,7 +177,6 @@ export function OptimizedCommentSection({
     );
   }
 
-  // Error state
   if (error && !isLoading) {
     return (
       <div className={cn("space-y-4", className)}>
@@ -218,7 +202,6 @@ export function OptimizedCommentSection({
     <>
       <CommentErrorBoundary>
         <div className={cn("space-y-6", className)}>
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -240,7 +223,6 @@ export function OptimizedCommentSection({
             </div>
 
             <div className="flex max-sm:justify-between items-center gap-2">
-              {/* Sort controls */}
               {sortedComments.length > 1 && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Sort by:</span>
@@ -260,7 +242,6 @@ export function OptimizedCommentSection({
                 </div>
               )}
 
-              {/* Collapse/Expand button */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -282,7 +263,6 @@ export function OptimizedCommentSection({
             </div>
           </div>
 
-          {/* Content */}
           <AnimatePresence>
             {isExpanded && (
               <motion.div
@@ -292,7 +272,6 @@ export function OptimizedCommentSection({
                 transition={{ duration: 0.2 }}
                 className={cn("space-y-6", isSmallMobile && "space-y-4")}
               >
-                {/* Comment form */}
                 <div
                   className={cn(
                     "bg-white border border-gray-200 rounded-lg",
@@ -309,7 +288,6 @@ export function OptimizedCommentSection({
 
                 <Separator />
 
-                {/* Comments list */}
                 <div className="space-y-4">
                   {isLoading ? (
                     <div className="flex items-center justify-center py-8">
@@ -350,7 +328,6 @@ export function OptimizedCommentSection({
                   )}
                 </div>
 
-                {/* Load more */}
                 {pagination && pagination.hasNextPage && (
                   <div className="text-center">
                     <Button

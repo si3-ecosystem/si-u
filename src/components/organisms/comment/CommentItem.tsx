@@ -21,9 +21,8 @@ export function CommentItem({
 }: CommentItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [showReplies, setShowReplies] = useState(false); // Collapsed by default
+  const [showReplies, setShowReplies] = useState(false); 
 
-  // Use engagement hook for reactions
   const {
     toggleLike,
     toggleDislike,
@@ -43,7 +42,6 @@ export function CommentItem({
     if (onReply) {
       await onReply(content, comment._id);
       setIsReplying(false);
-      // Auto-expand replies after adding one
       setShowReplies(true);
     }
   };
@@ -73,19 +71,6 @@ export function CommentItem({
   const canEdit = comment.userId === currentUserId && !!onEdit;
   const canDelete = comment.userId === currentUserId && !!onDelete;
 
-  // Debug logging (development only)
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`CommentItem Debug [${comment._id}]:`, {
-      depth,
-      hasReplies: !!comment.replies,
-      repliesCount: comment.replies?.length || 0,
-      replyCount: comment.replyCount,
-      isReply: comment.isReply,
-      parentId: comment.parentCommentId,
-    });
-  }
-
-  // Calculate indentation based on depth
   const getIndentClass = (depth: number) => {
     if (depth === 0) return '';
     if (depth === 1) return 'ml-4';
@@ -104,14 +89,10 @@ export function CommentItem({
         depth > 0 && 'border-l border-gray-200 pl-4'
       )}
     >
-      {/* Main comment */}
       <div className="flex gap-3">
-        {/* Avatar */}
         <CommentAvatar user={comment.user} size="md" />
 
-        {/* Comment content */}
         <div className="flex-1 min-w-0">
-          {/* Header */}
           <div className="flex items-center gap-2 mb-1">
             <span className="font-medium text-sm text-gray-900">
               {comment.user?.firstName && comment.user?.lastName
@@ -122,7 +103,6 @@ export function CommentItem({
               }
             </span>
 
-            {/* User role badge */}
             {comment.user?.roles && comment.user.roles.length > 0 && (
               <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                 {comment.user.roles[0]}
@@ -136,7 +116,6 @@ export function CommentItem({
             />
           </div>
 
-          {/* Comment content or edit form */}
           {isEditing ? (
             <div className="mb-3">
               <CommentForm
@@ -156,7 +135,6 @@ export function CommentItem({
             </div>
           )}
 
-          {/* Actions */}
           {!isEditing && (
             <CommentActions
               comment={comment}
@@ -175,7 +153,6 @@ export function CommentItem({
             />
           )}
 
-          {/* Reply form */}
           {isReplying && (
             <div className="mb-4">
               <CommentForm
@@ -191,10 +168,8 @@ export function CommentItem({
         </div>
       </div>
 
-      {/* Replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4">
-          {/* Toggle replies button */}
           <button
             onClick={() => setShowReplies(!showReplies)}
             className="text-xs text-blue-600 hover:text-blue-800 font-medium mb-2 flex items-center gap-1"
@@ -203,7 +178,6 @@ export function CommentItem({
             {showReplies ? 'Hide' : 'Show'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
           </button>
 
-          {/* Replies list */}
           {showReplies && (
             <div className="space-y-4">
               {comment.replies.map((reply) => (

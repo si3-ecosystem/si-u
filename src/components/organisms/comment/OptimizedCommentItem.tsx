@@ -75,7 +75,6 @@ export function OptimizedCommentItem({
   isDeleting = false,
   className = '',
 }: OptimizedCommentItemProps) {
-  // Responsive hook for mobile detection
   const {  isSmallMobile } = useResponsive();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -84,7 +83,6 @@ export function OptimizedCommentItem({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
 
-  // Use optimized reactions hook
   const {
     isReacting,
     toggleLike,
@@ -97,29 +95,25 @@ export function OptimizedCommentItem({
     contentType,
   });
 
-  // Permission checks
   const canReply = useMemo(() => {
-    // Only allow replies to top-level comments (depth 0)
     return depth === 0 && !!onReply;
   }, [depth, onReply]);
 
   const canEdit = useMemo(() => comment.userId === currentUserId && !!onEdit, [comment.userId, currentUserId, onEdit]);
   const canDelete = useMemo(() => comment.userId === currentUserId && !!onDelete, [comment.userId, currentUserId, onDelete]);
 
-  // Handle edit
   const handleEdit = async (newContent: string) => {
     if (!onEdit || !newContent.trim()) return;
 
     try {
       await onEdit(comment._id, newContent.trim());
-      setEditContent(newContent.trim()); // Update local state
+      setEditContent(newContent.trim()); 
       setIsEditing(false);
     } catch (error) {
       console.error('Failed to edit comment:', error);
     }
   };
 
-  // Handle delete
   const handleDelete = async () => {
     if (!onDelete) return;
     
@@ -131,26 +125,23 @@ export function OptimizedCommentItem({
     }
   };
 
-  // Handle reply
   const handleReply = async (content: string) => {
     if (!onReply) return;
     
     try {
       await onReply(content, comment._id);
       setIsReplying(false);
-      setShowReplies(true); // Auto-expand replies after adding one
+      setShowReplies(true); 
     } catch (error) {
       console.error('Failed to reply to comment:', error);
     }
   };
 
-  // Cancel edit
   const cancelEdit = () => {
     setIsEditing(false);
     setEditContent(comment.content);
   };
 
-  // Indentation based on depth
   const indentationClass = depth > 0 ? `ml-${Math.min(depth * 4, 16)}` : '';
 
 
@@ -168,19 +159,15 @@ export function OptimizedCommentItem({
         className
       )}
     >
-      {/* Main comment */}
       <div className={cn(
         "flex gap-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow",
         isSmallMobile ? "p-2" : "p-4"
       )}>
-        {/* Avatar */}
         <div className="flex-shrink-0">
           <CommentAvatar user={comment.user} size="md" />
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Header */}
           <div className={cn(
             "flex items-center mb-2",
             isSmallMobile ? "flex-col items-start gap-1" : "gap-2 flex-wrap"
@@ -193,7 +180,6 @@ export function OptimizedCommentItem({
                 {getResponsiveDisplayName(comment.user, true)}
               </span>
 
-              {/* User role badge */}
               {comment.user?.roles && comment.user.roles.length > 0 && (
                 <Badge variant="secondary" className={cn(
                   isSmallMobile ? "text-xs px-1 py-0" : "text-xs"
@@ -210,7 +196,6 @@ export function OptimizedCommentItem({
                 isEdited={comment.isEdited}
               />
 
-              {/* Actions dropdown - only show for comment author */}
               {(canEdit || canDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -252,7 +237,6 @@ export function OptimizedCommentItem({
             </div>
           </div>
 
-          {/* Content */}
           {isEditing ? (
             <div className="space-y-3">
               <OptimizedCommentForm
@@ -277,13 +261,11 @@ export function OptimizedCommentItem({
             </div>
           )}
 
-          {/* Actions */}
           {!isEditing && (
             <div className={cn(
               "flex items-center mt-3",
               isSmallMobile ? "gap-2 flex-wrap" : "gap-4"
             )}>
-              {/* Like button */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -304,7 +286,6 @@ export function OptimizedCommentItem({
                 {comment.likeCount > 0 && comment.likeCount}
               </Button>
 
-              {/* Dislike button */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -321,7 +302,6 @@ export function OptimizedCommentItem({
                 {comment.dislikeCount > 0 && comment.dislikeCount}
               </Button>
 
-              {/* Reply button - only show for top-level comments */}
               {canReply && (
                 <Button
                   variant="ghost"
@@ -339,7 +319,6 @@ export function OptimizedCommentItem({
                 </Button>
               )}
 
-              {/* Show replies toggle */}
               {comment.replies && comment.replies.length > 0 && (
                 <Button
                   variant="ghost"
@@ -358,7 +337,6 @@ export function OptimizedCommentItem({
             </div>
           )}
 
-          {/* Reply form */}
           <AnimatePresence>
             {isReplying && (
               <motion.div
@@ -381,7 +359,6 @@ export function OptimizedCommentItem({
             )}
           </AnimatePresence>
 
-          {/* Replies */}
           <AnimatePresence>
             {showReplies && comment.replies && comment.replies.length > 0 && (
               <motion.div
@@ -413,7 +390,6 @@ export function OptimizedCommentItem({
         </div>
       </div>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

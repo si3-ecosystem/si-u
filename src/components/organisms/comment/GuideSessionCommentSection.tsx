@@ -20,10 +20,10 @@ export function GuideSessionCommentSection({
 }: GuideSessionCommentSectionProps) {
   // Get user role from Redux store
   const user = useAppSelector(state => state.user);
-  const userRole: UserRole = user?.roles?.[0] || 'scholar';
+  const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'guide') ? 'guide' : 'scholar' ;
 
-  // Guide sessions use guide_session content type
   const contentType: ContentType = 'guide_session';
+
 
   return (
     <OptimizedCommentSection
@@ -31,7 +31,7 @@ export function GuideSessionCommentSection({
       contentType={contentType}
       userRole={userRole}
       showStats={true}
-      maxDepth={2} // Only allow one level of replies
+      maxDepth={2} 
       pageSize={20}
       autoRefresh={false}
       refreshInterval={30000}

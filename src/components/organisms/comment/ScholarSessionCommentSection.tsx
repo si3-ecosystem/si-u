@@ -10,19 +10,13 @@ interface ScholarSessionCommentSectionProps {
   className?: string;
 }
 
-/**
- * Pre-configured comment section specifically for Scholar Session pages
- * This component handles all the configuration and user context automatically
- */
 export function ScholarSessionCommentSection({ 
   contentId, 
   className 
 }: ScholarSessionCommentSectionProps) {
-  // Get user role from Redux store
   const user = useAppSelector(state => state.user);
-  const userRole: UserRole = user?.roles?.[0] || 'scholar';
+  const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'scholar') ? 'scholar' : 'scholar' ;
 
-  // Scholar sessions use scholar_session content type
   const contentType: ContentType = 'scholar_session';
 
   return (
@@ -31,7 +25,7 @@ export function ScholarSessionCommentSection({
       contentType={contentType}
       userRole={userRole}
       showStats={true}
-      maxDepth={2} // Only allow one level of replies
+      maxDepth={2} 
       pageSize={20}
       autoRefresh={false}
       refreshInterval={30000}
