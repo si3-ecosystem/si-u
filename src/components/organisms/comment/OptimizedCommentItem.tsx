@@ -42,6 +42,8 @@ import { CommentTimestamp } from '@/components/atoms/comment/CommentTimestamp';
 import { useOptimizedCommentReactions } from '@/hooks/useOptimizedCommentReactions';
 import { Comment, ContentType } from '@/types/comment';
 import { cn } from '@/lib/utils';
+import { getResponsiveDisplayName } from '@/lib/utils/username';
+import { useResponsive } from '@/hooks/useResponsive';
 import { OptimizedCommentForm } from './OptimizedCommentForm';
 
 interface OptimizedCommentItemProps {
@@ -73,7 +75,8 @@ export function OptimizedCommentItem({
   isDeleting = false,
   className = '',
 }: OptimizedCommentItemProps) {
-
+  // Responsive hook for mobile detection
+  const {  isSmallMobile } = useResponsive();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
@@ -166,7 +169,10 @@ export function OptimizedCommentItem({
       )}
     >
       {/* Main comment */}
-      <div className="flex gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+      <div className={cn(
+        "flex gap-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow",
+        isSmallMobile ? "p-2" : "p-4"
+      )}>
         {/* Avatar */}
         <div className="flex-shrink-0">
           <CommentAvatar user={comment.user} size="md" />
@@ -175,32 +181,38 @@ export function OptimizedCommentItem({
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-medium text-sm text-gray-900">
-              {comment.user?.firstName && comment.user?.lastName
-                ? `${comment.user.firstName} ${comment.user.lastName}`
-                : comment.user?.email 
-                  ? comment.user.email.split('@')[0]
-                  : 'Anonymous User'
-              }
-            </span>
-            
-            {/* User role badge */}
-            {comment.user?.roles && comment.user.roles.length > 0 && (
-              <Badge variant="secondary" className="text-xs">
-                {comment.user.roles[0]}
-              </Badge>
-            )}
-            
-            <CommentTimestamp
-              createdAt={comment.createdAt}
-              updatedAt={comment.updatedAt}
-              isEdited={comment.isEdited}
-            />
+          <div className={cn(
+            "flex items-center mb-2",
+            isSmallMobile ? "flex-col items-start gap-1" : "gap-2 flex-wrap"
+          )}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={cn(
+                "font-medium text-gray-900 truncate",
+                isSmallMobile ? "text-xs" : "text-sm"
+              )}>
+                {getResponsiveDisplayName(comment.user, true)}
+              </span>
 
-            {/* Actions dropdown - only show for comment author */}
-            {(canEdit || canDelete) && (
-              <DropdownMenu>
+              {/* User role badge */}
+              {comment.user?.roles && comment.user.roles.length > 0 && (
+                <Badge variant="secondary" className={cn(
+                  isSmallMobile ? "text-xs px-1 py-0" : "text-xs"
+                )}>
+                  {comment.user.roles[0]}
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <CommentTimestamp
+                createdAt={comment.createdAt}
+                updatedAt={comment.updatedAt}
+                isEdited={comment.isEdited}
+              />
+
+              {/* Actions dropdown - only show for comment author */}
+              {(canEdit || canDelete) && (
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
@@ -235,8 +247,9 @@ export function OptimizedCommentItem({
                     </>
                   )}
                 </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+                </DropdownMenu>
+              )}
+            </div>
           </div>
 
           {/* Content */}
@@ -255,7 +268,10 @@ export function OptimizedCommentItem({
             </div>
           ) : (
             <div className="prose prose-sm max-w-none">
-              <p className="text-gray-700 whitespace-pre-wrap break-words">
+              <p className={cn(
+                "text-gray-700 whitespace-pre-wrap break-words",
+                isSmallMobile ? "text-sm" : "text-base"
+              )}>
                 {comment.content}
               </p>
             </div>
@@ -263,7 +279,10 @@ export function OptimizedCommentItem({
 
           {/* Actions */}
           {!isEditing && (
-            <div className="flex items-center gap-4 mt-3">
+            <div className={cn(
+              "flex items-center mt-3",
+              isSmallMobile ? "gap-2 flex-wrap" : "gap-4"
+            )}>
               {/* Like button */}
               <Button
                 variant="ghost"
@@ -271,7 +290,8 @@ export function OptimizedCommentItem({
                 onClick={toggleLike}
                 disabled={isReacting || isUpdating || isDeleting}
                 className={cn(
-                  'h-8 px-2 text-xs transition-colors',
+                  'transition-colors',
+                  isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
                   hasLiked && 'text-blue-600 bg-blue-50 hover:bg-blue-100',
                   (isReacting || isUpdating || isDeleting) && 'opacity-50 cursor-not-allowed'
                 )}
@@ -291,7 +311,8 @@ export function OptimizedCommentItem({
                 onClick={toggleDislike}
                 disabled={isReacting || isUpdating || isDeleting}
                 className={cn(
-                  'h-8 px-2 text-xs transition-colors',
+                  'transition-colors',
+                  isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
                   hasDisliked && 'text-red-600 bg-red-50 hover:bg-red-100',
                   (isReacting || isUpdating || isDeleting) && 'opacity-50 cursor-not-allowed'
                 )}
@@ -308,7 +329,8 @@ export function OptimizedCommentItem({
                   onClick={() => setIsReplying(!isReplying)}
                   disabled={isUpdating || isDeleting}
                   className={cn(
-                    'h-8 px-2 text-xs transition-colors',
+                    'transition-colors',
+                    isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
                     (isUpdating || isDeleting) && 'opacity-50 cursor-not-allowed'
                   )}
                 >

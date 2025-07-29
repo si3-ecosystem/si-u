@@ -286,16 +286,15 @@ export function useOptimizedComments(options: UseOptimizedCommentsOptions): UseO
       const previousComments = queryClient.getQueryData<ThreadedCommentsResponse>(commentsQueryKey);
       const previousStats = queryClient.getQueryData<CommentStatsResponse>(statsQueryKey);
       
-      // Optimistically remove comment
+      // Optimistically remove comment (immutable update)
       if (previousComments) {
         const removeCommentFromList = (comments: Comment[]): Comment[] => {
-          return comments.filter(comment => {
-            if (comment._id === commentId) return false;
-            if (comment.replies) {
-              comment.replies = removeCommentFromList(comment.replies);
-            }
-            return true;
-          });
+          return comments
+            .filter(comment => comment._id !== commentId)
+            .map(comment => ({
+              ...comment,
+              replies: comment.replies ? removeCommentFromList(comment.replies) : undefined,
+            }));
         };
 
         queryClient.setQueryData(commentsQueryKey, {
@@ -306,19 +305,28 @@ export function useOptimizedComments(options: UseOptimizedCommentsOptions): UseO
 
       return { previousComments, previousStats };
     },
-    onError: (_error, _variables, context) => {
+    onError: (error, _variables, context) => {
+      console.error('Delete comment error:', error);
+
+      // Restore previous state immutably
       if (context?.previousComments) {
         queryClient.setQueryData(commentsQueryKey, context.previousComments);
       }
       if (context?.previousStats) {
         queryClient.setQueryData(statsQueryKey, context.previousStats);
       }
+
       toast.error('Failed to delete comment. Please try again.');
     },
     onSuccess: () => {
+      // Invalidate queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: commentsQueryKey });
       queryClient.invalidateQueries({ queryKey: statsQueryKey });
       toast.success('Comment deleted successfully!');
+    },
+    onSettled: () => {
+      // Ensure loading states are reset and queries are fresh
+      queryClient.invalidateQueries({ queryKey: commentsQueryKey });
     },
   });
 
