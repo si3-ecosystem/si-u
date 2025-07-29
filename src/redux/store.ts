@@ -5,7 +5,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 import userReducer from "./slice/userSlice";
 import pushReducer from "./slice/pushSlice";
-import modelReducer from "./slice/modelSlice";
+import modalsReducer from "./slice/modalSlice";
 import communityReducer from "./slice/communitySlice";
 import commentReducer from "./slice/commentSlice";
 
@@ -13,7 +13,7 @@ export const store: Store = configureStore({
   reducer: {
     user: userReducer,
     push: pushReducer,
-    model: modelReducer,
+    modals: modalsReducer,
     community: communityReducer,
     comments: commentReducer,
   },

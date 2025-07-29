@@ -1,39 +1,39 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
-  LayoutDashboard,
   Users,
-  // BookOpen,
   Video,
   Brain,
   Share2,
   Settings,
-  // UserSquare2,
-  Presentation,
   ScrollText,
   Shield,
+  Presentation,
+  LayoutDashboard,
 } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+
 import {
   Sidebar,
-  SidebarContent,
+  useSidebar,
+  SidebarRail,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
+  SidebarContent,
   SidebarTrigger,
-  useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+
 import LogoutButton from "../auth/LogoutButton";
 
 // Define types for menu items
 interface MenuItem {
-  title: string;
-  icon: React.ComponentType<{ className?: string }>;
   href: string;
+  title: string;
   badge?: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 interface SubMenuGroup {
@@ -91,7 +91,7 @@ const subMenuGroups: SubMenuGroup[] = [
     ],
   },
   {
-    title: "Grow3dge",
+    title: "GROW3EDGE ACCELERATOR",
     items: [
       {
         title: "Grow3dge Sessions",
