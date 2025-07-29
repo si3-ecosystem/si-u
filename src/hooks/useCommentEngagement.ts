@@ -154,6 +154,7 @@ export function useOptimisticCommentEngagement(options: UseCommentEngagementOpti
     } finally {
       // Clear optimistic state
       setOptimisticReactions(prev => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [commentId]: _removed, ...rest } = prev;
         return rest;
       });
@@ -176,6 +177,7 @@ export function useOptimisticCommentEngagement(options: UseCommentEngagementOpti
     } finally {
       // Clear optimistic state
       setOptimisticReactions(prev => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [commentId]: _, ...rest } = prev;
         return rest;
       });

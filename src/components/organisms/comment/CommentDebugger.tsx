@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { useReduxComments } from '@/hooks/useReduxComments';
 import { useAppSelector } from '@/redux/store';
 import { selectCommentsForContent, selectThreadedCommentsForContent } from '@/redux/selectors/commentSelectors';
 
@@ -28,7 +27,7 @@ export function CommentDebugger({ contentId }: CommentDebuggerProps) {
               ) : (
                 <span className="text-green-600"> Top Level</span>
               )}
-              <span className="text-gray-600"> - "{comment.content.substring(0, 30)}..."</span>
+              <span className="text-gray-600"> - &quot;{comment.content.substring(0, 30)}...&quot;</span>
             </li>
           ))}
         </ul>
@@ -41,13 +40,13 @@ export function CommentDebugger({ contentId }: CommentDebuggerProps) {
             <li key={comment._id}>
               <span className="font-mono">{comment._id}</span> - 
               <span className="text-purple-600"> {comment.replies?.length || 0} replies</span>
-              <span className="text-gray-600"> - "{comment.content.substring(0, 30)}..."</span>
+              <span className="text-gray-600"> - &quot;{comment.content.substring(0, 30)}...&quot;</span>
               {comment.replies && comment.replies.length > 0 && (
                 <ul className="list-disc list-inside ml-4 mt-1">
                   {comment.replies.map(reply => (
                     <li key={reply._id} className="text-blue-600">
                       <span className="font-mono">{reply._id}</span> - 
-                      <span className="text-gray-600">"{reply.content.substring(0, 20)}..."</span>
+                      <span className="text-gray-600">&quot;{reply.content.substring(0, 20)}...&quot;</span>
                     </li>
                   ))}
                 </ul>

@@ -3,6 +3,7 @@
 import Loading from "@/app/loading";
 import SessionOverview from "@/components/organisms/scholars/siUSessions/details/OverView";
 import SessionHeader from "@/components/organisms/scholars/siUSessions/details/SessionHeader";
+import { GuideSessionCommentSection } from "@/components/organisms/comment/GuideSessionCommentSection";
 import { getGuidesById } from "@/lib/sanity/client";
 import { GuidesSession } from "@/types/siherguides/session";
 import { useQuery } from "@tanstack/react-query";
@@ -46,6 +47,14 @@ export default function SessionDetailsPage() {
         )}
 
         <SessionOverview overview={data.description} />
+      </div>
+
+      {/* Comment Section */}
+      <div className="bg-white p-8 mt-6 rounded-lg shadow">
+        <GuideSessionCommentSection
+          contentId={data._id}
+          className="mt-0"
+        />
       </div>
     </section>
   );

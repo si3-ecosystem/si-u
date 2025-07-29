@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import Loading from "@/app/loading";
 import { ContentDetailLayout } from "@/components/templates/ContentDetailLayout";
 import { ContentHero } from "@/components/molecules/content/ContentHero";
-
+import { IdeasLabCommentSection } from "@/components/organisms/comment/IdeasLabCommentSection";
 import { CommentNotifications } from "@/components/molecules/comment/CommentNotifications";
 
 export default function ScholarsIdeaLabDetail() {
@@ -35,11 +35,11 @@ export default function ScholarsIdeaLabDetail() {
     <>
       <ContentDetailLayout
         backHref="/scholars/ideas-lab"
-        backLabel="← Back to Ideas Lab"
+        backLabel="Back to Ideas Lab"
         contentId={data._id}
         contentType="scholar_ideas_lab"
         userRole="scholar" // TODO: Get from auth context
-        enableComments={true}
+        enableComments={false} // Disable built-in comments, we'll use our optimized version
         maxWidth="xl"
       >
         {/* Hero Section */}
@@ -58,6 +58,16 @@ export default function ScholarsIdeaLabDetail() {
         <div className="px-6 lg:px-8 pb-8">
           <div className="max-w-4xl mx-auto prose prose-lg prose-gray">
             <PortableTextComponent value={data.body} />
+          </div>
+        </div>
+
+        {/* Optimized Comment Section */}
+        <div className="px-6 lg:px-8 pb-8">
+          <div className="max-w-4xl mx-auto">
+            <IdeasLabCommentSection
+              contentId={data._id}
+              className="mt-8"
+            />
           </div>
         </div>
       </ContentDetailLayout>

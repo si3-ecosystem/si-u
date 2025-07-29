@@ -74,7 +74,8 @@ function commentReducer(state: CommentState, action: CommentAction): CommentStat
       };
 
     case 'DELETE_COMMENT':
-      const { [action.payload]: deleted, ...remainingComments } = state.comments;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [action.payload]: _, ...remainingComments } = state.comments;
       return {
         ...state,
         comments: remainingComments,
@@ -99,7 +100,8 @@ function commentReducer(state: CommentState, action: CommentAction): CommentStat
       };
 
     case 'CLEAR_ERROR':
-      const { [action.payload]: clearedError, ...remainingErrors } = state.errors;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [action.payload]: _error, ...remainingErrors } = state.errors;
       return {
         ...state,
         errors: remainingErrors,
@@ -115,7 +117,8 @@ function commentReducer(state: CommentState, action: CommentAction): CommentStat
       };
 
     case 'CLEAR_OPTIMISTIC_UPDATE':
-      const { [action.payload]: clearedUpdate, ...remainingUpdates } = state.optimisticUpdates;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [action.payload]: _update, ...remainingUpdates } = state.optimisticUpdates;
       return {
         ...state,
         optimisticUpdates: remainingUpdates,
@@ -131,7 +134,8 @@ function commentReducer(state: CommentState, action: CommentAction): CommentStat
       };
 
     case 'CLEAR_DRAFT':
-      const { [action.payload]: clearedDraft, ...remainingDrafts } = state.drafts;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [action.payload]: _draft, ...remainingDrafts } = state.drafts;
       return {
         ...state,
         drafts: remainingDrafts,

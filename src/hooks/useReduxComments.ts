@@ -36,7 +36,6 @@ import {
   selectIsEditing,
   selectIsReplying,
   selectNotifications,
-  selectThreadedCommentsForContent,
   selectSortedThreadedCommentsForContent,
 } from '@/redux/selectors/commentSelectors';
 import { Comment, CommentStats } from '@/types/comment';

@@ -54,7 +54,6 @@ export function CommentSection({
     commentStats,
     isExpanded: isReduxExpanded,
     setComments,
-    addComment: reduxAddComment,
     updateComment: reduxUpdateComment,
     deleteComment: reduxDeleteComment,
     setStats,
@@ -175,7 +174,7 @@ export function CommentSection({
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
         <MessageCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
         <p className="text-gray-600">
-          You don't have permission to view comments for this content.
+          You don&apos;t have permission to view comments for this content.
         </p>
       </div>
     );

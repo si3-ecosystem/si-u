@@ -69,10 +69,7 @@ export interface CommentsResponse {
   pagination: PaginationResponse;
 }
 
-export interface ThreadedCommentsResponse {
-  comments: Comment[];
-  pagination: PaginationResponse;
-}
+// Removed duplicate - using the one below with proper pagination structure
 
 export interface CommentStatsResponse {
   analytics: CommentStats;
@@ -103,6 +100,37 @@ export interface CommentRepliesQueryParams {
   commentId: string;
   page?: number;
   limit?: number;
+}
+
+// Additional types for optimized service
+export interface ThreadedCommentQueryParams {
+  contentId: string;
+  contentType: ContentType;
+  page?: number;
+  limit?: number;
+}
+
+export interface ThreadedCommentsResponse {
+  comments: Comment[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalComments: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+export interface CommentStatsResponse {
+  analytics: {
+    totalComments: number;
+    totalReplies: number;
+    totalTopLevel: number;
+    uniqueUserCount: number;
+    latestComment: string;
+    oldestComment: string;
+  };
 }
 
 // UI-specific types

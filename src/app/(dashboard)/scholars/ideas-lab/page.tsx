@@ -75,7 +75,6 @@ export default function ScholarsIdeaLabPage() {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-        {/* Banner Section */}
         <ContentBanner
           title={data.title || "Scholars Ideas Lab"}
           description={data.description || "Explore innovative ideas and research from our scholar community"}
@@ -86,7 +85,6 @@ export default function ScholarsIdeaLabPage() {
           className="mb-8"
         />
 
-        {/* Content Listing */}
         <div className="px-4 lg:px-6 pb-16">
           <EnhancedContentListing
             title="Latest Ideas"
@@ -99,7 +97,6 @@ export default function ScholarsIdeaLabPage() {
             currentPage={ideaLabs.pageIndex + 1}
             totalPages={ideaLabs.pageCount}
             onPageChange={(page: number) => {
-              // Handle pagination - you might need to implement this in the hook
               console.log('Navigate to page:', page);
             }}
             searchQuery={searchQuery}

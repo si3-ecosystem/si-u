@@ -5,6 +5,7 @@ import SessionOverview from "@/components/organisms/scholars/siUSessions/details
 import SessionCurriculum from "@/components/organisms/scholars/siUSessions/details/SessionCurriculum";
 import SessionHeader from "@/components/organisms/scholars/siUSessions/details/SessionHeader";
 import SessionProgress from "@/components/organisms/scholars/siUSessions/details/SessionProgress";
+import { ScholarSessionCommentSection } from "@/components/organisms/comment/ScholarSessionCommentSection";
 import { getSessionById } from "@/lib/sanity/client";
 import { Session } from "@/types/session";
 import { useQuery } from "@tanstack/react-query";
@@ -47,6 +48,14 @@ export default function SessionDetailsPage() {
       <div className="bg-white p-8">
         <SessionOverview overview={data.overview} />
         <SessionCurriculum curriculum={data.curriculum} />
+      </div>
+
+      {/* Comment Section */}
+      <div className="bg-white p-8 mt-6 rounded-lg border">
+        <ScholarSessionCommentSection
+          contentId={data._id}
+          className="mt-0"
+        />
       </div>
     </section>
   );
