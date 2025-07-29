@@ -7,6 +7,7 @@ import userReducer from "./slice/userSlice";
 import pushReducer from "./slice/pushSlice";
 import modalsReducer from "./slice/modalSlice";
 import communityReducer from "./slice/communitySlice";
+import commentReducer from "./slice/commentSlice";
 
 export const store: Store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store: Store = configureStore({
     push: pushReducer,
     modals: modalsReducer,
     community: communityReducer,
+    comments: commentReducer,
   },
 
   middleware: (getDefaultMiddleware) =>

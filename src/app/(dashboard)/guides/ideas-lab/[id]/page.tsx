@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Loading from "@/app/loading";
 import { HeroSection } from "@/components/organisms/guides/ideas-lab/details/HeroSection";
+import { GuideIdeasLabCommentSection } from "@/components/organisms/comment/GuideIdeasLabCommentSection";
 
 export default function IdeaLabDetailsPage() {
   const params = useParams();
@@ -44,6 +45,14 @@ export default function IdeaLabDetailsPage() {
         />
         <div className="max-w-[886px] mx-auto w-full prose prose-p:text-black">
           <PortableTextComponent value={data.body} />
+        </div>
+
+        {/* Comment Section */}
+        <div className="max-w-[886px] mx-auto w-full mt-12">
+          <GuideIdeasLabCommentSection
+            contentId={data._id}
+            className="bg-white p-6 rounded-lg border"
+          />
         </div>
       </div>
     </div>

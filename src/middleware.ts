@@ -73,6 +73,7 @@ export async function middleware(request: NextRequest) {
   // ✅ Use the passed request for cookie access
   const user = await verifyJwtToken(request);
 
+
   const isAuthenticated = !!user;
   const isAdmin = isAuthenticated && user?.roles?.includes("admin");
   const isGuide = isAuthenticated && user?.roles?.includes("guide");
