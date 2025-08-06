@@ -184,7 +184,7 @@ async function verifyJwtToken(
       return null;
     }
 
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = process.env.JWT_SECRET || "iqwejiowjdekasdaslkdjlkasjedkwqjeiwqp;zMedjiwerpqweiq-dkflnlka!kjekjd@kxlkjvflkxjfkjklxjvkl";
     if (!jwtSecret) {
       console.error("JWT_SECRET environment variable is not set");
       return null;
