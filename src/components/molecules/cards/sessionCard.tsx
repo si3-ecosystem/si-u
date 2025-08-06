@@ -28,15 +28,13 @@ export function SessionCard({
     session?.partner?.logo && urlForImage(session?.partner?.logo)?.src;
 
   // RSVP functionality
-  const { rsvp, rsvpStatus, createRSVP, updateRSVP, deleteRSVP, isCreating, isUpdating, isDeleting, config } = useRSVP(session._id, session);
+  const { rsvp, rsvpStatus, hasRSVP, createRSVP, updateRSVP, deleteRSVP, isCreating, isUpdating, isDeleting, config } = useRSVP(session._id, session);
 
   // Calendar integration
   const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } = useCalendarIntegration(session);
 
   const handleCancelAttendance = () => {
-    if (rsvpStatus) {
-      deleteRSVP();
-    }
+    deleteRSVP();
   };
 
   const handleDirectRSVP = () => {
@@ -193,7 +191,9 @@ export function SessionCard({
                   onClose={() => setOpenDropdownId(null)}
                   eventId={session._id}
                   currentStatus={rsvpStatus}
+                  hasRSVP={hasRSVP}
                   hasValidEmail={config.hasValidEmail}
+                  isDeleting={isDeleting}
                   onCalendarAdd={handleCalendarAdd}
                   onJoinChannel={handleJoinChannel}
                   onCancelAttendance={handleCancelAttendance}

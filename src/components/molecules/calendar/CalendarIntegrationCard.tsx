@@ -38,7 +38,7 @@ export function CalendarIntegrationCard({
       name: 'Apple Calendar',
       icon: Calendar,
       action: addToAppleCalendar,
-      description: 'Download .ics file for Apple Calendar',
+      description: 'Download .ics file - double-click to open in Calendar',
       color: 'bg-gray-600 hover:bg-gray-700',
     },
     {
@@ -66,7 +66,7 @@ export function CalendarIntegrationCard({
             Add to Your Calendar
           </CardTitle>
           <p className="text-blue-700 text-sm">
-            Don't forget about this session! Choose your preferred calendar:
+            Don&quot;t forget about this session! Choose your preferred calendar:
           </p>
         </CardHeader>
       )}
@@ -91,10 +91,14 @@ export function CalendarIntegrationCard({
           </Button>
         ))}
 
-        <div className="pt-2 border-t border-blue-200">
+        <div className="pt-2 border-t border-blue-200 space-y-1">
           <p className="text-xs text-blue-600 flex items-center gap-1">
             <Copy className="w-3 h-3" />
-            Tip: After clicking "Add to Google Calendar", remember to click "Save" in the popup.
+            Tip: After clicking 
+            &quot;Add to Google Calendar&quot;, remember to click &quot;Save&quot; in the popup.
+          </p>
+          <p className="text-xs text-blue-600">
+            📱 For Apple Calendar & ICS downloads: Double-click the downloaded file to add it to your calendar app.
           </p>
         </div>
       </CardContent>

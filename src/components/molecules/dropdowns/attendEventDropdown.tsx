@@ -4,6 +4,7 @@ import {
   X,
   XCircle,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { RSVPStatus } from "@/types/rsvp";
 
@@ -11,7 +12,9 @@ interface AttendEventDropdownProps {
   onClose: () => void;
   eventId: string;
   currentStatus?: RSVPStatus | null;
+  hasRSVP?: boolean;
   hasValidEmail?: boolean;
+  isDeleting?: boolean;
   onCalendarAdd?: (type: 'google' | 'apple' | 'ics') => void;
   onJoinChannel?: () => void;
   onCancelAttendance?: () => void;
@@ -22,7 +25,9 @@ export function AttendEventDropdown({
   onClose,
   eventId,
   currentStatus,
+  hasRSVP = false,
   hasValidEmail = true,
+  isDeleting = false,
   onCalendarAdd,
   onJoinChannel,
   onCancelAttendance,
@@ -90,15 +95,24 @@ export function AttendEventDropdown({
           <ChevronRight className="w-4 h-4 ml-auto" />
         </button>
 
-        {/* Cancel the Attendance */}
-        <button
-          onClick={handleCancelClick}
-          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-800 transition-colors"
-        >
-          <XCircle className="w-5 h-5" />
-          <span>Cancel the Attendance</span>
-          <ChevronRight className="w-4 h-4 ml-auto" />
-        </button>
+        {/* Cancel the Attendance - Only show if user has an RSVP */}
+        {hasRSVP && (
+          <button
+            onClick={handleCancelClick}
+            disabled={isDeleting}
+            className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-800 transition-colors ${
+              isDeleting ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {isDeleting ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <XCircle className="w-5 h-5" />
+            )}
+            <span>{isDeleting ? 'Cancelling...' : 'Cancel the Attendance'}</span>
+            {!isDeleting && <ChevronRight className="w-4 h-4 ml-auto" />}
+          </button>
+        )}
 
         {/* RSVP Option */}
         <button

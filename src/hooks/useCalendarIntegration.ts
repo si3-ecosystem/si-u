@@ -35,16 +35,21 @@ export function useCalendarIntegration(session: GuidesSession) {
     try {
       const event = CalendarIntegration.sessionToCalendarEvent(session);
       CalendarIntegration.downloadICSFile(event);
-      ErrorHandler.showSuccess('Calendar file downloaded!');
+      ErrorHandler.showSuccess('Calendar file downloaded! Double-click the file to add it to your calendar app.');
     } catch (error) {
       ErrorHandler.handle(error, 'ICS file download');
     }
   }, [session]);
 
   const addToAppleCalendar = useCallback(() => {
-    // Apple Calendar uses ICS files
-    downloadICSFile();
-  }, [downloadICSFile]);
+    try {
+      const event = CalendarIntegration.sessionToCalendarEvent(session);
+      CalendarIntegration.downloadICSFile(event);
+      ErrorHandler.showSuccess('Calendar file downloaded! Double-click the .ics file to open it in Apple Calendar.');
+    } catch (error) {
+      ErrorHandler.handle(error, 'Apple Calendar integration');
+    }
+  }, [session]);
 
   const getCalendarLinks = useCallback(() => {
     try {

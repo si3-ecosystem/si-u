@@ -21,8 +21,8 @@ export class RSVPService {
   }
 
   // Get user's RSVPs
-  static async getUserRSVPs(params?: GetUserRSVPsParams): Promise<ApiResponse<IRSVP[]>> {
-    return apiClient.get<IRSVP[]>('/rsvp/my-rsvps', params);
+  static async getUserRSVPs(params?: GetUserRSVPsParams): Promise<ApiResponse<{ rsvps: IRSVP[]; pagination: any }>> {
+    return apiClient.get<{ rsvps: IRSVP[]; pagination: any }>('/rsvp/my-rsvps', params);
   }
 
   // Get RSVP by ID
@@ -147,9 +147,11 @@ export class RSVPService {
   // Get user's RSVP for specific event
   static async getUserRSVPForEvent(eventId: string): Promise<ApiResponse<IRSVP | null>> {
     // Since there's no direct route, we'll get all user RSVPs and filter
-    const response = await apiClient.get<IRSVP[]>('/rsvp/my-rsvps');
-    if (response.status === 'success' && response.data) {
-      const userRSVP = response.data.find(rsvp => rsvp.eventId === eventId);
+    const response = await apiClient.get<{ rsvps: IRSVP[]; pagination: any }>('/rsvp/my-rsvps');
+
+    if (response.status === 'success' && response.data && response.data.rsvps) {
+      const userRSVP = response.data.rsvps.find(rsvp => rsvp.eventId === eventId);
+
       return {
         status: 'success',
         data: userRSVP || null

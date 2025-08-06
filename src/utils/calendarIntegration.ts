@@ -105,10 +105,17 @@ export class CalendarIntegration {
    */
   static generateGoogleCalendarUrl(event: CalendarEvent): string {
     let details = event.description;
+    let location = event.location || '';
 
-    // Ensure meeting URL is prominently displayed
+    // Ensure meeting URL is prominently displayed in both description and location
     if (event.url) {
-      details = `${event.description}\n\n🔗 JOIN MEETING: ${event.url}`;
+      details = `🔗 JOIN MEETING: ${event.url}\n\n${event.description}`;
+      // If it's a virtual meeting, put the URL in location too
+      if (!location || location === 'Online' || location === 'Virtual Session') {
+        location = `Online Meeting: ${event.url}`;
+      } else {
+        location = `${location} | Meeting: ${event.url}`;
+      }
     }
 
     const params = new URLSearchParams({
@@ -116,7 +123,7 @@ export class CalendarIntegration {
       text: event.title,
       dates: `${this.formatDateForGoogle(event.startDate)}/${this.formatDateForGoogle(event.endDate)}`,
       details: details,
-      location: event.location || (event.url ? 'Online Meeting' : ''),
+      location: location,
     });
 
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -147,6 +154,12 @@ export class CalendarIntegration {
     const dtstart = this.formatDateForICS(event.startDate);
     const dtend = this.formatDateForICS(event.endDate);
 
+    // Enhance description with meeting URL at the top
+    let description = event.description;
+    if (event.url) {
+      description = `JOIN MEETING: ${event.url}\\n\\n${event.description}`;
+    }
+
     const icsContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
@@ -159,7 +172,7 @@ export class CalendarIntegration {
       `DTSTART:${dtstart}`,
       `DTEND:${dtend}`,
       `SUMMARY:${this.escapeICSText(event.title)}`,
-      `DESCRIPTION:${this.escapeICSText(event.description)}`,
+      `DESCRIPTION:${this.escapeICSText(description)}`,
     ];
 
     if (event.location) {

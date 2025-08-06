@@ -26,8 +26,8 @@ export function useUserRSVPs(params?: GetUserRSVPsParams) {
     },
   });
 
-  const rsvps = data?.data || [];
-  const pagination = data?.pagination;
+  const rsvps = data?.data?.rsvps || [];
+  const pagination = data?.data?.pagination;
 
   // Helper functions for filtering
   const filterByStatus = (status?: RSVPStatus) => {
