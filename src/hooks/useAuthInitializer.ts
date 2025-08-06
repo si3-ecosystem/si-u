@@ -18,6 +18,11 @@ export function useAuthInitializer() {
       return;
     }
 
+    // Don't override recent updates (within last 5 seconds)
+    if (currentUser.lastUpdated && Date.now() - currentUser.lastUpdated < 5000) {
+      return;
+    }
+
     const initializeAuth = () => {
       try {
         // Check for JWT token in localStorage

@@ -133,8 +133,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Must be verified
+    // Handle verification requirements based on login method
     if (!isVerified) {
+      const hasWalletAddress = !!user?.wallet_address;
+
+      // If user has a wallet address, they can access dashboard without email verification
+      // Wallet users authenticate via wallet signature, not email
+      if (hasWalletAddress) {
+        return NextResponse.next();
+      }
+
+      // Email-only users need email verification
       return NextResponse.redirect(new URL("/verify-email", request.url));
     }
 

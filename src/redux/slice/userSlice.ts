@@ -5,12 +5,14 @@ interface UserState {
   user: any;
   address: string | null;
   isLoggedIn: boolean;
+  lastUpdated?: number; // Track when user data was last updated
 }
 
 const initialState: UserState = {
   user: {},
   address: null,
   isLoggedIn: false,
+  lastUpdated: undefined,
 };
 
 const userSlice = createSlice({
@@ -21,7 +23,22 @@ const userSlice = createSlice({
   reducers: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setUser: (state: UserState, action: PayloadAction<any>) => {
+      // Preserve login state when updating user data
+      const wasLoggedIn = state.isLoggedIn;
+      const existingAddress = state.address;
+
       state.user = action.payload;
+      state.lastUpdated = Date.now(); // Track when user data was updated
+
+      // Ensure we don't accidentally log out the user during profile updates
+      if (wasLoggedIn && action.payload) {
+        state.isLoggedIn = true;
+      }
+
+      // Preserve wallet address if it exists
+      if (existingAddress && !state.address) {
+        state.address = existingAddress;
+      }
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,10 +55,22 @@ const userSlice = createSlice({
     setConnected: (state: UserState, action: PayloadAction<boolean>) => {
       state.isLoggedIn = action.payload;
     },
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateUserProfile: (state: UserState, action: PayloadAction<any>) => {
+      // Specifically for profile updates - preserves all auth state
+      state.user = {
+        ...state.user,
+        ...action.payload,
+      };
+      state.lastUpdated = Date.now();
+      // Explicitly preserve login state
+      state.isLoggedIn = true;
+    },
   },
 });
 
-export const { setUser, resetUser, setConnected, setAddress } =
+export const { setUser, resetUser, setConnected, setAddress, updateUserProfile } =
   userSlice.actions;
 
 export default userSlice.reducer;
