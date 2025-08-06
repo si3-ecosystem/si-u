@@ -56,7 +56,7 @@ const Domain = () => {
   };
 
   return (
-    <div className="tracking-wider border-b border-gray-300 bg-gray-100 shadow-md text-xs py-1 lg:py-2 px-2">
+    <div className="tracking-wider border-b border-gray-300 shadow-md text-xs py-1 lg:py-2 px-2">
       <div className="flex justify-center items-center mx-auto">
         {existingDomain ? (
           <div className="flex items-center p-2">

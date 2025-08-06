@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Home, Loader2, LogOut, X, Play } from "lucide-react";
+import { Home, Loader2, X, Play } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -77,11 +77,6 @@ const Navbar = () => {
     setIframeLoading(false);
   }, []);
 
-  const handleLogout = useCallback(async () => {
-    // await handleCompleteLogout();
-    router.replace("/login");
-  }, [router]);
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && visibleIframe) {
@@ -114,7 +109,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="font-dm-sans border-b border-gray-300 sm:px-6 lg:px-8 bg-gray-100">
+      <nav className="font-dm-sans border-b border-gray-300 sm:px-6 lg:px-8">
         <div className="flex relative justify-between items-center px-2 w-full p-1 lg:p-2 max-w-[90rem] mx-auto text-xs">
           {/* Logo Section */}
           <div className="flex gap-2 sm:gap-4 items-center">
@@ -158,16 +153,6 @@ const Navbar = () => {
               />
               {buttonText}
               {loading && <Loader2 className="animate-spin size-5 ml-1" />}
-            </button>
-            {/* Logout Button */}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex gap-2 items-center px-4 h-8 sm:font-medium text-white bg-gray-900 rounded-lg hover:shadow-md transition-shadow duration-200"
-              aria-label="Logout"
-            >
-              <span>Logout</span>
-              <LogOut className="size-5" />
             </button>
           </div>
         </div>
