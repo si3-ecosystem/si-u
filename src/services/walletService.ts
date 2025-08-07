@@ -17,12 +17,10 @@ export interface WalletInfo {
   lastUsed?: string;
 }
 
-export interface WalletInfoResponse extends ApiResponse {
-  data: {
-    walletInfo: WalletInfo | null;
-    isConnected: boolean;
-  };
-}
+export type WalletInfoResponse = ApiResponse<{
+  walletInfo: WalletInfo | null;
+  isConnected: boolean;
+}>;
 
 export interface ConnectWalletRequest {
   address: string;
@@ -30,38 +28,40 @@ export interface ConnectWalletRequest {
   network: NetworkType;
 }
 
-export interface ConnectWalletResponse extends ApiResponse {
-  data: {
-    walletInfo: WalletInfo;
-    message: string;
-  };
-}
+export type ConnectWalletResponse = ApiResponse<{
+  walletInfo: WalletInfo;
+  message: string;
+}>;
 
-export interface WalletHistoryResponse extends ApiResponse {
-  data: {
-    history: Array<{
-      action: 'connect' | 'disconnect' | 'activity';
-      timestamp: string;
-      walletInfo?: WalletInfo;
-    }>;
-  };
-}
+export type WalletHistoryResponse = ApiResponse<{
+  history: Array<{
+    action: 'connect' | 'disconnect' | 'activity';
+    timestamp: string;
+    walletInfo?: WalletInfo;
+  }>;
+}>;
 
 export class WalletService {
   /**
    * Get current wallet information
    */
   static async getWalletInfo(): Promise<WalletInfoResponse> {
-    const response = await apiClient.get('/user/wallet/info');
-    return response.data;
+    const response = await apiClient.get<{
+      walletInfo: WalletInfo | null;
+      isConnected: boolean;
+    }>('/user/wallet/info');
+    return response;
   }
 
   /**
    * Connect a wallet
    */
   static async connectWallet(walletData: ConnectWalletRequest): Promise<ConnectWalletResponse> {
-    const response = await apiClient.post('/user/wallet/connect', walletData);
-    return response.data;
+    const response = await apiClient.post<{
+      walletInfo: WalletInfo;
+      message: string;
+    }>('/user/wallet/connect', walletData);
+    return response;
   }
 
   /**
@@ -69,7 +69,7 @@ export class WalletService {
    */
   static async disconnectWallet(): Promise<ApiResponse> {
     const response = await apiClient.delete('/user/wallet/disconnect');
-    return response.data;
+    return response;
   }
 
   /**
@@ -77,15 +77,21 @@ export class WalletService {
    */
   static async updateWalletActivity(): Promise<ApiResponse> {
     const response = await apiClient.patch('/user/wallet/activity');
-    return response.data;
+    return response;
   }
 
   /**
    * Get wallet connection history
    */
   static async getWalletHistory(): Promise<WalletHistoryResponse> {
-    const response = await apiClient.get('/user/wallet/history');
-    return response.data;
+    const response = await apiClient.get<{
+      history: Array<{
+        action: 'connect' | 'disconnect' | 'activity';
+        timestamp: string;
+        walletInfo?: WalletInfo;
+      }>;
+    }>('/user/wallet/history');
+    return response;
   }
 
   /**

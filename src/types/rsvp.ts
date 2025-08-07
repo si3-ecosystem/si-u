@@ -36,9 +36,9 @@ export interface IDigitalLink {
 export interface INotificationSettings {
   emailUpdates: boolean;
   sessionReminder: boolean;
-  marketingEmails: boolean;
-  weeklyDigest: boolean;
-  eventAnnouncements: boolean;
+  // marketingEmails: boolean;
+  // weeklyDigest: boolean;
+  // eventAnnouncements: boolean;
 }
 
 // Wallet Information Interface

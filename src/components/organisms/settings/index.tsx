@@ -31,7 +31,6 @@ export default function Settings() {
           <div className=" space-y-6">
             <AccountWalletSection onDisconnectWallet={handleDisconnectWallet} />
             <SupportSection />
-            <ProfileEditForm />
 
             <Button
               variant="destructive"
@@ -44,6 +43,8 @@ export default function Settings() {
           </div>
           <div className=" space-y-6">
             <NotificationSection />
+            <ProfileEditForm />
+
           </div>
         </div>
       </div>

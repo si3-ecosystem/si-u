@@ -44,7 +44,7 @@ export function NotificationSection() {
 
       try {
         const response = await NotificationService.getNotificationSettings();
-        if (response.status === "success") {
+        if (response.status === "success" && response.data) {
           setSettings(response.data);
           return;
         }
@@ -155,7 +155,7 @@ export function NotificationSection() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4 border border-gray-200 p-4 rounded-lg  divide-gray-200 divide-y">
-          {(Object.keys(settings) as Array<keyof NotificationSettings>).map(
+          {(Object.keys(settings) as Array<keyof NotificationSettings>).slice(0, 2).map(
             (key) => (
               <div key={key} className="flex items-center justify-between pt-3">
                 <div>
