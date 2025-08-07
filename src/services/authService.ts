@@ -59,9 +59,8 @@ export class UnifiedAuthService {
       const userData: UserData = {
         _id: payload._id,
         email: payload.email,
+        username: payload.username,
         roles: payload.roles || [],
-        firstName: payload.firstName,
-        lastName: payload.lastName,
         isVerified: payload.isVerified || false,
         wallet_address: payload.wallet_address,
         createdAt: payload.createdAt,

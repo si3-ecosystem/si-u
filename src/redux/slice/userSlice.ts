@@ -45,7 +45,7 @@ interface UserState {
 }
 
 // Critical fields that should never be lost during updates
-const CRITICAL_FIELDS = ['_id', 'wallet_address', 'email', 'roles'] as const;
+const CRITICAL_FIELDS = ['_id', 'wallet_address', 'email', 'roles', 'username'] as const;
 
 const initialState: UserState = {
   user: {},
@@ -93,8 +93,12 @@ const safeMergeUserData = (currentUser: UserData, newData: UserData): UserData =
     const newValue = newData[typedKey];
     const currentValue = currentUser[typedKey];
 
+    // Special handling for username - always update if new data has it
+    if (typedKey === 'username' && newValue) {
+      merged[typedKey] = newValue;
+    }
     // If it's a critical field and current value exists, only update if new value is truthy
-    if (CRITICAL_FIELDS.includes(typedKey as any) && currentValue) {
+    else if (CRITICAL_FIELDS.includes(typedKey as any) && currentValue) {
       if (newValue) {
         merged[typedKey] = newValue;
       }

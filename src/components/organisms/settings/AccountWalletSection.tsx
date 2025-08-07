@@ -20,18 +20,15 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load wallet info on component mount
   useEffect(() => {
     loadWalletInfo();
   }, []);
 
-  // Use wallet info from user data if available
   useEffect(() => {
     if (currentUser?.user?.walletInfo) {
       setWalletInfo(currentUser.user.walletInfo);
       setIsLoading(false);
     } else if (currentUser?.user?.wallet_address) {
-      // Fallback to legacy wallet_address field
       setWalletInfo({
         address: currentUser.user.wallet_address,
         connectedWallet: 'Other',
@@ -39,14 +36,12 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
       });
       setIsLoading(false);
     } else if (currentUser?.user) {
-      // User data loaded but no wallet info
       setWalletInfo(null);
       setIsLoading(false);
     }
   }, [currentUser?.user?.walletInfo, currentUser?.user?.wallet_address, currentUser?.user]);
 
   const loadWalletInfo = async () => {
-    // Don't load from API if we already have wallet data from user
     if (currentUser?.user?.walletInfo || currentUser?.user?.wallet_address) {
       console.log('Using existing wallet data from user profile');
       return;
@@ -56,7 +51,6 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
       setIsLoading(true);
       setError(null);
 
-      // Only try API if we don't have local wallet data
       try {
         const response = await WalletService.getWalletInfo();
         if (response.status === 'success') {
@@ -81,7 +75,6 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
 
     } catch (error: any) {
       console.error('Failed to load wallet info:', error);
-      // Don't override existing wallet data with error
       if (!currentUser?.user?.walletInfo && !currentUser?.user?.wallet_address) {
         setError('Failed to load wallet information');
       }
@@ -95,7 +88,6 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
 
     setIsDisconnecting(true);
     try {
-      // Try to disconnect via API
       const response = await WalletService.disconnectWallet();
       if (response.status === 'success') {
         setWalletInfo(null);
@@ -107,7 +99,6 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
     } catch (error: any) {
       console.error('Failed to disconnect wallet:', error);
 
-      // For now, if API fails, just disconnect locally
       setWalletInfo(null);
 
       if (error?.statusCode === 401) {
@@ -253,7 +244,7 @@ export function AccountWalletSection({ onDisconnectWallet }: AccountWalletSectio
         </div>
 
         {/* Email */}
-        <div className="space-y-2">
+        <div className="space-y-2 overflow-hidden">
           <label className="text-sm font-medium text-gray-700">Email</label>
           <div className="p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">

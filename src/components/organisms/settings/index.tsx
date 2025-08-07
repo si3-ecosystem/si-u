@@ -11,12 +11,10 @@ import { LogOut } from 'lucide-react';
 
 export default function Settings() {
   const handleLogout = () => {
-    // Implement logout logic
     console.log('Logout clicked');
   };
 
   const handleDisconnectWallet = () => {
-    // Implement wallet disconnect logic
     console.log('Disconnect wallet clicked');
   };
 
@@ -30,16 +28,10 @@ export default function Settings() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Account & Wallet + Support */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 overflow-hidden">
           <div className="lg:col-span-1 space-y-6">
-            {/* Account & Wallet Section */}
             <AccountWalletSection onDisconnectWallet={handleDisconnectWallet} />
-
-            {/* Support Section */}
             <SupportSection />
-
-            {/* Logout Button */}
             <Button
               variant="destructive"
               className="w-full"
@@ -49,13 +41,8 @@ export default function Settings() {
               Logout
             </Button>
           </div>
-
-          {/* Right Column - Notifications + Profile Edit Form */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Notification Settings */}
             <NotificationSection />
-
-            {/* Profile Edit Form */}
             <Card>
               <CardContent className="pt-6">
                 <ProfileEditForm />
