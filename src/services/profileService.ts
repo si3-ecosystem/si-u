@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from './api';
-import { ApiResponse } from '@/types/rsvp';
+import { ApiResponse, INotificationSettings, IWalletInfo } from '@/types/rsvp';
 
 export interface UserProfile {
   _id: string;
@@ -21,7 +21,7 @@ export interface UserProfile {
   newsletter: boolean;
   interests: string[];
   companyName?: string;
-  wallet_address?: string;
+  wallet_address?: string; // Legacy field
   personalValues: string[];
   companyAffiliation?: string;
   digitalLinks: Array<{
@@ -30,6 +30,10 @@ export interface UserProfile {
   }>;
   createdAt: string;
   updatedAt: string;
+  // New fields from backend implementation
+  notificationSettings?: INotificationSettings;
+  walletInfo?: IWalletInfo;
+  settingsUpdatedAt?: string;
 }
 
 export interface UpdateProfileRequest {

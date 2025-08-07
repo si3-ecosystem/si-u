@@ -32,6 +32,24 @@ export interface IDigitalLink {
   url: string;
 }
 
+// Notification Settings Interface
+export interface INotificationSettings {
+  emailUpdates: boolean;
+  sessionReminder: boolean;
+  marketingEmails: boolean;
+  weeklyDigest: boolean;
+  eventAnnouncements: boolean;
+}
+
+// Wallet Information Interface
+export interface IWalletInfo {
+  address?: string;
+  connectedWallet?: 'Zerion' | 'MetaMask' | 'WalletConnect' | 'Other';
+  network?: 'Mainnet' | 'Polygon' | 'Arbitrum' | 'Base' | 'Optimism';
+  connectedAt?: string;
+  lastUsed?: string;
+}
+
 // User Interface
 export interface IUser {
   _id: string;
@@ -47,12 +65,16 @@ export interface IUser {
   newsletter: boolean;
   interests: string[];
   companyName?: string;
-  wallet_address?: string;
+  wallet_address?: string; // Legacy field - use walletInfo.address instead
   personalValues: string[];
   companyAffiliation?: string;
   digitalLinks: IDigitalLink[];
   createdAt: string;
   updatedAt: string;
+  // New fields from backend implementation
+  notificationSettings?: INotificationSettings;
+  walletInfo?: IWalletInfo;
+  settingsUpdatedAt?: string;
 }
 
 // RSVP Interface

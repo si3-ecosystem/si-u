@@ -3,7 +3,7 @@
  * Handles HTTP requests with authentication and error handling
  */
 
-import { AuthService } from '@/utils/auth';
+import { UnifiedAuthService } from './authService';
 import { ApiResponse, ApiError } from '@/types/rsvp';
 
 export class ApiClient {
@@ -26,7 +26,7 @@ export class ApiClient {
     const config: RequestInit = {
       headers: {
         ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        ...AuthService.getAuthHeaders(),
+        ...UnifiedAuthService.getAuthHeaders(),
         ...options.headers,
       },
       ...options,

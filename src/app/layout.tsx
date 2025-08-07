@@ -7,6 +7,7 @@ import ReduxProvider from "@/providers/ReduxProvider";
 import WalletProvider from "@/providers/WagmiProvider";
 import { TanstackClientProvider } from "@/providers/TanstackClientProvider";
 import { AuthInitializer } from "@/components/providers/AuthInitializer";
+import { AuthDebugPanel } from "@/components/debug/AuthDebugPanel";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,6 +30,7 @@ export default function RootLayout({
               <TanstackClientProvider>
                 {children}
                 <Toaster />
+                <AuthDebugPanel />
               </TanstackClientProvider>
             </AuthInitializer>
           </ReduxProvider>

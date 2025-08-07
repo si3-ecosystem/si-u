@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProfile } from '@/hooks/useProfile';
 import { UpdateProfileRequest } from '@/services/profileService';
-import { Mail, User,  AlertTriangle, CheckCircle, Send } from 'lucide-react';
+import { Mail, User, AlertTriangle, CheckCircle, Send } from 'lucide-react';
 
 // Validation schema - essential fields only
 const profileSchema = z.object({
@@ -37,18 +37,23 @@ export function ProfileEditForm() {
     isUpdating
   } = useProfile();
 
-  // OTP verification state for email updates
-  const [showOTPField, setShowOTPField] = React.useState(false);
-  const [otpCode, setOtpCode] = React.useState('');
-  const [pendingEmail, setPendingEmail] = React.useState('');
-  const [isVerifyingOTP, setIsVerifyingOTP] = React.useState(false);
-  const [isSendingOTP, setIsSendingOTP] = React.useState(false);
+  // Client-side rendering guard to prevent hydration mismatches
+  const [isClient, setIsClient] = useState(false);
+  const [showOTPField, setShowOTPField] = useState(false);
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string>('');
+  const [otpCode, setOtpCode] = useState('');
+  const [isSendingOTP, setIsSendingOTP] = useState(false);
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Email verification state for existing email
-  const [showEmailVerification, setShowEmailVerification] = React.useState(false);
-  const [emailVerificationOTP, setEmailVerificationOTP] = React.useState('');
-  const [isVerifyingEmail, setIsVerifyingEmail] = React.useState(false);
-  const [isSendingEmailVerification, setIsSendingEmailVerification] = React.useState(false);
+  const [emailVerificationOTP, setEmailVerificationOTP] = useState('');
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+  const [isSendingEmailVerification, setIsSendingEmailVerification] = useState(false);
 
   // Check if email is actually verified (from backend perspective)
   const isEmailVerified = profile?.isVerified || false;
@@ -99,12 +104,20 @@ export function ProfileEditForm() {
     const updateData: UpdateProfileRequest = {
       email: data.email,
       username: data.username,
-      // Keep existing profile data for commented out fields
+      // Preserve ALL existing profile data to prevent data loss
       name: profile?.name,
+      firstName: profile?.firstName,
+      lastName: profile?.lastName,
       phone: profile?.phone,
       bio: profile?.bio,
       companyName: profile?.companyName,
       companyAffiliation: profile?.companyAffiliation,
+      interests: profile?.interests,
+      personalValues: profile?.personalValues,
+      newsletter: profile?.newsletter,
+      // CRITICAL: Preserve verification status and wallet data
+      isVerified: profile?.isVerified,
+      digitalLinks: profile?.digitalLinks,
     };
 
     updateProfile(updateData);
@@ -154,11 +167,21 @@ export function ProfileEditForm() {
         // OTP verified, now update profile with verified email
         const updateData: UpdateProfileRequest = {
           email: pendingEmail,
+          // Preserve ALL existing profile data to prevent data loss
+          username: profile?.username,
           name: profile?.name,
+          firstName: profile?.firstName,
+          lastName: profile?.lastName,
           phone: profile?.phone,
           bio: profile?.bio,
           companyName: profile?.companyName,
           companyAffiliation: profile?.companyAffiliation,
+          interests: profile?.interests,
+          personalValues: profile?.personalValues,
+          newsletter: profile?.newsletter,
+          // CRITICAL: Preserve verification status and wallet data
+          isVerified: true, // Email just verified
+          digitalLinks: profile?.digitalLinks,
         };
 
         updateProfile(updateData);
@@ -250,46 +273,6 @@ export function ProfileEditForm() {
 
   return (
     <div className="space-y-6">
-      {/* Profile Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            Profile Status
-            {isProfileComplete ? (
-              <CheckCircle className="w-5 h-5 text-green-600" />
-            ) : (
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Profile Completion</span>
-              <Badge variant={profileCompletion === 100 ? 'default' : 'secondary'}>
-                {profileCompletion}%
-              </Badge>
-            </div>
-            
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${profileCompletion}%` }}
-              ></div>
-            </div>
-
-            {isTemporaryEmail && (
-              <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                <span className="text-sm text-amber-800">
-                  Please update your email address to enable RSVP functionality
-                </span>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Edit Form */}
       <Card>
         <CardHeader>
@@ -301,15 +284,17 @@ export function ProfileEditForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Email */}
             <div>
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email Address *
-                {isTemporaryEmail && (
+              <div className="flex items-center gap-2 mb-1">
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email Address *
+                </Label>
+                {isClient && isTemporaryEmail && (
                   <Badge variant="destructive" className="text-xs">
                     Temporary
                   </Badge>
                 )}
-              </Label>
+              </div>
               <Input
                 id="email"
                 type="email"
@@ -324,19 +309,19 @@ export function ProfileEditForm() {
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
               )}
-              {isTemporaryEmail && canUpdateEmail && (
+              {isClient && isTemporaryEmail && canUpdateEmail && (
                 <p className="text-amber-600 text-sm mt-1">
                   Your current email is temporary. Please update to a real email address.
                 </p>
               )}
 
-              {!canUpdateEmail && isEmailVerified && (
-                <p className="text-green-600 text-sm mt-1">
+              {isClient && !canUpdateEmail && isEmailVerified && (
+                <p className="text-brand text-sm mt-1">
                   ✓ Your email address is verified and cannot be changed.
                 </p>
               )}
 
-              {!canUpdateEmail && !isEmailVerified && (
+              {isClient && !canUpdateEmail && !isEmailVerified && (
                 <div className="mt-2">
                   <p className="text-amber-600 text-sm mb-2">
                     ⚠️ Your email address is not verified. Please verify to access all features.
@@ -347,7 +332,7 @@ export function ProfileEditForm() {
                     disabled={isSendingEmailVerification}
                     variant="outline"
                     size="sm"
-                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    className="text-brand border-brand/20 hover:bg-brand/10"
                   >
                     {isSendingEmailVerification ? 'Sending...' : 'Verify Email'}
                   </Button>
@@ -355,14 +340,16 @@ export function ProfileEditForm() {
               )}
 
               {/* Email verification for existing email */}
-              {showEmailVerification && (
-                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <Label htmlFor="emailVerificationOTP" className="text-green-800 font-medium">
-                    Email Verification Code
-                  </Label>
-                  <p className="text-sm text-green-700 mb-2">
-                    We&apos;ve sent a verification code to: <strong>{profile?.email}</strong>
-                  </p>
+              {isClient && showEmailVerification && (
+                <div className="mt-4 p-4 bg-brand/5 border border-brand/20 rounded-lg">
+                  <div className="mb-2">
+                    <Label htmlFor="emailVerificationOTP" className="text-brand font-medium">
+                      Email Verification Code
+                    </Label>
+                    <p className="text-sm text-brand/80 mt-1">
+                      We&apos;ve sent a verification code to: <strong>{profile?.email}</strong>
+                    </p>
+                  </div>
                   <div className="flex gap-2">
                     <Input
                       id="emailVerificationOTP"
@@ -389,7 +376,7 @@ export function ProfileEditForm() {
                       size="sm"
                       onClick={sendEmailVerification}
                       disabled={isSendingEmailVerification}
-                      className="text-green-600"
+                      className="text-brand"
                     >
                       <Send className="w-3 h-3 mr-1" />
                       {isSendingEmailVerification ? 'Sending...' : 'Resend Code'}
@@ -411,14 +398,16 @@ export function ProfileEditForm() {
               )}
 
               {/* OTP field for email updates */}
-              {showOTPField && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <Label htmlFor="otp" className="text-blue-800 font-medium">
-                    Email Update Verification Code
-                  </Label>
-                  <p className="text-sm text-blue-700 mb-2">
-                    We&apos;ve sent a verification code to: <strong>{pendingEmail}</strong>
-                  </p>
+              {isClient && showOTPField && (
+                <div className="mt-4 p-4 bg-brand/5 border border-brand/20 rounded-lg">
+                  <div className="mb-2">
+                    <Label htmlFor="otp" className="text-brand font-medium">
+                      Email Update Verification Code
+                    </Label>
+                    <p className="text-sm text-brand/80 mt-1">
+                      We&apos;ve sent a verification code to: <strong>{pendingEmail}</strong>
+                    </p>
+                  </div>
                   <div className="flex gap-2">
                     <Input
                       id="otp"
@@ -445,7 +434,7 @@ export function ProfileEditForm() {
                       size="sm"
                       onClick={() => sendOTPToEmail(pendingEmail)}
                       disabled={isSendingOTP}
-                      className="text-blue-600"
+                      className="text-brand"
                     >
                       <Send className="w-3 h-3 mr-1" />
                       {isSendingOTP ? 'Sending...' : 'Resend Code'}

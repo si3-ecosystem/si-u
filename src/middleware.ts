@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
 
   // Helper function to get default dashboard based on user role
   const getDefaultDashboard = () => {
-    if (isAdmin) return "/admin/dashboard";
+    if (isAdmin) return "/dashboard";
     if (isGuide) return "/guide/dashboard";
     if (isPartner) return "/partner/dashboard";
     return "/dashboard";
