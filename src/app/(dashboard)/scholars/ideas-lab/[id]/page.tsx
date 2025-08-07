@@ -5,7 +5,7 @@ import { getScholarsIdeasLabCardById } from "@/lib/sanity/client";
 import { PortableText as PortableTextComponent } from "@portabletext/react";
 import { useParams } from "next/navigation";
 import Loading from "@/app/loading";
-import { ContentDetailLayout } from "@/components/templates/ContentDetailLayout";
+import { ContentDetailLayout } from "@/components/organisms/layout/ContentDetailLayout";
 import { ContentHero } from "@/components/molecules/content/ContentHero";
 import { IdeasLabCommentSection } from "@/components/organisms/comment/IdeasLabCommentSection";
 import { CommentNotifications } from "@/components/molecules/comment/CommentNotifications";

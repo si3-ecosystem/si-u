@@ -5,7 +5,6 @@
 
 import { store } from '@/redux/store';
 import { initializeUser, setUser, updateUserProfile, resetUser, UserData } from '@/redux/slice/userSlice';
-import { ApiResponse } from '@/types/rsvp';
 import { apiClient } from './api';
 
 export interface LoginResponse {

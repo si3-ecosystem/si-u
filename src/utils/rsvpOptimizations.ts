@@ -4,7 +4,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
-import { IRSVP, RSVPStatus } from '@/types/rsvp';
+import { RSVPStatus } from '@/types/rsvp';
 
 export class RSVPOptimizations {
   /**
@@ -152,7 +152,7 @@ export class RSVPOptimizations {
       // Clean up old cache entries (keep last 50)
       if (cache.size > 50) {
         const firstKey = cache.keys().next().value;
-        cache.delete(firstKey);
+        cache.delete(firstKey as any);
       }
 
       return result;
@@ -248,7 +248,7 @@ export class RSVPOptimizations {
       // Limit cache size
       if (cache.size > 100) {
         const firstKey = cache.keys().next().value;
-        cache.delete(firstKey);
+        cache.delete(firstKey as any);
       }
 
       return result;
