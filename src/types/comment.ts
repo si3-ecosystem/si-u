@@ -7,6 +7,7 @@ export type { ContentType, UserRole } from './api';
 export interface User {
   _id: string;
   email: string;
+  username?: string;
   roles: UserRole[];
   firstName?: string;
   lastName?: string;

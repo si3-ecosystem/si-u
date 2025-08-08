@@ -1,11 +1,13 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Grid, Star, User } from "lucide-react";
+import { Grid, Star, User, Settings } from "lucide-react";
 
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { useAppSelector } from "@/redux/store";
 
 // import {
 //   Notification,
@@ -24,6 +26,13 @@ const profileMenuItems = [
     label: "Profile",
     href: "/profile",
     icon: <User className="h-5 w-5" />,
+    showChevron: true,
+  },
+
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: <Settings className="h-5 w-5" />,
     showChevron: true,
   },
 
@@ -67,6 +76,25 @@ const profileMenuItems = [
 
 export function Header() {
   const { open } = useSidebar();
+  const currentUser = useAppSelector(state => state.user);
+  const [isClient, setIsClient] = React.useState(false);
+
+  // Ensure client-side rendering for user data to prevent hydration mismatch
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Get user data with fallbacks - only on client side
+  const username = isClient ?
+    (currentUser?.user?.email || currentUser?.user?.username || "user.edu") :
+    "user.edu";
+  const walletAddress = isClient ? currentUser?.user?.walletAddress : null;
+  const subtext = isClient && walletAddress ?
+    `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
+    "user.siher.eth";
+  const avatarUrl = isClient ?
+    (currentUser?.user?.avatar || "/placeholder.png") :
+    "/placeholder.png";
 
   // const handleMarkAllRead = () => {
   //   console.log("Marking all as read");
@@ -99,10 +127,10 @@ export function Header() {
         /> */}
 
         <ProfileDropdown
-          username="annabanana.edu"
-          avatarUrl="/placeholder.png"
+          username={username}
+          avatarUrl={avatarUrl}
           menuItems={profileMenuItems}
-          subtext="annabanana.siher.eth"
+          subtext={subtext}
         />
       </div>
     </header>
