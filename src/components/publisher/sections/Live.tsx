@@ -20,7 +20,7 @@ const AudioVisualizer = ({ isPlaying }: AudioVisualizerProps) => {
     const barElements = visualizerRef.current.childNodes;
     let animationId: number;
     const animate = () => {
-      for (const bar of barElements) {
+      for (const bar of Array.from(barElements)) {
         if (bar instanceof HTMLElement) {
           bar.style.height = `${Math.floor(Math.random() * 50) + 20}px`;
         }
@@ -39,11 +39,13 @@ const AudioVisualizer = ({ isPlaying }: AudioVisualizerProps) => {
         {bars.map((_, i) => (
           <div
             key={`bar-${i}`}
-            className={`w-3 bg-blue-primary rounded-t-md ${isPlaying ? "animate-pulse" : ""}`}
+            className={`w-3 bg-blue-primary rounded-t-md ${
+              isPlaying ? "animate-pulse" : ""
+            }`}
             style={{
               height: "10px",
               animationDelay: `${i * 0.1}s`,
-              transition: "height 0.3s ease"
+              transition: "height 0.3s ease",
             }}
           />
         ))}
@@ -55,22 +57,29 @@ const AudioVisualizer = ({ isPlaying }: AudioVisualizerProps) => {
 interface MediaComponentProps {
   url: string;
   mediaType: "video" | "audio" | null;
-  onPlayStateChange: (isPlaying: boolean) => void;
 }
 
-const MediaComponent = ({ url, mediaType, onPlayStateChange }: MediaComponentProps) => {
+const MediaComponent = ({ url, mediaType }: MediaComponentProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   if (!url) return null;
   if (mediaType === "video") {
-    return <video src={url} className="w-full h-full object-cover rounded-2xl" playsInline muted loop autoPlay />;
+    return (
+      <video
+        src={url}
+        className="w-full h-full object-cover rounded-2xl"
+        playsInline
+        muted
+        loop
+        autoPlay
+      />
+    );
   }
   if (mediaType === "audio") {
     const handlePlay = () => {
       if (audioRef.current) {
         audioRef.current.play();
         setIsPlaying(true);
-        onPlayStateChange(true);
       }
     };
     return (
@@ -81,7 +90,6 @@ const MediaComponent = ({ url, mediaType, onPlayStateChange }: MediaComponentPro
           className="hidden"
           onEnded={() => {
             setIsPlaying(false);
-            onPlayStateChange(false);
           }}
         />
         {isPlaying ? (
@@ -94,7 +102,12 @@ const MediaComponent = ({ url, mediaType, onPlayStateChange }: MediaComponentPro
             aria-label="Play audio"
           >
             <div className="w-16 h-16 bg-blue-primary rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path d="M8 5v14l11-7z" />
               </svg>
             </div>
@@ -108,12 +121,17 @@ const MediaComponent = ({ url, mediaType, onPlayStateChange }: MediaComponentPro
 
 const Live = () => {
   const data: LiveTypes = useSelector((state: RootState) => state.content.live);
-  const name: string = useSelector((state: RootState) => state.content.landing.fullName.trim().split(" ")[0]);
+  const name: string = useSelector(
+    (state: RootState) => state.content.landing.fullName.trim().split(" ")[0]
+  );
   const [mediaType, setMediaType] = useState<"video" | "audio" | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const validDetails = useMemo(() => {
-    return data?.details?.filter((item) => item?.title?.trim() && item?.heading?.trim()) ?? [];
+    return (
+      data?.details?.filter(
+        (item) => item?.title?.trim() && item?.heading?.trim()
+      ) ?? []
+    );
   }, [data?.details]);
   const hasImage: boolean = Boolean(data?.image);
   const hasMedia: boolean = Boolean(data?.url);
@@ -128,7 +146,10 @@ const Live = () => {
   }, [data?.url]);
 
   return (
-    <section className="bg-purple-primary p-4 py-10 sm:py-16" aria-label="Live Section">
+    <section
+      className="bg-purple-primary p-4 py-10 sm:py-16"
+      aria-label="Live Section"
+    >
       <div className="max-w-[90rem] mx-auto space-y-8">
         {/* Live content */}
         {(hasImage || hasMedia) && (
@@ -147,7 +168,9 @@ const Live = () => {
                 <>
                   {/* Image */}
                   <div className="relative w-full aspect-video overflow-hidden">
-                    {!isImageLoaded && <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-2xl" />}
+                    {!isImageLoaded && (
+                      <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-2xl" />
+                    )}
                     <Image
                       src={data.image}
                       alt="Live content image"
@@ -161,12 +184,14 @@ const Live = () => {
                   </div>
                   {/* Media */}
                   <div className="w-full aspect-video">
-                    <MediaComponent url={data.url} mediaType={mediaType} onPlayStateChange={setIsPlaying} />
+                    <MediaComponent url={data.url} mediaType={mediaType} />
                   </div>
                 </>
               ) : hasImage ? (
                 <div className="relative w-full aspect-video overflow-hidden col-span-full">
-                  {!isImageLoaded && <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-2xl" />}
+                  {!isImageLoaded && (
+                    <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-2xl" />
+                  )}
                   <Image
                     src={data.image}
                     alt="Live content image"
@@ -180,7 +205,7 @@ const Live = () => {
                 </div>
               ) : (
                 <div className="w-full aspect-video col-span-full">
-                  <MediaComponent url={data.url} mediaType={mediaType} onPlayStateChange={setIsPlaying} />
+                  <MediaComponent url={data.url} mediaType={mediaType} />
                 </div>
               )}
             </div>
@@ -219,7 +244,8 @@ const Live = () => {
         {validDetails.length === 0 && data?.details?.length > 0 && (
           <div className="text-center py-6">
             <p className="text-gray-500 italic">
-              Note: Detail cards require title, heading, and body content to display.
+              Note: Detail cards require title, heading, and body content to
+              display.
             </p>
           </div>
         )}

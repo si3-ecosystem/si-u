@@ -13,7 +13,7 @@ const Home = () => {
   const openDrawer = () => setIsOpen(true);
 
   return (
-    <div className="h-screen text-gray-800">
+    <div className="h-screen font-firamono text-gray-800">
       <Navbar />
       <Domain />
       {/* Page View */}

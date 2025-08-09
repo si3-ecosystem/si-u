@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Home, Loader2, X, Play } from "lucide-react";
-import Link from "next/link";
+import { Home, Loader2, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector, useStore } from "react-redux";
@@ -51,7 +50,6 @@ const Navbar = () => {
         errorMessage =
           error.response.data?.message ?? error.response.data ?? "Bad request";
       } else if (error.response?.status === 401) {
-        // await handleCompleteLogout();
         router.replace("/login");
         return;
       } else if (error.code === "ECONNABORTED") {
@@ -109,7 +107,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="font-dm-sans border-b border-gray-300 sm:px-6 lg:px-8">
+      <nav className="font-dm-sans border-y border-gray-300 sm:px-6 lg:px-8">
         <div className="flex relative justify-between items-center px-2 w-full p-1 lg:p-2 max-w-[90rem] mx-auto text-xs">
           {/* Logo Section */}
           <div className="flex gap-2 sm:gap-4 items-center">
@@ -127,17 +125,7 @@ const Navbar = () => {
             >
               Aurpay Tutorial
             </button>
-            {/* Preview Button */}
-            <Link
-              href="/preview"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex gap-2 items-center px-4 h-8 text-white bg-gray-900 rounded-lg hover:shadow-md transition-shadow duration-200"
-              aria-label="Preview content in new tab"
-            >
-              <Play className="size-3" />
-              Preview
-            </Link>
+
             {/* Publish Button */}
             <button
               type="button"
@@ -167,7 +155,7 @@ const Navbar = () => {
           aria-modal="true"
           aria-labelledby="iframe-title"
         >
-          <div
+          <button
             className="relative p-5 w-4/5 max-w-2xl bg-white rounded-lg shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
@@ -195,7 +183,7 @@ const Navbar = () => {
               }`}
               onLoad={handleIframeLoad}
             />
-          </div>
+          </button>
         </div>
       )}
     </>

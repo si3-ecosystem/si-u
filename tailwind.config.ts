@@ -14,6 +14,9 @@ const config: Config = {
         brandGray: "#454545",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        "blue-primary": "#3E21F3",
+        "light-purple": "#C8BAFD",
+        "purple-primary": "#ECE9FD",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
