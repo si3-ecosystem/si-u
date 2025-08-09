@@ -1,3 +1,4 @@
+import React from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
@@ -5,6 +6,10 @@ import { AttendEventDropdown } from "../dropdowns/attendEventDropdown";
 import { GuidesSession } from "@/types/siherguides/session";
 import { urlForImage } from "@/lib/sanity/image";
 import moment from "moment";
+import { useRSVP } from "@/hooks/useRSVP";
+import { useCalendarIntegration } from "@/hooks/useCalendarIntegration";
+import { RSVPStatus } from "@/types/rsvp";
+import { ErrorHandler } from "@/utils/errorHandler";
 
 interface SessionCardProps {
   session: GuidesSession;
@@ -21,6 +26,102 @@ export function SessionCard({
 }: SessionCardProps) {
   const partnersImage =
     session?.partner?.logo && urlForImage(session?.partner?.logo)?.src;
+
+  // RSVP functionality
+  const { rsvp, rsvpStatus, hasRSVP, createRSVP, updateRSVP, deleteRSVP, isCreating, isUpdating, isDeleting, config } = useRSVP(session._id, session);
+
+  // Calendar integration
+  const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } = useCalendarIntegration(session);
+
+  const handleCancelAttendance = () => {
+    deleteRSVP();
+  };
+
+  const handleDirectRSVP = () => {
+    // Directly create RSVP with attending status
+    if (rsvp && rsvp._id && rsvp._id !== 'temp-id') {
+      // Update existing RSVP to attending
+      updateRSVP({ status: RSVPStatus.ATTENDING });
+    } else {
+      // Create new RSVP with attending status - no dietary restrictions
+      createRSVP({
+        eventId: session._id,
+        status: RSVPStatus.ATTENDING,
+        guestCount: 1
+      });
+    }
+  };
+
+  const handleCalendarAdd = (type: 'google' | 'apple' | 'ics') => {
+    switch (type) {
+      case 'google':
+        addToGoogleCalendar();
+        break;
+      case 'apple':
+        addToAppleCalendar();
+        break;
+      case 'ics':
+        downloadICSFile();
+        break;
+      default:
+        ErrorHandler.showInfo(`Calendar type ${type} not supported`);
+    }
+  };
+
+  const handleJoinChannel = () => {
+    // Try new location virtual link first, then fall back to legacy rsvpChannelLink
+    const channelLink = session.location?.virtualLink || session.rsvpChannelLink;
+
+    if (channelLink) {
+      window.open(channelLink, '_blank');
+    } else {
+      ErrorHandler.showInfo('Channel link not available');
+    }
+  };
+
+
+
+  const getButtonText = () => {
+    if (!config.isRSVPEnabled) return 'RSVP Disabled';
+    if (config.isDeadlinePassed) return 'RSVP Closed';
+    if (!config.hasValidEmail) return 'Update Email to RSVP';
+    if (isCreating || isUpdating || isDeleting) return 'Updating...';
+
+    switch (rsvpStatus) {
+      case RSVPStatus.ATTENDING:
+        return config.requiresApproval ? 'Pending Approval' : 'Attending';
+      case RSVPStatus.MAYBE:
+        return 'Maybe';
+      case RSVPStatus.NOT_ATTENDING:
+        return 'Not Attending';
+      case RSVPStatus.WAITLISTED:
+        return 'Waitlisted';
+      default:
+        return 'Attend Event';
+    }
+  };
+
+  const getButtonStyle = () => {
+    const baseStyle = "text-white border font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 max-lg:w-full max-lg:text-center";
+
+    if (!config.isRSVPEnabled || config.isDeadlinePassed) {
+      return `${baseStyle} border-gray-400 bg-gray-400 cursor-not-allowed`;
+    }
+
+    switch (rsvpStatus) {
+      case RSVPStatus.ATTENDING:
+        return `${baseStyle} border-green-600 bg-green-600 hover:bg-green-700`;
+      case RSVPStatus.MAYBE:
+        return `${baseStyle} border-yellow-600 bg-yellow-600 hover:bg-yellow-700`;
+      case RSVPStatus.NOT_ATTENDING:
+        return `${baseStyle} border-red-600 bg-red-600 hover:bg-red-700`;
+      case RSVPStatus.WAITLISTED:
+        return `${baseStyle} border-blue-600 bg-blue-600 hover:bg-blue-700`;
+      default:
+        return `${baseStyle} border-black bg-black hover:bg-gray-800`;
+    }
+  };
+
   return (
     <Card className="p-4 w-full">
       <div className="flex flex-col md:flex-row gap-4">
@@ -79,18 +180,32 @@ export function SessionCard({
             <div className="mt-4 md:mt-0 relative max-lg:w-full">
               <button
                 onClick={() => toggleDropdown(session._id)}
-                className="text-white border border-black max-lg:w-full max-lg:text-center bg-black  font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2"
+                className={getButtonStyle()}
+                disabled={isCreating || isUpdating || isDeleting || !config.isRSVPEnabled || config.isDeadlinePassed || !config.hasValidEmail}
               >
-                Attend Event
+                {getButtonText()}
               </button>
 
               {openDropdownId === session._id && (
-                <AttendEventDropdown onClose={() => setOpenDropdownId(null)} />
+                <AttendEventDropdown
+                  onClose={() => setOpenDropdownId(null)}
+                  eventId={session._id}
+                  currentStatus={rsvpStatus}
+                  hasRSVP={hasRSVP}
+                  hasValidEmail={config.hasValidEmail}
+                  isDeleting={isDeleting}
+                  onCalendarAdd={handleCalendarAdd}
+                  onJoinChannel={handleJoinChannel}
+                  onCancelAttendance={handleCancelAttendance}
+                  onOpenRSVPForm={handleDirectRSVP}
+                />
               )}
             </div>
           </div>
         </div>
       </div>
+
+
     </Card>
   );
 }

@@ -1,52 +1,52 @@
+"use client";
+
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
-import Image from "next/image";
+import { ProfileEditForm } from "@/components/organisms/profile/ProfileEditForm";
+import { AccountWalletSection } from "./AccountWalletSection";
+import { SupportSection } from "./SupportSection";
+import { NotificationSection } from "./NotificationSection";
+import { LogOut } from "lucide-react";
 
 export default function Settings() {
+  const handleLogout = () => {
+    console.log("Logout clicked");
+  };
+
+  const handleDisconnectWallet = () => {
+    console.log("Disconnect wallet clicked");
+  };
+
   return (
-    <div>
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm p-6">
-        <div className="flex flex-col items-center mb-6">
-          <div className="relative w-28 h-28 mb-3">
-            <Image
-              src="/card_placeholder.png"
-              alt="Profile picture"
-              width={96}
-              height={96}
-              className="rounded-full object-center object-cover h-full w-full"
-            />
-          </div>
-          <h2 className="text-lg font-medium">siher.et</h2>
-          <div className="flex items-center mt-2 text-sm gap-2  rounded-full px-3 py-1">
-            <span className="font-bold">
-              eth: <span className="text-gray-500">0x8687...edce</span>
-            </span>
-            <button className="ml-1 text-gray-500 hover:text-gray-700">
-              <Copy className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="mt-3 bg-green-100 text-green-600 px-4 py-1 rounded-full text-sm">
-            You are logged in
-          </div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+          <p className="mt-2 text-gray-600">
+            Manage your wallet, preference, and connected accounts.
+          </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex justify-between py-2">
-            <span className="">Wallet</span>
-            <span className="font-semibold">Zerion</span>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 overflow-hidden">
+          <div className=" space-y-6">
+            <AccountWalletSection onDisconnectWallet={handleDisconnectWallet} />
+            <SupportSection />
+
+            <Button
+              variant="destructive"
+              className=" bg-red-100 text-red-700 font-medium hover:bg-red-200 hover:text-red-800 rounded-lg w-fit"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
           </div>
-          <div className="flex justify-between py-2">
-            <span className="">Connected network</span>
-            <span className="font-semibold">Mainnet</span>
+          <div className=" space-y-6">
+            <NotificationSection />
+            <ProfileEditForm />
+
           </div>
         </div>
-
-        <Button
-          variant="destructive"
-          className="w-full mt-16 bg-red-100 text-red-700 font-medium hover:text-white"
-        >
-          Disconnect
-        </Button>
       </div>
     </div>
   );

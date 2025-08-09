@@ -1,12 +1,14 @@
 "use client";
 
+import React from "react";
+import { useRouter } from "next/navigation";
 import { Kollabs } from "@/components/molecules/icons/Kollabs";
 import { Rewards } from "@/components/molecules/icons/Rewards";
 import { SessionsCompleted } from "@/components/molecules/icons/SessionsCompleted";
 import { LearningProgress } from "@/components/organisms/dashboard/dashboardLearningProgress";
 import { DashboardProfileHeader } from "@/components/organisms/dashboard/dashboardProfileHeader";
-
 import { UpcomingSessions } from "@/components/organisms/dashboard/dashboardUpcomingSessions";
+import { useAppSelector } from "@/redux/store";
 
 const statsData = [
   {
@@ -72,18 +74,33 @@ const sessionsData = [
 ];
 
 export default function DashboardPage() {
-  const profileData = {
-    username: "annabanana.edu",
-    subtext: "annabanana.siher.eth",
-    avatarUrl: "/placeholder.png",
-  };
+  const router = useRouter();
+  const currentUser = useAppSelector(state => state.user);
+  const [isClient, setIsClient] = React.useState(false);
+
+  // Ensure client-side rendering for user data to prevent hydration mismatch
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Get user data with fallbacks - only on client side
+  const username = isClient ?
+    (currentUser?.user?.email || currentUser?.user?.username || "user.edu") :
+    "user.edu";
+  const walletAddress = isClient ? currentUser?.user?.walletAddress : null;
+  const subtext = isClient && walletAddress ?
+    `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
+    "user.siher.eth";
+  const avatarUrl = isClient ?
+    (currentUser?.user?.avatar || "/placeholder.png") :
+    "/placeholder.png";
 
   const handleShareProfile = () => {
     console.log("Share profile clicked");
   };
 
   const handleEditProfile = () => {
-    console.log("Edit profile clicked");
+    router.push("/settings");
   };
 
   const handleLearnMore = () => {
@@ -96,9 +113,9 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen w-full bg-[#f6f6f6]">
       <DashboardProfileHeader
-        username={profileData.username}
-        subtext={profileData.subtext}
-        avatarUrl={profileData.avatarUrl}
+        username={username}
+        subtext={subtext}
+        avatarUrl={avatarUrl}
         onShare={handleShareProfile}
         onEdit={handleEditProfile}
         statsData={statsData}
