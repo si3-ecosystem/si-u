@@ -10,6 +10,7 @@ import {
   Shield,
   Presentation,
   LayoutDashboard,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -76,6 +77,7 @@ const subMenuGroups: SubMenuGroup[] = [
       { title: "Sessions", icon: Video, href: "/guides/sessions" },
       { title: "Ideas Lab", icon: Brain, href: "/guides/ideas-lab" },
       { title: "Go Live (Coming Soon) ", icon: Share2, href: "/#" },
+      { title: "Publisher", icon: Globe, href: "/publisher" },
     ],
   },
   {
