@@ -375,7 +375,7 @@ export const fixSessionsQuery = groq`
 `;
 
 export const communitiesQuery = groq`
-  *[_type == "cards" && published == true] | order(order asc){
+  *[_type == "cards" && published == true] | order(communityName asc){
     _id,
     published,
     order,
@@ -461,5 +461,21 @@ export const scholarsIdeasLabCardByIdQuery = groq`
     date,
     ideaLabImage,
     body
+  }
+`;
+
+
+export const dashboardBannerQuery = groq`
+  *[_type == "dashboardSchema"][0] {
+    _id,
+    title,
+    banner-> {
+      title,
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
   }
 `;

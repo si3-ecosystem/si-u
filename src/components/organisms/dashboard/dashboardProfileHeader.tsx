@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { StatsCard, StatsCardGrid } from "./dashboardStatsCard";
 import { ProfileDiamond } from "@/components/molecules/icons/ProfileDiamond";
+import { urlForImage } from "@/lib/sanity/image";
 
 interface statsData {
   title: string;
@@ -19,6 +20,7 @@ interface ProfileHeaderProps {
   statsData: statsData[];
   onShare?: () => void;
   onEdit?: () => void;
+  bannerData: any;
 }
 
 export function DashboardProfileHeader({
@@ -28,11 +30,14 @@ export function DashboardProfileHeader({
   onShare,
   onEdit,
   statsData,
+  bannerData
 }: ProfileHeaderProps) {
+
+  const backgroundImage = bannerData?.banner?.background && urlForImage(bannerData?.banner?.background)?.src;
   return (
     <div className="flex flex-col justify-between rounded-lg  p-6 min-h-[267px] relative">
       <Image
-        src={"/dashboardbg.png"}
+        src={backgroundImage || "/dashboardbg.png"}
         alt="background"
         fill
         className="w-full absolute inset-0 z-0 object-cover object-center"
