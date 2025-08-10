@@ -23,6 +23,7 @@ import {
   scholarsIdeasLabCardByIdQuery,
   fixCardByIdQuery,
   guidesByIdQuery,
+  dashboardBannerQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -187,4 +188,11 @@ export async function getScholarsIdeasLabCardById(id: string) {
 export async function getFixCardById(id: string) {
   if (!client) throw new Error("Sanity client not configured");
   return client.fetch(fixCardByIdQuery(id));
+}
+
+export async function getDashboardBanner() {
+  if (client) {
+    return (await client.fetch(dashboardBannerQuery)) || {};
+  }
+  return {};
 }

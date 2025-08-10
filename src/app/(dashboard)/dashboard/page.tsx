@@ -9,6 +9,9 @@ import { LearningProgress } from "@/components/organisms/dashboard/dashboardLear
 import { DashboardProfileHeader } from "@/components/organisms/dashboard/dashboardProfileHeader";
 import { UpcomingSessions } from "@/components/organisms/dashboard/dashboardUpcomingSessions";
 import { useAppSelector } from "@/redux/store";
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardBanner } from "@/lib/sanity/client";
+import Loading from "@/app/loading";
 
 const statsData = [
   {
@@ -78,6 +81,12 @@ export default function DashboardPage() {
   const currentUser = useAppSelector(state => state.user);
   const [isClient, setIsClient] = React.useState(false);
 
+   const { data, isLoading } = useQuery({
+    queryKey: ["dashboardBanner"],
+    queryFn: getDashboardBanner,
+  });
+
+
   // Ensure client-side rendering for user data to prevent hydration mismatch
   React.useEffect(() => {
     setIsClient(true);
@@ -110,6 +119,9 @@ export default function DashboardPage() {
   const handleExploreSessions = () => {
     console.log("Explore sessions clicked");
   };
+
+  if(isLoading) return <Loading />;
+
   return (
     <div className="min-h-screen w-full bg-[#f6f6f6]">
       <DashboardProfileHeader
@@ -119,6 +131,7 @@ export default function DashboardPage() {
         onShare={handleShareProfile}
         onEdit={handleEditProfile}
         statsData={statsData}
+        bannerData={data}
       />
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
