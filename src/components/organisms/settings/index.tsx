@@ -15,12 +15,10 @@ export default function Settings() {
 
   const handleDisconnectWallet = () => {
     console.log("Wallet disconnected");
-    // Could trigger user data refresh or other actions
   };
 
   const handleConnectWallet = () => {
     console.log("Wallet connected");
-    // Could trigger user data refresh or other actions
   };
 
   return (

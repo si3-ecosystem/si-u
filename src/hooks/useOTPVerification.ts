@@ -12,11 +12,6 @@ export function useOTPVerification() {
     setIsVerifyingOTP(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      console.log("=== VERIFY EMAIL DEBUG ===");
-      console.log("Verifying OTP:", otp);
-      console.log("New email:", email);
-      console.log("Request URL:", `${apiUrl}/api/auth/verify-email`);
-
       const response = await fetch(`${apiUrl}/api/auth/verify-email`, {
         method: "POST",
         headers: {
@@ -28,22 +23,16 @@ export function useOTPVerification() {
       });
 
       const responseData = await response.json();
-      console.log("Verify email response:", responseData);
 
       if (response.ok && responseData.status === "success") {
-        console.log("✅ Email verified successfully");
         setOtpCode("");
 
-        // Update token if provided
         if (responseData.data?.token) {
           localStorage.setItem('token', responseData.data.token);
-          console.log("✅ Updated JWT token");
         }
 
         return { success: true, data: responseData };
       } else {
-        console.error("❌ Email verification failed");
-        console.error("Response:", responseData);
         return { success: false, error: responseData.message || "Invalid OTP" };
       }
     } catch (error) {

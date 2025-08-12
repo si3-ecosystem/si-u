@@ -6,7 +6,6 @@ import {
   Brain,
   Share2,
   Settings,
-  ScrollText,
   Shield,
   Presentation,
   LayoutDashboard,
@@ -93,7 +92,7 @@ const subMenuGroups: SubMenuGroup[] = [
     ],
   },
   {
-    title: "GROW3EDGE ACCELERATOR",
+    title: "GROW3DGE PROGRAM",
     items: [
       {
         title: "Grow3dge Sessions",
@@ -101,10 +100,15 @@ const subMenuGroups: SubMenuGroup[] = [
         href: "/grow3dge/grow3dge-sessions",
       },
       {
-        title: "Grow3dge Playbook",
-        icon: ScrollText,
-        href: "/grow3dge/grow3dge-playbook",
+        title: "Idea Labs",
+        icon: Brain,
+        href: "/grow3dge/ideas-lab",
       },
+      // {
+      //   title: "Grow3dge Playbook",
+      //   icon: ScrollText,
+      //   href: "/grow3dge/grow3dge-playbook",
+      // },
     ],
   },
   // {

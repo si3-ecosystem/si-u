@@ -8,23 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { UpdateProfileRequest } from "@/services/profileService";
 
-// Components
-import { DebugPanel } from "./components/DebugPanel";
 import { StepperProgress } from "./components/StepperProgress";
 import { EmailVerificationStep } from "./steps/EmailVerificationStep";
 import { OTPVerificationStep } from "./steps/OTPVerificationStep";
 import { ProfileUpdateStep } from "./steps/ProfileUpdateStep";
 
-// Hooks
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { useOTPVerification } from "@/hooks/useOTPVerification";
 import { useProfileFormSteps } from "@/hooks/useProfileFormSteps";
 
-
-// Simple validation schema - only validate what's required
 const profileSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  username: z.string().optional(), // Always optional, validate in component if needed
+  username: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -34,7 +29,6 @@ export function ProfileEditForm() {
   const [isClient, setIsClient] = useState(false);
   const [showDebug, setShowDebug] = useState(true);
 
-  // Initialize hooks
   const stepManager = useProfileFormSteps({ profile, isClient });
   const emailVerification = useEmailVerification({ profile });
   const otpVerification = useOTPVerification();
@@ -56,10 +50,7 @@ export function ProfileEditForm() {
     defaultValues: stableProfileData,
   });
 
-  const { formState: { errors, isDirty, isValid, isSubmitting }, reset, watch, getValues } = form;
-
-  // Watch form values for debugging
-  const watchedEmail = watch("email");
+  const { reset, getValues } = form;
 
   useEffect(() => {
     if (stableProfileData.email || stableProfileData.username) {
@@ -67,29 +58,19 @@ export function ProfileEditForm() {
     }
   }, [stableProfileData, reset]);
 
-  // Update form validation when step changes
   useEffect(() => {
-    // Trigger re-validation when step changes
     form.trigger();
   }, [stepManager.currentStep, form]);
 
   // Handler functions
   const handleEmailSubmit = async (data: ProfileFormData) => {
-    console.log("=== HANDLE EMAIL SUBMIT ===");
-    console.log("Calling emailVerification.handleEmailSubmit with:", data);
-
     const result = await emailVerification.handleEmailSubmit(data);
-    console.log("Email verification result:", result);
 
     if (result.success) {
-      console.log("✅ Email verification successful, advancing to next step");
-      console.log("Current step before:", stepManager.currentStep);
       stepManager.goToNextStep();
-      console.log("Current step after:", stepManager.currentStep);
     } else {
       console.log("❌ Email verification failed:", result.error);
     }
-    console.log("=== END HANDLE EMAIL SUBMIT ===");
   };
 
   const handleProfileSubmit = (data: ProfileFormData) => {
@@ -114,47 +95,25 @@ export function ProfileEditForm() {
   };
 
   const onSubmit = (data: ProfileFormData) => {
-    console.log("=== FORM SUBMIT DEBUG ===");
-    console.log("onSubmit called with currentStep:", stepManager.currentStep);
-    console.log("Form data:", data);
-    console.log("Form is valid:", isValid);
-    console.log("Form errors:", errors);
-
     if (stepManager.currentStep === "email") {
-      console.log("📧 Calling handleEmailSubmit");
       handleEmailSubmit(data);
     } else if (stepManager.currentStep === "profile") {
-      console.log("👤 Calling handleProfileSubmit");
       handleProfileSubmit(data);
-    } else {
-      console.log("❌ Unknown step:", stepManager.currentStep);
     }
-    console.log("=== END FORM SUBMIT DEBUG ===");
   };
 
   // OTP and verification handlers
   const handleVerifyOTP = async () => {
-    console.log("=== HANDLE VERIFY OTP ===");
-    console.log("Pending email:", emailVerification.pendingEmail);
-    console.log("OTP code:", otpVerification.otpCode);
-
-    const result = await otpVerification.verifyOTP(emailVerification.pendingEmail, otpVerification.otpCode);
-    console.log("OTP verification result:", result);
+    const result = await otpVerification.verifyOTP(
+      emailVerification.pendingEmail,
+      otpVerification.otpCode
+    );
 
     if (result.success) {
-      console.log("✅ OTP verification successful, advancing to profile step");
-
-      // If we have new user data from the response, we might want to refresh the user state
-      if (result.data?.data?.user) {
-        console.log("✅ Updated user data received:", result.data.data.user);
-        // You might want to dispatch an action to update the Redux store here
-      }
-
       stepManager.goToNextStep();
     } else {
       console.log("❌ OTP verification failed:", result.error);
     }
-    console.log("=== END HANDLE VERIFY OTP ===");
   };
 
   const handleResendOTP = () => {
@@ -163,26 +122,8 @@ export function ProfileEditForm() {
 
   const handleDebugSend = () => {
     const formData = getValues();
-    console.log("=== MANUAL TEST DEBUG ===");
-    console.log("Manual test with form data:", formData);
     handleEmailSubmit(formData);
   };
-
-  // Debug data for the debug panel
-  const debugData = {
-    currentStep: stepManager.currentStep,
-    isValid,
-    isDirty,
-    isSubmitting,
-    isSendingOTP: emailVerification.isSendingOTP,
-    profileEmail: profile?.email || "",
-    watchedEmail: watchedEmail || "",
-    pendingEmail: emailVerification.pendingEmail || "",
-    hasTemporaryEmail: stepManager.hasTemporaryEmail,
-    isEmailVerified: stepManager.isEmailVerified,
-    errors,
-  };
-
   if (!profile) {
     return (
       <Card>
@@ -195,26 +136,25 @@ export function ProfileEditForm() {
 
   return (
     <div className="space-y-6">
-      {/* Debug Panel */}
-      <DebugPanel
-        showDebug={showDebug}
-        onToggleDebug={() => setShowDebug(!showDebug)}
-        debugData={debugData}
-      />
-
-      {/* Edit Form */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg lg:text-xl font-bold">
-            Edit Profile
+            {stepManager.currentStep === "profile"
+              ? "Complete Your Profile"
+              : "Edit Profile"}
           </CardTitle>
-          <p className="text-gray-600">Update your personal information</p>
+          <p className="text-gray-600">
+            {stepManager.currentStep === "profile"
+              ? "Finalize your profile with a username"
+              : "Update your personal information"}
+          </p>
         </CardHeader>
 
         <CardContent>
           <div className="border border-gray-200 rounded-lg p-4">
-            {/* Stepper Progress */}
-            <StepperProgress currentStep={stepManager.currentStep} />
+            {stepManager.currentStep !== "profile" && (
+              <StepperProgress currentStep={stepManager.currentStep} />
+            )}
 
             {/* Step 1: Email */}
             {stepManager.currentStep === "email" && (

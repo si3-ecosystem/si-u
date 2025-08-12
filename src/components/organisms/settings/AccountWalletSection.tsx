@@ -11,7 +11,7 @@ import WalletConnectDialog from "@/components/organisms/settings/wallet-connect/
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { useAppDispatch } from "@/redux/store";
-import { setAddress, forceUpdateUser } from "@/redux/slice/userSlice";
+import {  forceUpdateUser } from "@/redux/slice/userSlice";
 import { UnifiedAuthService } from "@/services/authService";
 import { useDisconnect } from "wagmi";
 
