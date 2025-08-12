@@ -27,7 +27,8 @@ export function useProfile() {
     bio: currentUser.user.bio,
     avatar: currentUser.user.avatar,
     roles: currentUser.user.roles || [],
-    isVerified: currentUser.user.isVerified || false,
+    isVerified: currentUser.user.isVerified || currentUser.user.isEmailVerified || false,
+    isEmailVerified: currentUser.user.isEmailVerified || currentUser.user.isVerified || false,
     newsletter: currentUser.user.newsletter || false,
     interests: currentUser.user.interests || [],
     companyName: currentUser.user.companyName,
@@ -39,7 +40,8 @@ export function useProfile() {
     updatedAt: currentUser.user.updatedAt,
   } : null;
 
-  const isLoading = false; // No loading since we're using Redux data
+  // Check if we're still loading user data
+  const isLoading = !currentUser?.isInitialized || (!currentUser?.user && currentUser?.isLoggedIn);
   const error = null; // No error since we're using Redux data
 
   // Mutation for updating profile

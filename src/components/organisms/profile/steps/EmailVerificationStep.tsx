@@ -19,9 +19,6 @@ interface EmailVerificationStepProps {
   isEmailVerified: boolean;
   isSendingOTP: boolean;
   onSubmit: (data: ProfileFormData) => void;
-  onDebugSend: () => void;
-  onToggleDebug: () => void;
-  showDebug: boolean;
 }
 
 export function EmailVerificationStep({
@@ -31,9 +28,6 @@ export function EmailVerificationStep({
   isEmailVerified,
   isSendingOTP,
   onSubmit,
-  onDebugSend,
-  onToggleDebug,
-  showDebug,
 }: EmailVerificationStepProps) {
   const { register, handleSubmit, formState: { errors }, getValues } = form;
 
@@ -118,42 +112,8 @@ export function EmailVerificationStep({
           type="submit"
           className="w-fit"
           disabled={isSendingOTP}
-          onClick={() => {
-            console.log("=== BUTTON CLICK DEBUG ===");
-            console.log("Button clicked, form will submit");
-            console.log("isSendingOTP:", isSendingOTP);
-            console.log("Form values:", getValues());
-            console.log("Form errors:", errors);
-            console.log("=== END BUTTON CLICK DEBUG ===");
-          }}
         >
           {isSendingOTP ? "Sending..." : "Send Verification Code"}
-        </Button>
-        
-        {/* Debug button for manual testing */}
-        <Button
-          type="button"
-          variant="outline"
-          className="w-fit"
-          onClick={() => {
-            const formData = getValues();
-            console.log("=== MANUAL DEBUG SEND ===");
-            console.log("Form data:", formData);
-            handleEmailSubmit(formData);
-          }}
-        >
-          🔧 Debug Send
-        </Button>
-        
-        {/* Debug toggle button */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="w-fit"
-          onClick={onToggleDebug}
-        >
-          {showDebug ? "Hide Debug" : "Show Debug"}
         </Button>
       </div>
     </form>

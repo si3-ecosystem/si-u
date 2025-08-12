@@ -25,9 +25,8 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function ProfileEditForm() {
-  const { profile, updateProfile, isUpdating } = useProfile();
+  const { profile, updateProfile, isUpdating, isLoading } = useProfile();
   const [isClient, setIsClient] = useState(false);
-  const [showDebug, setShowDebug] = useState(true);
 
   const stepManager = useProfileFormSteps({ profile, isClient });
   const emailVerification = useEmailVerification({ profile });
@@ -120,17 +119,26 @@ export function ProfileEditForm() {
     emailVerification.sendOTPToEmail(emailVerification.pendingEmail);
   };
 
-  const handleDebugSend = () => {
-    const formData = getValues();
-    handleEmailSubmit(formData);
-  };
-  if (!profile) {
+
+  // Show loading state while profile is loading or user data is not available
+  if (!profile || !isClient) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <p className="text-gray-500">Please log in to view your profile.</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg lg:text-xl font-bold">
+              Edit Profile
+            </CardTitle>
+            <p className="text-gray-600">Loading your profile information...</p>
+          </CardHeader>
+          <CardContent className="flex items-center justify-center py-8">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-gray-600">Loading profile data...</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -165,9 +173,6 @@ export function ProfileEditForm() {
                 isEmailVerified={stepManager.isEmailVerified}
                 isSendingOTP={emailVerification.isSendingOTP}
                 onSubmit={onSubmit}
-                onDebugSend={handleDebugSend}
-                onToggleDebug={() => setShowDebug(!showDebug)}
-                showDebug={showDebug}
               />
             )}
 
