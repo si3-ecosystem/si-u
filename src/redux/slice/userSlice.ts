@@ -202,6 +202,28 @@ const userSlice = createSlice({
       // Also update wallet_address in user data if address is provided
       if (action.payload) {
         state.user.wallet_address = action.payload;
+      } else {
+        // Clear wallet_address when setting address to null
+        delete state.user.wallet_address;
+      }
+    },
+
+    // Force update user data without field preservation (for wallet disconnect)
+    forceUpdateUser: (state: UserState, action: PayloadAction<UserData>) => {
+      const newUserData = action.payload;
+
+      addDebugLog(state, 'forceUpdateUser', newUserData, ['No fields preserved - force update']);
+
+      // Directly replace user data without any field preservation
+      state.user = { ...newUserData };
+      state.lastUpdated = Date.now();
+      state.isLoggedIn = !!newUserData._id;
+
+      // Update address from wallet_address or clear it
+      if (newUserData.wallet_address) {
+        state.address = newUserData.wallet_address;
+      } else {
+        state.address = null;
       }
     },
 
@@ -236,7 +258,8 @@ export const {
   setAddress,
   setConnected,
   resetUser,
-  clearDebugLog
+  clearDebugLog,
+  forceUpdateUser
 } = userSlice.actions;
 
 // Export types for use in other files

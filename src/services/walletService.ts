@@ -65,7 +65,7 @@ export class WalletService {
   }
 
   /**
-   * Disconnect current wallet
+   * Disconnect current wallet - removes wallet data from user profile
    */
   static async disconnectWallet(): Promise<ApiResponse> {
     const response = await apiClient.delete('/user/wallet/disconnect');
