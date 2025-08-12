@@ -8,6 +8,7 @@ import { Grid, Star, User, Settings } from "lucide-react";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
+import { getDisplayUsername } from "@/lib/utils/username";
 
 // import {
 //   Notification,
@@ -85,9 +86,7 @@ export function Header() {
   }, []);
 
   // Get user data with fallbacks - only on client side
-  const username = isClient ?
-    (currentUser?.user?.email || currentUser?.user?.username || "user.edu") :
-    "user.edu";
+  const username = isClient ? getDisplayUsername(currentUser?.user) : "No username";
   const walletAddress = isClient ? currentUser?.user?.walletAddress : null;
   const subtext = isClient && walletAddress ?
     `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :

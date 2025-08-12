@@ -12,6 +12,7 @@ import { useAppSelector } from "@/redux/store";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardBanner } from "@/lib/sanity/client";
 import Loading from "@/app/loading";
+import { getDisplayUsername } from "@/lib/utils/username";
 
 const statsData = [
   {
@@ -93,9 +94,7 @@ export default function DashboardPage() {
   }, []);
 
   // Get user data with fallbacks - only on client side
-  const username = isClient ?
-    (currentUser?.user?.email || currentUser?.user?.username || "user.edu") :
-    "user.edu";
+  const username = isClient ? getDisplayUsername(currentUser?.user) : "No username";
   const walletAddress = isClient ? currentUser?.user?.walletAddress : null;
   const subtext = isClient && walletAddress ?
     `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
@@ -134,12 +133,27 @@ export default function DashboardPage() {
         bannerData={data}
       />
 
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <LearningProgress courses={coursesData} onLearnMore={handleLearnMore} />
-        <UpcomingSessions
-          sessions={sessionsData}
-          onExplore={handleExploreSessions}
-        />
+      <div className="relative mt-6">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 blur-sm">
+          <LearningProgress courses={coursesData} onLearnMore={handleLearnMore} />
+          <UpcomingSessions
+            sessions={sessionsData}
+            onExplore={handleExploreSessions}
+          />
+        </div>
+        
+        {/* Coming Soon Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 text-center border border-gray-200">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Coming Soon</h3>
+            
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import {
   profileStats,
   suggestedKollaboards,
 } from "@/constants/profile";
+import { getDisplayUsernameWithAt } from "@/lib/utils/username";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function ProfilePage() {
   // Get user data with fallbacks
   const userName = currentUser?.user?.name || currentUser?.user?.username || "User";
   const userEmail = currentUser?.user?.email || "";
-  const username = currentUser?.user?.username ? `@${currentUser.user.username}` : userEmail;
+  const username = getDisplayUsernameWithAt(currentUser?.user);
   const website = currentUser?.user?.website || "";
 
   return (
