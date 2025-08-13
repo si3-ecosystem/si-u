@@ -32,7 +32,7 @@ export default function SessionDetailsPage() {
     <section className="max-w-7xl mx-auto p-6 w-full">
       <SessionHeader title={data.title} description={data.description} />
 
-      <div className="bg-white p-8 mt-6 rounded-lg shadow">
+      <div className="mt-6">
         {data.videoUrl && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Session Video</h2>

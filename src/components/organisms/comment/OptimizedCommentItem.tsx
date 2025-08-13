@@ -18,7 +18,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -167,14 +167,14 @@ export function OptimizedCommentItem({
               )}>
                 {getResponsiveDisplayName(comment.user, true)}
               </span>
-
+{/* 
               {comment.user?.roles && comment.user.roles.length > 0 && (
                 <Badge variant="secondary" className={cn(
                   isSmallMobile ? "text-xs px-1 py-0" : "text-xs"
                 )}>
                   {comment.user.roles[0]}
                 </Badge>
-              )}
+              )} */}
             </div>
 
             <div className="flex items-center  gap-2">
