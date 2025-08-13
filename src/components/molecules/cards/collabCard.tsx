@@ -1,11 +1,11 @@
 import { Globe, LinkedinIcon, MapPin, TwitterIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Community } from "@/types/community";
 import { urlForImage } from "@/lib/sanity/image";
+import { PartnerProgramForm } from "@/components/molecules/forms/PartnerProgramForm";
 
 export function CollabCard({ item }: { item: Community }) {
   const cardBg = item.background && urlForImage(item?.background)?.src;
@@ -117,7 +117,7 @@ export function CollabCard({ item }: { item: Community }) {
           </div>
         </div>
         <div className="w-full px-5 pb-4">
-          <Button className="w-full">Learn More</Button>
+          <PartnerProgramForm title="Partnership Inquiry" />
         </div>
       </div>
     </Card>
