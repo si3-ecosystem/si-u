@@ -137,7 +137,6 @@ export class UnifiedAuthService {
       const response = await apiClient.get<UserData>('/auth/me');
 
       if (response.status === 'success' && response.data) {
-        console.log('[AuthService] Refreshing user data:', response.data);
         store.dispatch(updateUserProfile(response.data));
         return response.data;
       }
@@ -158,18 +157,13 @@ export class UnifiedAuthService {
       const response = await apiClient.get<UserData>('/auth/me');
 
       if (response.status === 'success' && response.data) {
-        console.log('[AuthService] Force refreshing user data:', response.data);
 
-        // Clean up partial wallet data and ensure proper field mapping
         const userData = {
           ...response.data,
-          // Map isVerified to isEmailVerified for consistency
-          isEmailVerified: response.data.isVerified ?? response.data.isEmailVerified ?? false,
-          // Also keep the original isVerified field
+          isEmailVerified: response.data.isVerified ?? response.data.isVerified ?? false,
           isVerified: response.data.isVerified ?? false,
         };
 
-        // Clean up partial wallet data (backend sometimes returns {network: "Mainnet"} instead of null)
         if (userData.walletInfo && !userData.walletInfo.address) {
           delete userData.walletInfo;
         }
@@ -182,7 +176,6 @@ export class UnifiedAuthService {
         // If response includes a new token, update it
         if ((response.data as any).token) {
           this.setToken((response.data as any).token);
-          console.log('[AuthService] JWT token updated after force refresh');
         }
 
         return userData;
@@ -205,13 +198,12 @@ export class UnifiedAuthService {
       const response = await apiClient.patch<UserData>('/auth/profile', {});
 
       if (response.status === 'success' && response.data) {
-        console.log('[AuthService] Token refresh successful');
 
         // Ensure proper field mapping for user data
         const userData = {
           ...response.data,
           // Map isVerified to isEmailVerified for consistency
-          isEmailVerified: response.data.isVerified ?? response.data.isEmailVerified ?? false,
+          isEmailVerified: response.data.isVerified ?? response.data.isVerified ?? false,
           // Also keep the original isVerified field
           isVerified: response.data.isVerified ?? false,
         };
@@ -230,7 +222,6 @@ export class UnifiedAuthService {
         // If response includes a new token, update it
         if ((response.data as any).token) {
           this.setToken((response.data as any).token);
-          console.log('[AuthService] JWT token updated after refresh');
         }
       }
     } catch (error) {
@@ -247,7 +238,6 @@ export class UnifiedAuthService {
       const response = await apiClient.patch<UserData>('/auth/profile', updates);
       
       if (response.status === 'success' && response.data) {
-        console.log('[AuthService] Profile updated:', response.data);
         
         // Use updateUserProfile to preserve critical fields
         store.dispatch(updateUserProfile(response.data));
@@ -276,12 +266,10 @@ export class UnifiedAuthService {
       await apiClient.post('/auth/logout');
     } catch (error) {
       console.error('[AuthService] Logout API error:', error);
-      // Continue with local logout even if API fails
     } finally {
       // Always clear local state
       this.clearToken();
       store.dispatch(resetUser());
-      console.log('[AuthService] User logged out');
     }
   }
 
@@ -304,7 +292,6 @@ export class UnifiedAuthService {
     try {
       if ((data as any)?.token) {
         this.setToken((data as any).token);
-        console.log('[AuthService] Token applied from auth update');
       }
       if (data?.user) {
         const userData = {
@@ -336,7 +323,6 @@ export class UnifiedAuthService {
    * Handle successful authentication
    */
   private static async handleAuthSuccess(data: LoginResponse): Promise<void> {
-    console.log('[AuthService] Handling auth success:', data);
     
     // Store token
     this.setToken(data.token);

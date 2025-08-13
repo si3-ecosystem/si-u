@@ -27,6 +27,10 @@ import {
 import { Button } from "@/components/ui/button";
 
 import LogoutButton from "../auth/LogoutButton";
+import { useQuery } from "@tanstack/react-query";
+import { getSeoSettings } from "@/lib/sanity/client";
+import Image from "next/image";
+import { urlForImage } from "@/lib/sanity/image";
 
 // Define types for menu items
 interface MenuItem {
@@ -123,6 +127,11 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { open } = useSidebar();
 
+  const { data: seoSettings } = useQuery({
+    queryKey: ["seo-settings"],
+    queryFn: getSeoSettings,
+  });
+
   if (!open) return null;
 
   const allMenuItems: MenuItem[] = [
@@ -148,10 +157,20 @@ export function AppSidebar() {
       <Sidebar className={cn("border-r !bg-white border", !open && "!w-0")}>
         <SidebarHeader className="!py-8 !px-6 bg-white">
           <div className="flex items-center justify-between w-full">
-            <Link href="/" className="">
-              <h2 className="px-4 text-[30px] !text-black font-bold uppercase">
-                {"Si<3>"}
-              </h2>
+            <Link href="/" className={cn(!open ? " " : "")}>
+              <div className="px-4">
+                <Image
+                  src={urlForImage(seoSettings?.favicon)?.src || ""}
+                  alt={
+                    seoSettings?.favicon?.alt ||
+                    seoSettings?.logo?.alt ||
+                    "Logo"
+                  }
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
             </Link>
             <SidebarTrigger />
           </div>

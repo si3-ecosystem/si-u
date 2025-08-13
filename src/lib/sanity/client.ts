@@ -26,6 +26,7 @@ import {
   fixCardByIdQuery,
   guidesByIdQuery,
   dashboardBannerQuery,
+  seoSettingsQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -209,6 +210,13 @@ export async function getFixCardById(id: string) {
 export async function getDashboardBanner() {
   if (client) {
     return (await client.fetch(dashboardBannerQuery)) || {};
+  }
+  return {};
+}
+
+export async function getSeoSettings() {
+  if (client) {
+    return (await client.fetch(seoSettingsQuery)) || {};
   }
   return {};
 }

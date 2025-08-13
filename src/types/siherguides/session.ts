@@ -82,6 +82,20 @@ export interface GuidesSession {
       _ref?: string;
     };
   };
+  // Enhanced PDF Guide Configuration
+  pdfGuide?: {
+    enabled: boolean;
+    title: string; // Editable CTA text
+    type: 'download' | 'url'; // Type of action
+    downloadFile?: {
+      asset: {
+        url: string;
+        _type?: string;
+        _ref?: string;
+      };
+    };
+    shareableUrl?: string; // URL for sharing
+  };
 }
 
 export interface SiherGuidesSession {

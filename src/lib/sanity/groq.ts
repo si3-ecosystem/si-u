@@ -325,6 +325,13 @@ export const fixCardByIdQuery = (id: string) => `
     partner->{_id, title, logo},
     downloadPdf,
     pdfFile{asset->{url}},
+    pdfGuide{
+      enabled,
+      title,
+      type,
+      downloadFile{asset->{url}},
+      shareableUrl
+    },
   }
 `;
 
@@ -348,7 +355,14 @@ export const fixSessionsQuery = groq`
       }
     },
     fixCards[]->{
-  pdfFile{asset->{url}},
+      pdfFile{asset->{url}},
+      pdfGuide{
+        enabled,
+        title,
+        type,
+        downloadFile{asset->{url}},
+        shareableUrl
+      },
       _id,
       title,
       description,
@@ -530,5 +544,30 @@ export const dashboardBannerQuery = groq`
         "ImageColor": asset->metadata.palette.dominant.background
       }
     },
+  }
+`;
+
+export const seoSettingsQuery = groq`
+  *[_type == "seoSettings"][0] {
+    _id,
+    title,
+    favicon {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    },
+    seoLogo {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    },
+    logo {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    }
   }
 `;
