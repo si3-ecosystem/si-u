@@ -21,6 +21,8 @@ import {
   allTopicsQuery,
   scholarsIdeasLabSessionQuery,
   scholarsIdeasLabCardByIdQuery,
+  grow3dgeIdeasLabSessionQuery,
+  grow3dgeIdeasLabCardByIdQuery,
   fixCardByIdQuery,
   guidesByIdQuery,
   dashboardBannerQuery,
@@ -181,6 +183,20 @@ export async function getScholarsIdeasLabSessionData() {
 export async function getScholarsIdeasLabCardById(id: string) {
   if (client) {
     return (await client.fetch(scholarsIdeasLabCardByIdQuery, { id })) || {};
+  }
+  return {};
+}
+
+export async function getGrow3dgeIdeasLabSessionData() {
+  if (client) {
+    return (await client.fetch(grow3dgeIdeasLabSessionQuery)) || {};
+  }
+  return {};
+}
+
+export async function getGrow3dgeIdeasLabCardById(id: string) {
+  if (client) {
+    return (await client.fetch(grow3dgeIdeasLabCardByIdQuery, { id })) || {};
   }
   return {};
 }
