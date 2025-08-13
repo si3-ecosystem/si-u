@@ -32,7 +32,6 @@ interface SessionCardProps {
 }
 
 export function SeasonSessionCard({ session }: SessionCardProps) {
-  console.log("session", session);
   return (
     <Card className="p-4 w-full">
       <div className="flex flex-col md:flex-row gap-4">

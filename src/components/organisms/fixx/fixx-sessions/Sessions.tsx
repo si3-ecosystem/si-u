@@ -17,7 +17,6 @@ interface SessionCard {
 }
 
 export function Sessions({ sessions }: { sessions: any }) {
-  console.log("sessions", sessions);
   return (
     <div className="w-full py-11">
       <h1 className="text-2xl font-medium mb-1 text-black">{sessions.title}</h1>

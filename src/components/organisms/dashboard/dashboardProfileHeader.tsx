@@ -2,7 +2,7 @@
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { StatsCard, StatsCardGrid } from "./dashboardStatsCard";
+// import { StatsCard, StatsCardGrid } from "./dashboardStatsCard";
 import { ProfileDiamond } from "@/components/molecules/icons/ProfileDiamond";
 import { urlForImage } from "@/lib/sanity/image";
 
@@ -29,7 +29,7 @@ export function DashboardProfileHeader({
   avatarUrl,
   onShare,
   onEdit,
-  statsData,
+  // statsData,
   bannerData
 }: ProfileHeaderProps) {
 
@@ -79,7 +79,7 @@ export function DashboardProfileHeader({
           </Button>
         </div>
       </div>
-      <div className="z-10 ">
+      {/* <div className="z-10 ">
         <StatsCardGrid>
           {statsData.map((stat: statsData, index: number) => (
             <StatsCard
@@ -91,7 +91,7 @@ export function DashboardProfileHeader({
             />
           ))}
         </StatsCardGrid>
-      </div>
+      </div> */}
     </div>
   );
 }
