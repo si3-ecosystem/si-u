@@ -21,7 +21,7 @@ export function FixCardHeader({
   return (
     <div className="mb-6">
       <Link
-        href="/fixx/fixx-sessions"
+        href="/grow3dge/grow3dge-sessions"
         className="text-black hover:underline text-sm"
       >
         ← Back

@@ -31,11 +31,8 @@ export function HighlightCard({
   showMetadata = true,
   contentId,
 }: HighlightCardProps) {
-  // Get comment count from Redux if contentId is provided
-  // Always call the hook, but conditionally use the result
   const { count: reduxCommentCount } = useReduxCommentCount(contentId || '');
 
-  // Use Redux count if contentId is provided, otherwise fall back to prop
   const displayCommentCount = contentId ? reduxCommentCount : commentCount;
 
   const formatDate = (dateString: string) => {
@@ -49,7 +46,7 @@ export function HighlightCard({
     }
   };
   return (
-    <div className="border border-gray-200 rounded-lg p-3 overflow-hidden sm:w-full sm:max-w-[320px]">
+    <div className="border border-gray-200 bg-white rounded-lg p-3 overflow-hidden sm:w-full sm:max-w-[320px]">
       {/* Image Section */}
       <div className="relative h-[178px] w-full rounded-lg overflow-hidden">
         <Image

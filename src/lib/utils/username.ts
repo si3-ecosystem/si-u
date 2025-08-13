@@ -3,6 +3,38 @@
  */
 
 /**
+ * Gets the display username from user object
+ * @param user - User object with username and email
+ * @returns Username or "No username" if not available
+ */
+export function getDisplayUsername(user: { username?: string; email?: string } | null | undefined): string {
+  if (!user) return "No username";
+
+  // Prioritize username over email
+  if (user.username && user.username.trim()) {
+    return user.username;
+  }
+
+  return "No username";
+}
+
+/**
+ * Gets the display username with @ prefix for profile pages
+ * @param user - User object with username and email
+ * @returns @username or "No username" if not available
+ */
+export function getDisplayUsernameWithAt(user: { username?: string; email?: string } | null | undefined): string {
+  if (!user) return "No username";
+
+  // Prioritize username over email
+  if (user.username && user.username.trim()) {
+    return `@${user.username}`;
+  }
+
+  return "No username";
+}
+
+/**
  * Truncates a username to show only the first 4 characters followed by "..."
  * @param username - The username to truncate
  * @param maxLength - Maximum length before truncation (default: 4)

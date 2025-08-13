@@ -306,7 +306,7 @@ export function OptimizedCommentSection({
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
+                    <div className="space-y-6 divide-y divide-gray-200">
                       {sortedComments.map((comment) => (
                         <OptimizedCommentItem
                           key={comment._id}

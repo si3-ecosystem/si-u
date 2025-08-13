@@ -1,127 +1,73 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useAppSelector } from "@/redux/store";
-import {  Copy, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { WalletService, WalletInfo } from "@/services/walletService";
+import { Loader2, Wallet } from "lucide-react";
+import WalletConnectDialog from "@/components/organisms/settings/wallet-connect/WalletConnectDialog";
 
+// Import our new components and hooks
+import { useWalletManagement } from "@/hooks/useWalletManagement";
+import { WalletDisplay } from "./wallet/WalletDisplay";
+import { WalletActions } from "./wallet/WalletActions";
+import { EmailVerificationWarning } from "./wallet/EmailVerificationWarning";
+
+// Remove prop dependencies - component is now self-contained
 interface AccountWalletSectionProps {
+  // Optional callbacks for parent components that want to listen to events
   onDisconnectWallet?: () => void;
+  onConnectWallet?: () => void;
 }
 
 export function AccountWalletSection({
   onDisconnectWallet,
+  onConnectWallet,
 }: AccountWalletSectionProps) {
-  const currentUser = useAppSelector((state) => state.user);
-  const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  // Use our custom hook for all wallet management logic
+  const {
+    walletInfo,
+    isLoading,
+    isDisconnecting,
+    isConnecting,
+    isWalletConnected,
+    isEmailVerified,
+    disconnectWallet,
+    connectWallet,
+    handleAuthSuccess,
+    copyWalletAddress,
+  } = useWalletManagement();
 
-  useEffect(() => {
-    loadWalletInfo();
-  }, []);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
-  useEffect(() => {
-    if (currentUser?.user?.walletInfo) {
-      setWalletInfo(currentUser.user.walletInfo);
-      setIsLoading(false);
-    } else if (currentUser?.user?.wallet_address) {
-      setWalletInfo({
-        address: currentUser.user.wallet_address,
-        connectedWallet: "Other",
-        network: "Mainnet",
-      });
-      setIsLoading(false);
-    } else if (currentUser?.user) {
-      setWalletInfo(null);
-      setIsLoading(false);
-    }
-  }, [
-    currentUser?.user?.walletInfo,
-    currentUser?.user?.wallet_address,
-    currentUser?.user,
-  ]);
-
-  const loadWalletInfo = async () => {
-    if (currentUser?.user?.walletInfo || currentUser?.user?.wallet_address) {
-      console.log("Using existing wallet data from user profile");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-
-      try {
-        const response = await WalletService.getWalletInfo();
-        if (response.status === "success") {
-          setWalletInfo(response.data.walletInfo);
-          return;
-        }
-      } catch (apiError: any) {
-        console.log("Wallet API endpoint failed:", apiError);
-
-        // Don't show error if we have local data
-        if (
-          currentUser?.user?.walletInfo ||
-          currentUser?.user?.wallet_address
-        ) {
-          return;
-        }
-      }
-    } catch (error: any) {
-      console.error("Failed to load wallet info:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Handle wallet disconnect with callback
   const handleDisconnectWallet = async () => {
-    if (!walletInfo?.address) return;
-
-    setIsDisconnecting(true);
-    try {
-      const response = await WalletService.disconnectWallet();
-      if (response.status === "success") {
-        setWalletInfo(null);
-        toast.success("Wallet disconnected successfully");
-        onDisconnectWallet?.();
-      } else {
-        throw new Error("Failed to disconnect wallet");
-      }
-    } catch (error: any) {
-      console.error("Failed to disconnect wallet:", error);
-
-      setWalletInfo(null);
-
-      if (error?.statusCode === 401) {
-        toast.warning(
-          "Wallet disconnected locally. Please verify your email to sync with server."
-        );
-      } else {
-        toast.warning("Wallet disconnected locally. Server sync failed.");
-      }
-
+    const result = await disconnectWallet();
+    if (result.success) {
       onDisconnectWallet?.();
-    } finally {
-      setIsDisconnecting(false);
     }
   };
 
-  const copyWalletAddress = () => {
-    if (walletInfo?.address) {
-      navigator.clipboard.writeText(walletInfo.address);
-      toast.success("Wallet address copied to clipboard!");
+  // Handle wallet connect with callback
+  const handleConnectWallet = () => {
+    connectWallet();
+    setShowAuthDialog(true);
+  };
+
+  // Handle auth success with callback
+  const handleWalletAuthSuccess = () => {
+    const result = handleAuthSuccess();
+    setShowAuthDialog(false);
+    if (result.success) {
+      onConnectWallet?.();
     }
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg lg:text-xl font-bold">
+            <Wallet className="w-5 h-5" />
             Account & Wallet
           </CardTitle>
         </CardHeader>
@@ -133,104 +79,47 @@ export function AccountWalletSection({
     );
   }
 
-  const networkInfo = walletInfo?.network
-    ? WalletService.getNetworkInfo(walletInfo.network)
-    : null;
-  const isWalletConnected = WalletService.isWalletConnected(walletInfo);
-
   return (
-    <Card className="">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg lg:text-xl font-bold">
-          Account & Wallet
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="">
-        <div className="space-y-3 border border-gray-200 rounded-lg p-4">
-          <div className="flex flex-wrap gap-3 justify-between border-b pb-3">
-            <label className="text-sm font-medium text-gray-700">
-              Wallet Address
-            </label>
-            <div className="flex items-center justify-between ">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">
-                    {isWalletConnected ? (
-                      <>
-                        eth:{" "}
-                        <span className="text-gray-500 font-mono">
-                          {WalletService.formatWalletAddress(
-                            walletInfo!.address!
-                          )}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-gray-500">No wallet connected</span>
-                    )}
-                  </p>
-                  {isWalletConnected && (
-                    <>
-                      <button
-                        onClick={copyWalletAddress}
-                        className="text-gray-500 hover:text-gray-700 transition-colors"
-                        title="Copy wallet address"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg lg:text-xl font-bold">
+            <Wallet className="w-5 h-5" />
+            Account & Wallet
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* Email verification warning */}
+          <EmailVerificationWarning
+            isWalletConnected={isWalletConnected}
+            isEmailVerified={isEmailVerified}
+          />
 
-          <div className="flex flex-wrap gap-3 justify-between border-b pb-3">
-            <label className="text-sm font-medium text-gray-700">
-              Connected Wallet
-            </label>
-            <div className="">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {isWalletConnected
-                    ? WalletService.getWalletDisplayName(
-                        walletInfo!.connectedWallet!
-                      )
-                    : "No wallet connected"}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Wallet display */}
+          <WalletDisplay
+            walletInfo={walletInfo}
+            isWalletConnected={isWalletConnected}
+            onCopyAddress={copyWalletAddress}
+          />
 
-          <div className="flex flex-wrap gap-3 justify-between pb-4">
-            <label className="text-sm font-medium text-gray-700">Network</label>
-            <div className="">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {networkInfo?.name || walletInfo?.network || "Unknown"}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Wallet actions */}
+          <WalletActions
+            isWalletConnected={isWalletConnected}
+            isEmailVerified={isEmailVerified}
+            isDisconnecting={isDisconnecting}
+            isConnecting={isConnecting}
+            onDisconnect={handleDisconnectWallet}
+            onConnect={handleConnectWallet}
+          />
+        </CardContent>
+      </Card>
 
-          {isWalletConnected && (
-            <Button
-              variant="destructive"
-              className=" bg-red-100 text-red-700 font-medium hover:bg-red-200 hover:text-red-800 rounded-lg w-fit"
-              onClick={handleDisconnectWallet}
-              disabled={isDisconnecting}
-            >
-              {isDisconnecting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Disconnecting...
-                </>
-              ) : (
-                "Disconnect Wallet"
-              )}
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      {/* Wallet Connection Dialog */}
+      <WalletConnectDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+        onSuccess={handleWalletAuthSuccess}
+      />
+    </>
   );
 }

@@ -1,0 +1,273 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "@/redux/store";
+import { forceUpdateUser } from "@/redux/slice/userSlice";
+import { useDisconnect } from "wagmi";
+import { toast } from "sonner";
+import { WalletService, WalletInfo } from "@/services/walletService";
+import { UnifiedAuthService } from "@/services/authService";
+
+export function useWalletManagement() {
+  const currentUser = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const { disconnect: disconnectWagmi } = useDisconnect();
+  
+  const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  // Derived state
+  const isWalletConnected = WalletService.isWalletConnected(walletInfo);
+  const isEmailVerified = currentUser?.user?.isVerified || currentUser?.user?.isEmailVerified;
+
+  useEffect(() => {
+    loadWalletInfo();
+  }, []);
+
+  useEffect(() => {
+    // Check if user has valid wallet info with address
+    if (currentUser?.user?.walletInfo?.address) {
+      setWalletInfo(currentUser.user.walletInfo);
+      setIsLoading(false);
+    } else if (currentUser?.user?.wallet_address) {
+      setWalletInfo({
+        address: currentUser.user.wallet_address,
+        connectedWallet: "Other",
+        network: "Mainnet",
+      });
+      setIsLoading(false);
+    } else if (currentUser?.user) {
+      // User exists but no valid wallet data - clear wallet info
+      setWalletInfo(null);
+      setIsLoading(false);
+    }
+  }, [
+    currentUser?.user?.walletInfo?.address,
+    currentUser?.user?.wallet_address,
+    currentUser?.user,
+  ]);
+
+  const loadWalletInfo = async () => {
+    // Only use existing data if it has a valid address
+    if (currentUser?.user?.walletInfo?.address || currentUser?.user?.wallet_address) {
+      console.log("Using existing wallet data from user profile");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      try {
+        const response = await WalletService.getWalletInfo();
+        if (response.status === "success" && (response as any).data) {
+          setWalletInfo((response as any).data.walletInfo ?? null);
+          return;
+        }
+      } catch (apiError: any) {
+        console.log("Wallet API endpoint failed:", apiError);
+
+        // Don't show error if we have local data with valid address
+        if (
+          currentUser?.user?.walletInfo?.address ||
+          currentUser?.user?.wallet_address
+        ) {
+          return;
+        }
+      }
+    } catch (error: any) {
+      console.error("Failed to load wallet info:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const disconnectWallet = async () => {
+    if (!walletInfo?.address) return { success: false, error: "No wallet connected" };
+
+    // Check if user's email is verified before allowing wallet disconnect
+    if (!isEmailVerified) {
+      const error = "Please verify your email address before disconnecting your wallet. This ensures you can still access your account.";
+      toast.error(error);
+      return { success: false, error };
+    }
+
+    setIsDisconnecting(true);
+    try {
+      // Call the wallet service to disconnect wallet from database
+      const response = await WalletService.disconnectWallet();
+
+      if (response.status === "success") {
+        // Clear local wallet state
+        setWalletInfo(null);
+
+        // IMPORTANT: Preserve email verification status when removing wallet
+        // Create updated user object that maintains verification status
+        const updatedUser = {
+          ...currentUser.user,
+          // Explicitly preserve critical verification fields
+          isVerified: currentUser.user.isVerified || currentUser.user.isEmailVerified,
+          isEmailVerified: currentUser.user.isEmailVerified || currentUser.user.isVerified,
+          email: currentUser.user.email,
+          username: currentUser.user.username,
+          _id: currentUser.user._id,
+          roles: currentUser.user.roles,
+          // Remove wallet fields
+          wallet_address: undefined,
+          walletInfo: undefined,
+        };
+
+        // Remove undefined fields
+        delete updatedUser.wallet_address;
+        delete updatedUser.walletInfo;
+
+        console.log("=== WALLET DISCONNECT DEBUG ===");
+        console.log("Original user:", currentUser.user);
+        console.log("Updated user (preserving verification):", updatedUser);
+        console.log("=== END WALLET DISCONNECT DEBUG ===");
+
+        dispatch(forceUpdateUser(updatedUser));
+
+        // Also disconnect from wagmi to prevent auto-reconnection
+        try {
+          disconnectWagmi();
+          console.log("Disconnected from wagmi");
+        } catch (wagmiError) {
+          console.warn("Failed to disconnect from wagmi:", wagmiError);
+        }
+
+        // Refresh JWT token to reflect the wallet disconnect
+        // But preserve the local state we just set
+        try {
+          const currentLocalUser = { ...updatedUser }; // Save our local state
+          await UnifiedAuthService.refreshToken();
+          console.log("JWT token refreshed after wallet disconnect");
+
+          // Re-apply our preserved state after token refresh
+          setTimeout(() => {
+            dispatch(forceUpdateUser(currentLocalUser));
+            console.log("Re-applied preserved user state after token refresh");
+          }, 100);
+        } catch (refreshError) {
+          console.warn("Failed to refresh JWT token after wallet disconnect:", refreshError);
+          // Don't try fallback refresh as it might overwrite our preserved state
+        }
+
+        // Force a re-render by updating the loading state
+        setIsLoading(true);
+        setTimeout(() => setIsLoading(false), 100);
+
+        toast.success("Wallet disconnected successfully. You can reconnect a wallet anytime.");
+        return { success: true };
+      } else {
+        throw new Error("Failed to disconnect wallet");
+      }
+    } catch (error: any) {
+      console.error("Failed to disconnect wallet:", error);
+
+      // Still disconnect locally but warn user about server sync
+      setWalletInfo(null);
+
+      // IMPORTANT: Preserve email verification status even in error case
+      const updatedUser = {
+        ...currentUser.user,
+        // Explicitly preserve critical verification fields
+        isVerified: currentUser.user.isVerified || currentUser.user.isEmailVerified,
+        isEmailVerified: currentUser.user.isEmailVerified || currentUser.user.isVerified,
+        email: currentUser.user.email,
+        username: currentUser.user.username,
+        _id: currentUser.user._id,
+        roles: currentUser.user.roles,
+        // Remove wallet fields
+        wallet_address: undefined,
+        walletInfo: undefined,
+      };
+
+      // Remove undefined fields
+      delete updatedUser.wallet_address;
+      delete updatedUser.walletInfo;
+
+      console.log("=== WALLET DISCONNECT ERROR CASE DEBUG ===");
+      console.log("Original user:", currentUser.user);
+      console.log("Updated user (preserving verification):", updatedUser);
+      console.log("=== END WALLET DISCONNECT ERROR CASE DEBUG ===");
+
+      dispatch(forceUpdateUser(updatedUser));
+
+      // Also disconnect from wagmi to prevent auto-reconnection
+      try {
+        disconnectWagmi();
+        console.log("Disconnected from wagmi (error case)");
+      } catch (wagmiError) {
+        console.warn("Failed to disconnect from wagmi (error case):", wagmiError);
+      }
+
+      if (error?.statusCode === 401) {
+        toast.warning(
+          "Wallet disconnected locally. Please verify your email to sync with server."
+        );
+      } else {
+        toast.warning("Wallet disconnected locally. Server sync failed.");
+      }
+
+      return { success: false, error: error.message };
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
+  const connectWallet = () => {
+    setIsConnecting(true);
+    return { success: true };
+  };
+
+  const handleAuthSuccess = () => {
+    setIsConnecting(false);
+
+    // Refresh our local wallet info from the updated user state
+    setTimeout(() => {
+      if (currentUser?.user?.walletInfo?.address) {
+        setWalletInfo(currentUser.user.walletInfo);
+      } else if (currentUser?.user?.wallet_address) {
+        setWalletInfo({
+          address: currentUser.user.wallet_address,
+          connectedWallet: "Other",
+          network: "Mainnet",
+        });
+      }
+    }, 100);
+
+    toast.success("Wallet connected successfully!");
+    return { success: true };
+  };
+
+  const copyWalletAddress = () => {
+    if (walletInfo?.address) {
+      navigator.clipboard.writeText(walletInfo.address);
+      toast.success("Wallet address copied to clipboard!");
+      return { success: true };
+    }
+    return { success: false, error: "No wallet address to copy" };
+  };
+
+  return {
+    // State
+    walletInfo,
+    isLoading,
+    isDisconnecting,
+    isConnecting,
+    isWalletConnected,
+    isEmailVerified,
+    
+    // Actions
+    disconnectWallet,
+    connectWallet,
+    handleAuthSuccess,
+    copyWalletAddress,
+    loadWalletInfo,
+    
+    // Setters for external control
+    setIsConnecting,
+  };
+}

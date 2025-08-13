@@ -4,7 +4,7 @@
  */
 
 import { store } from '@/redux/store';
-import { initializeUser, setUser, updateUserProfile, resetUser, UserData } from '@/redux/slice/userSlice';
+import { initializeUser, setUser, updateUserProfile, resetUser, forceUpdateUser, UserData } from '@/redux/slice/userSlice';
 import { apiClient } from './api';
 
 export interface LoginResponse {
@@ -54,8 +54,8 @@ export class UnifiedAuthService {
         return false;
       }
 
-      // Initialize user state from token
-      const userData: UserData = {
+      // Initialize basic user state from token first
+      const basicUserData: UserData = {
         _id: payload._id,
         email: payload.email,
         username: payload.username,
@@ -66,9 +66,17 @@ export class UnifiedAuthService {
         updatedAt: payload.updatedAt,
       };
 
-      console.log('[AuthService] Initializing user from token:', userData);
-      store.dispatch(initializeUser(userData));
-      
+      console.log('[AuthService] Initializing user from token:', basicUserData);
+      store.dispatch(initializeUser(basicUserData));
+
+      // Fetch full user profile to get complete data
+      try {
+        console.log('[AuthService] Fetching complete user profile...');
+        await this.refreshUserData();
+      } catch (error) {
+        console.warn('[AuthService] Failed to fetch complete profile, using token data:', error);
+      }
+
       return true;
     } catch (error) {
       console.error('[AuthService] Error during initialization:', error);
@@ -127,7 +135,7 @@ export class UnifiedAuthService {
   static async refreshUserData(): Promise<UserData> {
     try {
       const response = await apiClient.get<UserData>('/auth/me');
-      
+
       if (response.status === 'success' && response.data) {
         console.log('[AuthService] Refreshing user data:', response.data);
         store.dispatch(updateUserProfile(response.data));
@@ -137,6 +145,96 @@ export class UnifiedAuthService {
       throw new Error('Failed to refresh user data');
     } catch (error) {
       console.error('[AuthService] Refresh error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Force refresh user data from server without field preservation
+   * Use this when you want to completely replace user data (e.g., after wallet disconnect)
+   */
+  static async forceRefreshUserData(): Promise<UserData> {
+    try {
+      const response = await apiClient.get<UserData>('/auth/me');
+
+      if (response.status === 'success' && response.data) {
+        console.log('[AuthService] Force refreshing user data:', response.data);
+
+        // Clean up partial wallet data and ensure proper field mapping
+        const userData = {
+          ...response.data,
+          // Map isVerified to isEmailVerified for consistency
+          isEmailVerified: response.data.isVerified ?? response.data.isEmailVerified ?? false,
+          // Also keep the original isVerified field
+          isVerified: response.data.isVerified ?? false,
+        };
+
+        // Clean up partial wallet data (backend sometimes returns {network: "Mainnet"} instead of null)
+        if (userData.walletInfo && !userData.walletInfo.address) {
+          delete userData.walletInfo;
+        }
+        if (!userData.wallet_address) {
+          delete userData.wallet_address;
+        }
+
+        store.dispatch(forceUpdateUser(userData));
+
+        // If response includes a new token, update it
+        if ((response.data as any).token) {
+          this.setToken((response.data as any).token);
+          console.log('[AuthService] JWT token updated after force refresh');
+        }
+
+        return userData;
+      }
+
+      throw new Error('Failed to refresh user data');
+    } catch (error) {
+      console.error('[AuthService] Force refresh error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Refresh JWT token after wallet operations
+   * This ensures the token reflects the current user state
+   */
+  static async refreshToken(): Promise<void> {
+    try {
+      // Trigger a profile update with empty data to get a new token
+      const response = await apiClient.patch<UserData>('/auth/profile', {});
+
+      if (response.status === 'success' && response.data) {
+        console.log('[AuthService] Token refresh successful');
+
+        // Ensure proper field mapping for user data
+        const userData = {
+          ...response.data,
+          // Map isVerified to isEmailVerified for consistency
+          isEmailVerified: response.data.isVerified ?? response.data.isEmailVerified ?? false,
+          // Also keep the original isVerified field
+          isVerified: response.data.isVerified ?? false,
+        };
+
+        // Clean up partial wallet data (backend sometimes returns {network: "Mainnet"} instead of null)
+        if (userData.walletInfo && !userData.walletInfo.address) {
+          delete userData.walletInfo;
+        }
+        if (!userData.wallet_address) {
+          delete userData.wallet_address;
+        }
+
+        // Update user data with force update to avoid field preservation
+        store.dispatch(forceUpdateUser(userData));
+
+        // If response includes a new token, update it
+        if ((response.data as any).token) {
+          this.setToken((response.data as any).token);
+          console.log('[AuthService] JWT token updated after refresh');
+        }
+      }
+    } catch (error) {
+      console.error('[AuthService] Token refresh error:', error);
       throw error;
     }
   }
@@ -197,6 +295,28 @@ export class UnifiedAuthService {
       user: state.user.user,
       token: this.getStoredToken(),
     };
+  }
+
+  /**
+   * Apply auth update from API responses that include token and/or user
+   */
+  static applyAuthUpdate(data: { token?: string; user?: UserData }): void {
+    try {
+      if ((data as any)?.token) {
+        this.setToken((data as any).token);
+        console.log('[AuthService] Token applied from auth update');
+      }
+      if (data?.user) {
+        const userData = {
+          ...data.user,
+          isEmailVerified: (data.user as any).isEmailVerified ?? (data.user as any).isVerified ?? false,
+          isVerified: (data.user as any).isVerified ?? (data.user as any).isEmailVerified ?? false,
+        } as UserData;
+        store.dispatch(forceUpdateUser(userData));
+      }
+    } catch (e) {
+      console.error('[AuthService] Failed to apply auth update', e);
+    }
   }
 
   /**

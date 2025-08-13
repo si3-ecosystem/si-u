@@ -3,11 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Grid, Star, User, Settings } from "lucide-react";
+import { Grid,  User, Settings } from "lucide-react";
 
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
+import { getDisplayUsername } from "@/lib/utils/username";
 
 // import {
 //   Notification,
@@ -34,14 +35,9 @@ const profileMenuItems = [
     href: "/settings",
     icon: <Settings className="h-5 w-5" />,
     showChevron: true,
-  },
+  }
 
-  {
-    label: "Favorites",
-    href: "/favorites",
-    icon: <Star className="h-5 w-5" />,
-    showChevron: true,
-  },
+ 
 ];
 
 // const notifications: Notification[] = [
@@ -84,15 +80,14 @@ export function Header() {
     setIsClient(true);
   }, []);
 
-  // Get user data with fallbacks - only on client side
-  const username = isClient ?
-    (currentUser?.user?.email || currentUser?.user?.username || "user.edu") :
-    "user.edu";
-  const walletAddress = isClient ? currentUser?.user?.walletAddress : null;
-  const subtext = isClient && walletAddress ?
+  // Get user data with fallbacks - only on client side and when user is initialized
+  const isUserReady = isClient && currentUser?.isInitialized;
+  const username = isUserReady ? getDisplayUsername(currentUser?.user) : "No username";
+  const walletAddress = isUserReady ? currentUser?.user?.walletAddress : null;
+  const subtext = isUserReady && walletAddress ?
     `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
     "user.siher.eth";
-  const avatarUrl = isClient ?
+  const avatarUrl = isUserReady ?
     (currentUser?.user?.avatar || "/placeholder.png") :
     "/placeholder.png";
 

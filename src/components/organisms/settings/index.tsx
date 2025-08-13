@@ -14,7 +14,11 @@ export default function Settings() {
   };
 
   const handleDisconnectWallet = () => {
-    console.log("Disconnect wallet clicked");
+    console.log("Wallet disconnected");
+  };
+
+  const handleConnectWallet = () => {
+    console.log("Wallet connected");
   };
 
   return (
@@ -29,7 +33,10 @@ export default function Settings() {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 overflow-hidden">
           <div className=" space-y-6">
-            <AccountWalletSection onDisconnectWallet={handleDisconnectWallet} />
+            <AccountWalletSection
+              onDisconnectWallet={handleDisconnectWallet}
+              onConnectWallet={handleConnectWallet}
+            />
             <SupportSection />
 
             <Button

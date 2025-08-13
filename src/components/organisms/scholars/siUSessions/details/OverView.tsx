@@ -4,7 +4,7 @@ interface SessionOverviewProps {
 
 export default function SessionOverview({ overview }: SessionOverviewProps) {
   return (
-    <div className="mb-6">
+    <div className="mb-6 bg-white p-5">
       <h2 className="text-2xl font-medium text-black">Overview</h2>
       <p className="text-gray-600 mt-2 text-opacity-80">{overview}</p>
     </div>

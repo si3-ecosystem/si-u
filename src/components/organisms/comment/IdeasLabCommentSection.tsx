@@ -16,7 +16,6 @@ export function IdeasLabCommentSection({
 }: IdeasLabCommentSectionProps) {
   const user = useAppSelector(state => state.user);
 
-  console.log("user",user)
   const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'guide') ? 'guide' : 'scholar' ;
 
   const contentType: ContentType = userRole === 'guide' ? 'guide_ideas_lab' : 'scholar_ideas_lab';

@@ -21,10 +21,10 @@ export function SupportSection() {
           </label>
           <div className="flex items-center gap-2">
             <a
-              href="mailto:kara@si3.space"
+              href="mailto:members@si3.space"
               className="text-sm  hover:underline"
             >
-              kara@si3.space
+              members@si3.space
             </a>
           </div>
         </div>

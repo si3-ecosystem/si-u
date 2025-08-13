@@ -25,7 +25,7 @@ interface ProfileHeaderProps {
 
 export function DashboardProfileHeader({
   username,
-  subtext,
+  // subtext,
   avatarUrl,
   onShare,
   onEdit,
@@ -60,7 +60,7 @@ export function DashboardProfileHeader({
           </div>
           <div className="flex flex-col">
             <h2 className="text-xl font-bold">{username}</h2>
-            {subtext && <p className="text-sm text-gray-500">{subtext}</p>}
+            {/* {subtext && <p className="text-sm text-gray-500">{subtext}</p>} */}
           </div>
         </div>
         <div className="flex gap-3 z-10">
