@@ -72,7 +72,7 @@ export default function SIUSession() {
   if (isLoading || isSessionPageLoading) return <Loading />;
 
   return (
-    <div className=" w-full bg-[#f6f6f6] min-h-screen flex flex-col gap-8 lg:gap-16">
+    <div className=" w-full  min-h-screen flex flex-col gap-8 lg:gap-16">
       <Banner
         data={
           sessionPageData?.banner ?? {

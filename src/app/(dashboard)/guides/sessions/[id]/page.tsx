@@ -29,7 +29,7 @@ export default function SessionDetailsPage() {
   }
 
   return (
-    <section className="max-w-4xl mx-auto p-6 w-full">
+    <section className="max-w-7xl mx-auto p-6 w-full">
       <SessionHeader title={data.title} description={data.description} />
 
       <div className="bg-white p-8 mt-6 rounded-lg shadow">
@@ -50,7 +50,7 @@ export default function SessionDetailsPage() {
       </div>
 
       {/* Comment Section */}
-      <div className="bg-white p-8 mt-6 rounded-lg shadow">
+      <div className="bg-white p-8 mt-6 rounded-lg">
         <GuideSessionCommentSection
           contentId={data._id}
           className="mt-0"

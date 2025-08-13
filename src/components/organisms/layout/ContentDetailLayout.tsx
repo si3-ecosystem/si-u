@@ -47,7 +47,7 @@ export function ContentDetailLayout({
   };
 
   return (
-    <div className={cn('min-h-screen bg-gray-50', className)}>
+    <div className={cn('min-h-screen max-w-7xl mx-auto p-6 w-full ', className)}>
       <div className="pb-16 pt-4 px-4 lg:px-14">
         {/* Back navigation */}
         <Link
@@ -59,9 +59,9 @@ export function ContentDetailLayout({
         </Link>
 
         {/* Main content */}
-        <div className={cn('mx-auto w-full', maxWidthClasses[maxWidth])}>
+        <div className={cn(' w-full', maxWidthClasses[maxWidth])}>
           {/* Content area */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-8">
+          <div className=" rounded-lg overflow-hidden mb-8">
             {children}
           </div>
 

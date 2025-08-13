@@ -141,7 +141,7 @@ export function OptimizedCommentItem({
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'group relative',
+        'group relative first-of-type:pt-0 pt-4',
         indentationClass,
         isDeleting && 'opacity-50 pointer-events-none',
         className

@@ -74,7 +74,7 @@ export function PreviousSessionCard({ session }: { session: GuidesSession }) {
               </a>
             )}
             <Link
-              href={`/fixx/fixx-sessions/${session._id}`}
+              href={`/grow3dge/grow3dge-sessions/${session._id}`}
               className="flex-1"
             >
               <Button className="w-full h-11 bg-primary text-white rounded-lg">

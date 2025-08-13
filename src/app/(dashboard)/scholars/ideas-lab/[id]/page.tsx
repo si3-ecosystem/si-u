@@ -43,7 +43,7 @@ export default function ScholarsIdeaLabDetail() {
         maxWidth="xl"
       >
         {/* Hero Section */}
-        <div className="p-6 lg:p-8">
+        <div className="">
           <ContentHero
             title={data.title}
             description={data.description}
@@ -55,15 +55,15 @@ export default function ScholarsIdeaLabDetail() {
         </div>
 
         {/* Content Body */}
-        <div className="px-6 lg:px-8 pb-8">
-          <div className="max-w-4xl mx-auto prose prose-lg prose-gray">
+        <div className="bg-white p-6 ">
+          <div className="w-full max-w-7xl mx-auto prose prose-lg prose-gray">
             <PortableTextComponent value={data.body} />
           </div>
         </div>
 
         {/* Optimized Comment Section */}
-        <div className="px-6 lg:px-8 pb-8">
-          <div className="max-w-4xl mx-auto">
+        <div className="mt-8 bg-white">
+          <div className="w-full mx-auto p-6">
             <IdeasLabCommentSection
               contentId={data._id}
               className="mt-8"

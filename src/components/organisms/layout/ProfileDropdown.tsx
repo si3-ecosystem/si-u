@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type * as React from "react";
-import { Grid, Star, User, ChevronDown, ChevronRight } from "lucide-react";
+import { Grid,  User, ChevronDown, ChevronRight } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -51,12 +51,7 @@ export function ProfileDropdown({
       showChevron: true,
     },
 
-    {
-      label: "Favorites",
-      href: "/favorites",
-      icon: <Star className="h-5 w-5" />,
-      showChevron: true,
-    },
+   
   ];
 
   const items = menuItems.length > 0 ? menuItems : defaultMenuItems;

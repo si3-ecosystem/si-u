@@ -10,7 +10,6 @@ import { ContentListing } from "@/components/organisms/content/ContentListing";
 import { CommentNotifications } from "@/components/molecules/comment/CommentNotifications";
 import { useState } from "react";
 
-// Component to fetch and display comment counts for each item
 function EnhancedContentListing({
   items,
   categories,
@@ -18,11 +17,10 @@ function EnhancedContentListing({
   onCategoryChange,
   ...props
 }: any) {
-  // Transform items to include comment counts
   const enhancedItems = items.map((item: any) => {
     return {
       ...item,
-      contentId: item._id, // Pass contentId to HighlightCard for Redux comment count
+      contentId: item._id, 
     };
   });
 
@@ -74,7 +72,7 @@ export default function ScholarsIdeaLabPage() {
     });
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
+    <div className="w-full min-h-screen">
         <ContentBanner
           title={data.title || "Scholars Ideas Lab"}
           description={data.description || "Explore innovative ideas and research from our scholar community"}

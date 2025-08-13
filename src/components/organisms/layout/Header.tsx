@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Grid, Star, User, Settings } from "lucide-react";
+import { Grid,  User, Settings } from "lucide-react";
 
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
@@ -35,14 +35,9 @@ const profileMenuItems = [
     href: "/settings",
     icon: <Settings className="h-5 w-5" />,
     showChevron: true,
-  },
+  }
 
-  {
-    label: "Favorites",
-    href: "/favorites",
-    icon: <Star className="h-5 w-5" />,
-    showChevron: true,
-  },
+ 
 ];
 
 // const notifications: Notification[] = [
