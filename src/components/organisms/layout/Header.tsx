@@ -2,13 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Grid,  User, Settings } from "lucide-react";
+import { Grid, User, Settings } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
 import { getDisplayUsername } from "@/lib/utils/username";
+import { getSeoSettings } from "@/lib/sanity/client";
+import { urlForImage } from "@/lib/sanity/image";
 
 // import {
 //   Notification,
@@ -35,9 +39,7 @@ const profileMenuItems = [
     href: "/settings",
     icon: <Settings className="h-5 w-5" />,
     showChevron: true,
-  }
-
- 
+  },
 ];
 
 // const notifications: Notification[] = [
@@ -72,8 +74,14 @@ const profileMenuItems = [
 
 export function Header() {
   const { open } = useSidebar();
-  const currentUser = useAppSelector(state => state.user);
+  const currentUser = useAppSelector((state) => state.user);
   const [isClient, setIsClient] = React.useState(false);
+
+  // Fetch SEO settings for logo
+  const { data: seoSettings } = useQuery({
+    queryKey: ["seo-settings"],
+    queryFn: getSeoSettings,
+  });
 
   // Ensure client-side rendering for user data to prevent hydration mismatch
   React.useEffect(() => {
@@ -82,14 +90,17 @@ export function Header() {
 
   // Get user data with fallbacks - only on client side and when user is initialized
   const isUserReady = isClient && currentUser?.isInitialized;
-  const username = isUserReady ? getDisplayUsername(currentUser?.user) : "No username";
+  const username = isUserReady
+    ? getDisplayUsername(currentUser?.user)
+    : "No username";
   const walletAddress = isUserReady ? currentUser?.user?.walletAddress : null;
-  const subtext = isUserReady && walletAddress ?
-    `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
-    "user.siher.eth";
-  const avatarUrl = isUserReady ?
-    (currentUser?.user?.avatar || "/placeholder.png") :
-    "/placeholder.png";
+  const subtext =
+    isUserReady && walletAddress
+      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth`
+      : "user.siher.eth";
+  const avatarUrl = isUserReady
+    ? currentUser?.user?.avatar || "/placeholder.png"
+    : "/placeholder.png";
 
   // const handleMarkAllRead = () => {
   //   console.log("Marking all as read");
@@ -108,9 +119,18 @@ export function Header() {
         </div>
 
         <Link href="/" className={cn(!open ? " md:block" : "md:hidden")}>
-          <h2 className="px-4 text-[30px] !text-black font-bold uppercase">
-            Si&lt;3&gt;
-          </h2>
+          <div className="px-4">
+            <Image
+              src={
+                urlForImage(seoSettings?.favicon)?.src || ""
+              }
+              alt={seoSettings?.favicon?.alt || "Logo"}
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </div>
         </Link>
       </div>
 

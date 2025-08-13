@@ -181,7 +181,6 @@ const userSlice = createSlice({
         }
       });
 
-      addDebugLog(state, 'updateUserProfile', updates, preservedFields);
 
       state.user = mergedUser;
       state.lastUpdated = Date.now();
@@ -195,7 +194,7 @@ const userSlice = createSlice({
 
     // Set wallet address
     setAddress: (state: UserState, action: PayloadAction<string | null>) => {
-      addDebugLog(state, 'setAddress', action.payload);
+
 
       state.address = action.payload;
 
@@ -212,7 +211,6 @@ const userSlice = createSlice({
     forceUpdateUser: (state: UserState, action: PayloadAction<UserData>) => {
       const newUserData = action.payload;
 
-      addDebugLog(state, 'forceUpdateUser', newUserData, ['No fields preserved - force update']);
 
       // Directly replace user data without any field preservation
       state.user = { ...newUserData };
@@ -229,13 +227,11 @@ const userSlice = createSlice({
 
     // Set connection status
     setConnected: (state: UserState, action: PayloadAction<boolean>) => {
-      addDebugLog(state, 'setConnected', action.payload);
       state.isLoggedIn = action.payload;
     },
 
     // Reset user state (logout)
     resetUser: (state: UserState) => {
-      addDebugLog(state, 'resetUser', 'Logging out user');
 
       state.user = {};
       state.address = null;

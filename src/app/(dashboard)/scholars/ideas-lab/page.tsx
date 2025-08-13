@@ -76,14 +76,14 @@ export default function ScholarsIdeaLabPage() {
         <ContentBanner
           title={data.title || "Scholars Ideas Lab"}
           description={data.description || "Explore innovative ideas and research from our scholar community"}
-          backgroundImage={data.background}
-          thumbnailImage={data.thumbnail}
+          backgroundImage={data?.banner?.background}
+          thumbnailImage={data?.banner?.thumbnail}
           variant="default"
           textColor="dark"
           className="mb-8"
         />
 
-        <div className="px-4 lg:px-6 pb-16">
+        <div className=" pb-16">
           <EnhancedContentListing
             title="Latest Ideas"
             description="Discover the latest research ideas and innovations from our scholar community"

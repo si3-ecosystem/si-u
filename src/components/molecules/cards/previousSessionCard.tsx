@@ -4,7 +4,7 @@ import { GuidesSession } from "@/types/siherguides/session";
 import moment from "moment";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowDownToLine } from "lucide-react";
+import { ArrowDownToLine, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export function PreviousSessionCard({ session }: { session: GuidesSession }) {
@@ -57,7 +57,47 @@ export function PreviousSessionCard({ session }: { session: GuidesSession }) {
             </div>
           </div>
           <div className="flex gap-2 mt-4">
-            {session.pdfFile?.asset?.url && (
+            {/* Enhanced PDF Guide with configurable CTA */}
+            {session.pdfGuide?.enabled && (
+              <>
+                {session.pdfGuide.type === 'download' && session.pdfGuide.downloadFile?.asset?.url && (
+                  <a
+                    href={session.pdfGuide.downloadFile.asset.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="flex-1"
+                  >
+                    <Button
+                      className="w-full h-11 bg-black text-white rounded-lg"
+                      variant="outline"
+                    >
+                      <ArrowDownToLine className="mr-2 h-4 w-4" />
+                      {session.pdfGuide.title || "PDF Guide"}
+                    </Button>
+                  </a>
+                )}
+                {session.pdfGuide.type === 'url' && session.pdfGuide.shareableUrl && (
+                  <a
+                    href={session.pdfGuide.shareableUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1"
+                  >
+                    <Button
+                      className="w-full h-11 bg-black text-white rounded-lg"
+                      variant="outline"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      {session.pdfGuide.title || "View Guide"}
+                    </Button>
+                  </a>
+                )}
+              </>
+            )}
+
+            {/* Fallback to legacy pdfFile if new pdfGuide is not configured */}
+            {!session.pdfGuide?.enabled && session.pdfFile?.asset?.url && (
               <a
                 href={session.pdfFile.asset.url}
                 target="_blank"
@@ -73,6 +113,7 @@ export function PreviousSessionCard({ session }: { session: GuidesSession }) {
                 </Button>
               </a>
             )}
+
             <Link
               href={`/grow3dge/grow3dge-sessions/${session._id}`}
               className="flex-1"

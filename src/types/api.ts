@@ -52,10 +52,10 @@ export interface CrudService<T, CreateData = Partial<T>, UpdateData = Partial<T>
 }
 
 // Content types for commenting system
-export type ContentType = 'guide_session' | 'guide_ideas_lab' | 'scholar_session' | 'scholar_ideas_lab';
+export type ContentType = 'guide_session' | 'guide_ideas_lab' | 'scholar_session' | 'scholar_ideas_lab' | "grow3dge-idea-lab";
 
 // User roles
-export type UserRole = 'admin' | 'guide' | 'scholar';
+export type UserRole = 'admin' | 'guide' | 'scholar' | "partner";
 
 // Generic content item
 export interface ContentItem {

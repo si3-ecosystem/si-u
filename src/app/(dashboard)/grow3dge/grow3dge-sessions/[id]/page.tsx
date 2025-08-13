@@ -44,6 +44,7 @@ export default function FixCardDetailPage() {
         <FixCardActions
           pdfUrl={data.pdfFile?.asset?.url}
           videoUrl={data.videoUrl}
+          pdfGuide={data.pdfGuide}
         />
       </div>
     </section>

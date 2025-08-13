@@ -325,6 +325,13 @@ export const fixCardByIdQuery = (id: string) => `
     partner->{_id, title, logo},
     downloadPdf,
     pdfFile{asset->{url}},
+    pdfGuide{
+      enabled,
+      title,
+      type,
+      downloadFile{asset->{url}},
+      shareableUrl
+    },
   }
 `;
 
@@ -348,7 +355,14 @@ export const fixSessionsQuery = groq`
       }
     },
     fixCards[]->{
-  pdfFile{asset->{url}},
+      pdfFile{asset->{url}},
+      pdfGuide{
+        enabled,
+        title,
+        type,
+        downloadFile{asset->{url}},
+        shareableUrl
+      },
       _id,
       title,
       description,
@@ -464,6 +478,59 @@ export const scholarsIdeasLabCardByIdQuery = groq`
   }
 `;
 
+export const grow3dgeIdeasLabSessionQuery = groq`
+  *[_type == "grow3dgeIdeaLabsSession"][0] {
+    _id,
+    title,
+    description,
+    banner-> {
+      title,
+      description,
+      thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
+    "cards": ideaLabCards[]-> {
+      _id,
+      title,
+      description,
+      date,
+      ideaLabImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      videoUrl,
+      category-> {
+        _id,
+        title,
+        slug
+      },
+      body
+    }
+  }
+`;
+
+export const grow3dgeIdeasLabCardByIdQuery = groq`
+  *[_type == "grow3dgeIdeaLabCards" && _id == $id][0]{
+    ...,
+    _id,
+    title,
+    description,
+    publishedAt,
+    date,
+    ideaLabImage,
+    body
+  }
+`;
+
 
 export const dashboardBannerQuery = groq`
   *[_type == "dashboardSchema"][0] {
@@ -477,5 +544,30 @@ export const dashboardBannerQuery = groq`
         "ImageColor": asset->metadata.palette.dominant.background
       }
     },
+  }
+`;
+
+export const seoSettingsQuery = groq`
+  *[_type == "seoSettings"][0] {
+    _id,
+    title,
+    favicon {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    },
+    seoLogo {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    },
+    logo {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    }
   }
 `;

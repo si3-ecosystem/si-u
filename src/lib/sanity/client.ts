@@ -21,9 +21,12 @@ import {
   allTopicsQuery,
   scholarsIdeasLabSessionQuery,
   scholarsIdeasLabCardByIdQuery,
+  grow3dgeIdeasLabSessionQuery,
+  grow3dgeIdeasLabCardByIdQuery,
   fixCardByIdQuery,
   guidesByIdQuery,
   dashboardBannerQuery,
+  seoSettingsQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -185,6 +188,20 @@ export async function getScholarsIdeasLabCardById(id: string) {
   return {};
 }
 
+export async function getGrow3dgeIdeasLabSessionData() {
+  if (client) {
+    return (await client.fetch(grow3dgeIdeasLabSessionQuery)) || {};
+  }
+  return {};
+}
+
+export async function getGrow3dgeIdeasLabCardById(id: string) {
+  if (client) {
+    return (await client.fetch(grow3dgeIdeasLabCardByIdQuery, { id })) || {};
+  }
+  return {};
+}
+
 export async function getFixCardById(id: string) {
   if (!client) throw new Error("Sanity client not configured");
   return client.fetch(fixCardByIdQuery(id));
@@ -193,6 +210,13 @@ export async function getFixCardById(id: string) {
 export async function getDashboardBanner() {
   if (client) {
     return (await client.fetch(dashboardBannerQuery)) || {};
+  }
+  return {};
+}
+
+export async function getSeoSettings() {
+  if (client) {
+    return (await client.fetch(seoSettingsQuery)) || {};
   }
   return {};
 }
