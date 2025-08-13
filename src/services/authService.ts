@@ -54,8 +54,8 @@ export class UnifiedAuthService {
         return false;
       }
 
-      // Initialize user state from token
-      const userData: UserData = {
+      // Initialize basic user state from token first
+      const basicUserData: UserData = {
         _id: payload._id,
         email: payload.email,
         username: payload.username,
@@ -66,9 +66,17 @@ export class UnifiedAuthService {
         updatedAt: payload.updatedAt,
       };
 
-      console.log('[AuthService] Initializing user from token:', userData);
-      store.dispatch(initializeUser(userData));
-      
+      console.log('[AuthService] Initializing user from token:', basicUserData);
+      store.dispatch(initializeUser(basicUserData));
+
+      // Fetch full user profile to get complete data
+      try {
+        console.log('[AuthService] Fetching complete user profile...');
+        await this.refreshUserData();
+      } catch (error) {
+        console.warn('[AuthService] Failed to fetch complete profile, using token data:', error);
+      }
+
       return true;
     } catch (error) {
       console.error('[AuthService] Error during initialization:', error);

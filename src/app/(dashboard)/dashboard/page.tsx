@@ -93,13 +93,14 @@ export default function DashboardPage() {
     setIsClient(true);
   }, []);
 
-  // Get user data with fallbacks - only on client side
-  const username = isClient ? getDisplayUsername(currentUser?.user) : "No username";
-  const walletAddress = isClient ? currentUser?.user?.walletAddress : null;
-  const subtext = isClient && walletAddress ?
+  // Get user data with fallbacks - only on client side and when user is initialized
+  const isUserReady = isClient && currentUser?.isInitialized;
+  const username = isUserReady ? getDisplayUsername(currentUser?.user) : "No username";
+  const walletAddress = isUserReady ? currentUser?.user?.walletAddress : null;
+  const subtext = isUserReady && walletAddress ?
     `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
     "user.siher.eth";
-  const avatarUrl = isClient ?
+  const avatarUrl = isUserReady ?
     (currentUser?.user?.avatar || "/placeholder.png") :
     "/placeholder.png";
 

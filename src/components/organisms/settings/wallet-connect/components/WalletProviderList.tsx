@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { WalletService, WalletType } from "@/services/walletService";
-import { useConnect, useAccount } from "wagmi";
+import { useConnect, useAccount, useDisconnect } from "wagmi";
 
 interface Props {
   onSelected: (wallet: WalletType, address: string) => void;
@@ -10,6 +10,8 @@ interface Props {
 
 export default function WalletProviderList({ onSelected }: Props) {
   const { connectors, connectAsync } = useConnect();
+  const { address, isConnected, connector } = useAccount();
+  const { disconnectAsync } = useDisconnect();
   const providers: { id: WalletType; label: string }[] = [
     { id: "MetaMask", label: "MetaMask" },
     { id: "Zerion", label: "Zerion" },
@@ -28,23 +30,35 @@ export default function WalletProviderList({ onSelected }: Props) {
         return false;
       });
 
-      let address: string | undefined;
+      let walletAddress: string | undefined;
       if (target) {
-        const res = await connectAsync({ connector: target });
-        address = res.accounts?.[0];
+        // Check if this connector is already connected
+        if (target.id === connector?.id && isConnected && address) {
+          console.log("Wallet already connected, using existing connection");
+          walletAddress = address; // Use the address from useAccount hook
+        } else {
+          // Disconnect any existing connection first
+          if (isConnected && connector) {
+            console.log("Disconnecting existing wallet before connecting new one");
+            await disconnectAsync();
+          }
+
+          const res = await connectAsync({ connector: target });
+          walletAddress = res.accounts?.[0];
+        }
       }
 
-      if (!address) {
+      if (!walletAddress) {
         // Fallback: request accounts via window.ethereum
         const eth = (window as any).ethereum;
         if (!eth) throw new Error("No wallet provider found");
         const accounts: string[] = await eth.request({ method: "eth_requestAccounts" });
-        address = accounts[0];
+        walletAddress = accounts[0];
       }
 
-      if (!address) throw new Error("Failed to obtain wallet address");
+      if (!walletAddress) throw new Error("Failed to obtain wallet address");
 
-      onSelected(wallet, address);
+      onSelected(wallet, walletAddress);
     } catch (e: any) {
       console.error("Wallet provider connect failed", e);
       throw e;
