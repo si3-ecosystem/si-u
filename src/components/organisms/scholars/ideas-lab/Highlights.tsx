@@ -20,7 +20,6 @@ interface HighlightsProps {
 }
 
 function CategorySessions({ sessions }: { sessions: any[] }) {
-  console.log("sessions", sessions);
   return (
     <div className="flex flex-wrap gap-8">
       {sessions.map((session) => (
