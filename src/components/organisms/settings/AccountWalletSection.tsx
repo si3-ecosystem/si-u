@@ -30,11 +30,15 @@ export function AccountWalletSection({
     isConnecting,
     isWalletConnected,
     isEmailVerified,
+    hasTempEmail,
+    isEmailValidForWalletOps,
     disconnectWallet,
     connectWallet,
     handleAuthSuccess,
     copyWalletAddress,
   } = useWalletManagement();
+
+  console.log("isEmailVerified",isEmailVerified)
 
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
@@ -106,6 +110,8 @@ export function AccountWalletSection({
           <WalletActions
             isWalletConnected={isWalletConnected}
             isEmailVerified={isEmailVerified}
+            hasTempEmail={hasTempEmail}
+            isEmailValidForWalletOps={isEmailValidForWalletOps}
             isDisconnecting={isDisconnecting}
             isConnecting={isConnecting}
             onDisconnect={handleDisconnectWallet}

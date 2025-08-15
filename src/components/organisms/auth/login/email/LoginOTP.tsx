@@ -5,7 +5,7 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
 import { cn } from "@/lib/utils";
-import { authService } from "@/lib/api/authService";
+import { UnifiedAuthService } from "@/services/authService";
 
 interface LoginOTPProps {
   email: string;
@@ -58,7 +58,7 @@ const LoginOTP: React.FC<LoginOTPProps> = ({ email, onBack, onSuccess }) => {
       clearMessages();
 
       try {
-        const response = await authService.verifyEmailOTP(email, otpString);
+        const response = await UnifiedAuthService.verifyEmailOTP(email, otpString);
 
         onSuccess?.(response.data);
 
@@ -154,7 +154,7 @@ const LoginOTP: React.FC<LoginOTPProps> = ({ email, onBack, onSuccess }) => {
     clearMessages();
 
     try {
-      await authService.sendEmailOTP(email);
+      await UnifiedAuthService.sendEmailOTP(email);
       setResendMessage("New verification code sent to your email");
 
       resetOtp();

@@ -1,4 +1,5 @@
 import { ApiResponse, ApiError, ServiceConfig, RequestOptions } from '@/types/api';
+import { UnifiedAuthService } from '@/services/authService';
 
 /**
  * Base service class providing common HTTP operations with TypeScript safety
@@ -24,14 +25,8 @@ export class BaseService {
    * Get authentication token from storage
    */
   protected getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    
-    // Try cookie first (more secure)
-    const cookieToken = this.getCookie('si3-jwt');
-    if (cookieToken) return cookieToken;
-    
-    // Fallback to localStorage
-    return localStorage.getItem('si3-jwt');
+    // Use UnifiedAuthService for consistent token access
+    return UnifiedAuthService.getAuthHeaders().Authorization?.replace('Bearer ', '') || null;
   }
 
   /**

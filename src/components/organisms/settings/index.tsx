@@ -1,17 +1,17 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { ProfileEditForm } from "@/components/organisms/profile/ProfileEditForm";
 import { AccountWalletSection } from "./AccountWalletSection";
 import { SupportSection } from "./SupportSection";
 import { NotificationSection } from "./NotificationSection";
-import { LogOut } from "lucide-react";
+// import { LogOut } from "lucide-react";
 
 export default function Settings() {
-  const handleLogout = () => {
-    console.log("Logout clicked");
-  };
+  // const handleLogout = () => {
+  //   console.log("Logout clicked");
+  // };
 
   const handleDisconnectWallet = () => {
     console.log("Wallet disconnected");
@@ -39,14 +39,14 @@ export default function Settings() {
             />
             <SupportSection />
 
-            <Button
+            {/* <Button
               variant="destructive"
               className=" bg-red-100 text-red-700 font-medium hover:bg-red-200 hover:text-red-800 rounded-lg w-fit"
               onClick={handleLogout}
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
-            </Button>
+            </Button> */}
           </div>
           <div className=" space-y-6">
             <NotificationSection />

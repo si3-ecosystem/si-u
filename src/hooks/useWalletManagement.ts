@@ -7,6 +7,7 @@ import { useDisconnect } from "wagmi";
 import { toast } from "sonner";
 import { WalletService, WalletInfo } from "@/services/walletService";
 import { UnifiedAuthService } from "@/services/authService";
+import { TempEmailDetector } from "@/utils/tempEmailDetector";
 
 export function useWalletManagement() {
   const currentUser = useAppSelector((state) => state.user);
@@ -20,7 +21,12 @@ export function useWalletManagement() {
 
   // Derived state
   const isWalletConnected = WalletService.isWalletConnected(walletInfo);
+  const userEmail = currentUser?.user?.email;
   const isEmailVerified = currentUser?.user?.isVerified || currentUser?.user?.isEmailVerified;
+
+  // Check if user has a temp email - affects wallet disconnect permissions
+  const hasTempEmail = userEmail ? TempEmailDetector.isTempEmail(userEmail) : false;
+  const isEmailValidForWalletOps = userEmail ? TempEmailDetector.isEmailValidForWalletOperations(userEmail, isEmailVerified) : false;
 
   useEffect(() => {
     loadWalletInfo();
@@ -86,9 +92,18 @@ export function useWalletManagement() {
   const disconnectWallet = async () => {
     if (!walletInfo?.address) return { success: false, error: "No wallet connected" };
 
-    // Check if user's email is verified before allowing wallet disconnect
-    if (!isEmailVerified) {
-      const error = "Please verify your email address before disconnecting your wallet. This ensures you can still access your account.";
+    // Check if user's email is valid for wallet operations (verified and not temp)
+    if (!isEmailValidForWalletOps) {
+      let error: string;
+
+      if (hasTempEmail) {
+        error = "Cannot disconnect wallet with a temporary email address. Please update your email to a permanent address first.";
+      } else if (!isEmailVerified) {
+        error = "Please verify your email address before disconnecting your wallet. This ensures you can still access your account.";
+      } else {
+        error = "Please verify your email address before disconnecting your wallet.";
+      }
+
       toast.error(error);
       return { success: false, error };
     }
@@ -259,14 +274,16 @@ export function useWalletManagement() {
     isConnecting,
     isWalletConnected,
     isEmailVerified,
-    
+    hasTempEmail,
+    isEmailValidForWalletOps,
+
     // Actions
     disconnectWallet,
     connectWallet,
     handleAuthSuccess,
     copyWalletAddress,
     loadWalletInfo,
-    
+
     // Setters for external control
     setIsConnecting,
   };

@@ -10,6 +10,7 @@ import LoginMail from "./email/LoginMail";
 
 import InjectedWallet from "./wallet/InjectedWallet";
 import WalletSignature from "./wallet/WalletSignature";
+import { UnifiedAuthService } from "@/services/authService";
 
 type AuthState = "initial" | "otp" | "wallet_signature";
 
@@ -34,9 +35,9 @@ const AuthContainer = () => {
   }, []);
 
   const handleAuthSuccess = useCallback((data: AuthData) => {
-    // Store token in localStorage
-    if (data.token) {
-      localStorage.setItem("si3-jwt", data.token);
+    // Use UnifiedAuthService to handle auth success
+    if (data.token && data.user) {
+      UnifiedAuthService.applyAuthUpdate({ user: data.user, token: data.token });
     }
   }, []);
 

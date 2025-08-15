@@ -9,6 +9,7 @@ import ConfirmLogoutDialog from "./ConfirmLogoutDialog";
 
 import { useDispatch } from "react-redux";
 import { setLogoutModalOpen } from "@/redux/slice/modalSlice";
+import { UnifiedAuthService } from "@/services/authService";
 
 const LogoutButton = () => {
   const router = useRouter();
@@ -24,30 +25,15 @@ const LogoutButton = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
+      // Use UnifiedAuthService for proper logout
+      await UnifiedAuthService.logout();
 
-      if (response.ok) {
-        dispatch(setLogoutModalOpen(false));
-
-        router.refresh();
-        router.push("/login");
-      } else {
-        throw new Error("Logout failed");
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
       dispatch(setLogoutModalOpen(false));
+      router.push("/login");
 
-      router.refresh();
+    } catch (error) {
+      console.error('Logout error:', error);
+      dispatch(setLogoutModalOpen(false));
       router.push("/login");
     } finally {
       setIsLoading(false);

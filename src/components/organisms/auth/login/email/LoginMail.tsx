@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { authService } from "@/lib/api/authService";
+import { UnifiedAuthService } from "@/services/authService";
 
 interface LoginMailProps {
   onSubmit: (email: string) => void;
@@ -55,7 +55,7 @@ const LoginMail: React.FC<LoginMailProps> = ({ onSubmit }) => {
       setError("");
 
       try {
-        await authService.sendEmailOTP(trimmedEmail);
+        await UnifiedAuthService.sendEmailOTP(trimmedEmail);
         onSubmit(trimmedEmail);
       } catch (error: any) {
         setError(

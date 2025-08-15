@@ -18,13 +18,7 @@ export function useAuthInitializer() {
       return;
     }
 
-    // Don't override recent updates (within last 5 seconds)
-    if (currentUser.lastUpdated && Date.now() - currentUser.lastUpdated < 5000) {
-      console.log('[useAuthInitializer] Recent user update detected, skipping');
-      return;
-    }
-
-    // Use the unified auth service to initialize
+    // Use the unified auth service to initialize (it handles race conditions internally)
     const initializeAuth = async () => {
       try {
         console.log('[useAuthInitializer] Attempting to initialize authentication');
@@ -35,7 +29,7 @@ export function useAuthInitializer() {
     };
 
     initializeAuth();
-  }, [currentUser.isInitialized, currentUser.lastUpdated]);
+  }, [currentUser.isInitialized]);
 
   return {
     isInitialized: currentUser.isInitialized

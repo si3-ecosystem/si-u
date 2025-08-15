@@ -45,7 +45,18 @@ export function useEmailVerification({ profile }: UseEmailVerificationProps) {
           console.error("❌ Failed to send OTP - Response not ok or status not success");
           console.error("Status:", response.status);
           console.error("Response:", responseData);
-          return { success: false, error: responseData.message || "Failed to send OTP" };
+
+          // Extract error message from various possible response structures
+          let errorMessage = "Failed to send OTP";
+          if (responseData.message) {
+            errorMessage = responseData.message;
+          } else if (responseData.error?.message) {
+            errorMessage = responseData.error.message;
+          } else if (responseData.error) {
+            errorMessage = responseData.error;
+          }
+
+          return { success: false, error: errorMessage };
         }
       } catch (parseError) {
         console.error("❌ Failed to parse response as JSON:", parseError);
@@ -99,7 +110,18 @@ export function useEmailVerification({ profile }: UseEmailVerificationProps) {
       } else {
         console.error("❌ Failed to send verification email");
         console.error("Response:", responseData);
-        return { success: false, error: responseData.message || "Failed to send verification email" };
+
+        // Extract error message from various possible response structures
+        let errorMessage = "Failed to send verification email";
+        if (responseData.message) {
+          errorMessage = responseData.message;
+        } else if (responseData.error?.message) {
+          errorMessage = responseData.error.message;
+        } else if (responseData.error) {
+          errorMessage = responseData.error;
+        }
+
+        return { success: false, error: errorMessage };
       }
     } catch (error) {
       console.error("❌ Error sending verification email:", error);
