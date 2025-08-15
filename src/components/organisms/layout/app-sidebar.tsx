@@ -47,7 +47,7 @@ interface SubMenuGroup {
 
 const mainMenuItems: MenuItem[] = [
   {
-    title: "Dashboard",
+    title: "Home",
     icon: LayoutDashboard,
     href: "/",
   },
@@ -104,7 +104,7 @@ const subMenuGroups: SubMenuGroup[] = [
         href: "/grow3dge/grow3dge-sessions",
       },
       {
-        title: "Idea Labs",
+        title: "Grow3dge Idea Labs",
         icon: Brain,
         href: "/grow3dge/ideas-lab",
       },

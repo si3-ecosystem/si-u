@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { UpdateProfileRequest } from "@/services/profileService";
+import { toast } from "sonner";
 
 import { StepperProgress } from "./components/StepperProgress";
 import { EmailVerificationStep } from "./steps/EmailVerificationStep";
@@ -69,12 +70,19 @@ export function ProfileEditForm() {
       stepManager.goToNextStep();
     } else {
       console.log("❌ Email verification failed:", result.error);
+      // Show user-friendly error message in toast
+      if (result.error?.includes("already in use") || result.error?.includes("already exists")) {
+        toast.error("This email address is already in use by another account");
+      } else {
+        toast.error(result.error || "Failed to send verification email");
+      }
     }
   };
 
   const handleProfileSubmit = (data: ProfileFormData) => {
+    // Only include fields that should be updated
+    // Don't include email since it was already updated during verification
     const updateData: UpdateProfileRequest = {
-      email: emailVerification.pendingEmail || profile?.email,
       username: data.username,
       name: profile?.name,
       firstName: profile?.firstName,
@@ -112,6 +120,7 @@ export function ProfileEditForm() {
       stepManager.goToNextStep();
     } else {
       console.log("❌ OTP verification failed:", result.error);
+      toast.error(result.error || "Failed to verify OTP code");
     }
   };
 

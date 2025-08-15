@@ -6,6 +6,7 @@
 import { store } from '@/redux/store';
 import { initializeUser, setUser, updateUserProfile, resetUser, forceUpdateUser, UserData } from '@/redux/slice/userSlice';
 import { apiClient } from './api';
+import { AuthCacheManager } from '@/utils/authCacheManager';
 
 export interface LoginResponse {
   user: UserData;
@@ -20,15 +21,50 @@ export interface AuthState {
 
 export class UnifiedAuthService {
   private static readonly TOKEN_KEY = 'si3-jwt';
-  
+  private static isInitializing = false;
+  private static initializationPromise: Promise<boolean> | null = null;
+
   /**
    * Initialize authentication from stored token
+   * Prevents race conditions by ensuring only one initialization at a time
    */
   static async initialize(): Promise<boolean> {
+    // If already initializing, return the existing promise
+    if (this.isInitializing && this.initializationPromise) {
+      console.log('[AuthService] Initialization already in progress, waiting...');
+      return this.initializationPromise;
+    }
+
+    // Check if already initialized
+    const state = store.getState();
+    if (state.user.isInitialized) {
+      console.log('[AuthService] Already initialized, skipping');
+      return true;
+    }
+
+    // Start initialization
+    this.isInitializing = true;
+    this.initializationPromise = this.performInitialization();
+
+    try {
+      const result = await this.initializationPromise;
+      return result;
+    } finally {
+      this.isInitializing = false;
+      this.initializationPromise = null;
+    }
+  }
+
+  /**
+   * Perform the actual initialization logic
+   */
+  private static async performInitialization(): Promise<boolean> {
     try {
       const token = this.getStoredToken();
       if (!token) {
         console.log('[AuthService] No stored token found');
+        // Mark as initialized even if no token
+        store.dispatch(initializeUser({}));
         return false;
       }
 
@@ -36,6 +72,7 @@ export class UnifiedAuthService {
       if (!this.isValidTokenFormat(token)) {
         console.log('[AuthService] Invalid token format, clearing');
         this.clearToken();
+        store.dispatch(initializeUser({}));
         return false;
       }
 
@@ -44,6 +81,7 @@ export class UnifiedAuthService {
       if (!payload) {
         console.log('[AuthService] Failed to decode token, clearing');
         this.clearToken();
+        store.dispatch(initializeUser({}));
         return false;
       }
 
@@ -51,6 +89,7 @@ export class UnifiedAuthService {
       if (this.isTokenExpired(payload)) {
         console.log('[AuthService] Token expired, clearing');
         this.clearToken();
+        store.dispatch(initializeUser({}));
         return false;
       }
 
@@ -81,6 +120,7 @@ export class UnifiedAuthService {
     } catch (error) {
       console.error('[AuthService] Error during initialization:', error);
       this.clearToken();
+      store.dispatch(initializeUser({}));
       return false;
     }
   }
@@ -267,10 +307,42 @@ export class UnifiedAuthService {
     } catch (error) {
       console.error('[AuthService] Logout API error:', error);
     } finally {
-      // Always clear local state
-      this.clearToken();
-      store.dispatch(resetUser());
+      // Clear all authentication data
+      this.clearAllAuthData();
     }
+  }
+
+  /**
+   * Clear all authentication data and state
+   */
+  static clearAllAuthData(): void {
+    // Clear token
+    this.clearToken();
+
+    // Reset Redux state
+    store.dispatch(resetUser());
+
+    // Clear all localStorage auth-related data
+    if (typeof window !== 'undefined') {
+      // Clear any other auth-related localStorage items
+      const keysToRemove = ['si3-jwt', 'si3-token', 'user-preferences', 'auth-state'];
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+      });
+
+      // Clear sessionStorage
+      sessionStorage.clear();
+
+      // Clear auth-related cookies
+      document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
+
+    // Clear React Query cache if available
+    this.clearQueryCache();
+
+    // Emit logout event for other components to listen
+    this.emitAuthEvent('logout');
   }
 
   /**
@@ -323,12 +395,23 @@ export class UnifiedAuthService {
    * Handle successful authentication
    */
   private static async handleAuthSuccess(data: LoginResponse): Promise<void> {
-    
-    // Store token
-    this.setToken(data.token);
-    
-    // Update user state
-    store.dispatch(setUser(data.user));
+    // Use unified auth update method
+    this.applyAuthUpdate({ user: data.user, token: data.token });
+  }
+
+  /**
+   * Invalidate user-specific cache
+   */
+  private static invalidateUserCache(): void {
+    try {
+      if (typeof window !== 'undefined' && (window as any).__REACT_QUERY_CLIENT__) {
+        const queryClient = (window as any).__REACT_QUERY_CLIENT__;
+        AuthCacheManager.invalidateUserSpecificCache(queryClient);
+        console.log('[AuthService] User-specific cache invalidated for new login');
+      }
+    } catch (error) {
+      console.warn('[AuthService] Could not invalidate user cache:', error);
+    }
   }
 
   /**
@@ -379,5 +462,125 @@ export class UnifiedAuthService {
   static getAuthHeaders(): Record<string, string> {
     const token = this.getStoredToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
+  /**
+   * Clear React Query cache
+   */
+  private static clearQueryCache(): void {
+    try {
+      // Try to get the global query client and clear user-specific cache
+      if (typeof window !== 'undefined' && (window as any).__REACT_QUERY_CLIENT__) {
+        const queryClient = (window as any).__REACT_QUERY_CLIENT__;
+        AuthCacheManager.clearUserSpecificCache(queryClient);
+        console.log('[AuthService] User-specific React Query cache cleared');
+      }
+    } catch (error) {
+      console.warn('[AuthService] Could not clear React Query cache:', error);
+    }
+  }
+
+  /**
+   * Emit authentication events
+   */
+  private static emitAuthEvent(event: 'login' | 'logout' | 'refresh', data?: any): void {
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(`auth:${event}`, { detail: data }));
+        console.log(`[AuthService] Emitted auth:${event} event`);
+      }
+    } catch (error) {
+      console.warn('[AuthService] Could not emit auth event:', error);
+    }
+  }
+
+  /**
+   * Listen to authentication events
+   */
+  static onAuthEvent(event: 'login' | 'logout' | 'refresh', handler: (data?: any) => void): () => void {
+    if (typeof window === 'undefined') return () => {};
+
+    const eventHandler = (e: CustomEvent) => handler(e.detail);
+    window.addEventListener(`auth:${event}`, eventHandler as EventListener);
+
+    // Return cleanup function
+    return () => {
+      window.removeEventListener(`auth:${event}`, eventHandler as EventListener);
+    };
+  }
+
+  /**
+   * Apply authentication update - unified method for all auth state changes
+   * This ensures consistent state updates across Redux, cache, and events
+   */
+  static applyAuthUpdate(authData: { user: UserData; token: string }): void {
+    try {
+      console.log('[AuthService] Applying unified auth update:', authData.user);
+
+      // 1. Update token storage
+      this.setToken(authData.token);
+
+      // 2. Update Redux state
+      store.dispatch(setUser(authData.user));
+
+      // 3. Invalidate user-specific cache for new user data
+      this.invalidateUserCache();
+
+      // 4. Emit login event for components to react
+      this.emitAuthEvent('login', authData.user);
+
+      console.log('[AuthService] Auth update applied successfully');
+    } catch (error) {
+      console.error('[AuthService] Error applying auth update:', error);
+    }
+  }
+
+  /**
+   * Get current authentication state
+   */
+  static getAuthState(): { user: UserData | null; isAuthenticated: boolean; token: string | null } {
+    const state = store.getState();
+    const token = this.getStoredToken();
+
+    return {
+      user: state.user.user,
+      isAuthenticated: this.isAuthenticated(),
+      token,
+    };
+  }
+
+  /**
+   * Force refresh user data and update all state
+   */
+  static async forceRefreshAuth(): Promise<boolean> {
+    try {
+      console.log('[AuthService] Force refreshing auth state...');
+
+      const token = this.getStoredToken();
+      if (!token) {
+        console.log('[AuthService] No token found for refresh');
+        return false;
+      }
+
+      // Fetch fresh user data
+      const response = await apiClient.get('/auth/me');
+      if (response.data?.status === 'success' && response.data?.data) {
+        const userData = response.data.data;
+
+        // Apply unified update
+        this.applyAuthUpdate({ user: userData, token });
+
+        // Emit refresh event
+        this.emitAuthEvent('refresh', userData);
+
+        console.log('[AuthService] Auth state refreshed successfully');
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('[AuthService] Error refreshing auth state:', error);
+      return false;
+    }
   }
 }

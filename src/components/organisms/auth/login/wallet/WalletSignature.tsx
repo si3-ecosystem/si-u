@@ -7,7 +7,7 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-import { authService } from "@/lib/api/authService";
+import { UnifiedAuthService } from "@/services/authService";
 
 interface WalletSignatureProps {
   walletName: string;
@@ -39,7 +39,7 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
 
     try {
       // Request signature message from backend
-      const signatureResponse = await authService.requestWalletSignature(
+      const signatureResponse = await UnifiedAuthService.requestWalletSignature(
         walletAddress
       );
       const messageToSign = signatureResponse.data.message;
@@ -59,7 +59,7 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
       });
 
       // Verify signature with backend
-      const verifyResponse = await authService.verifyWalletSignature(
+      const verifyResponse = await UnifiedAuthService.verifyWalletSignature(
         walletAddress,
         signature
       );
