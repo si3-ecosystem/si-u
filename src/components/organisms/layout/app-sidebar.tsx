@@ -27,8 +27,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import LogoutButton from "../auth/LogoutButton";
-import { useQuery } from "@tanstack/react-query";
-import { getSeoSettings } from "@/lib/sanity/client";
 import Image from "next/image";
 
 // Define types for menu items
@@ -126,11 +124,6 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { open } = useSidebar();
 
-  const { data: seoSettings } = useQuery({
-    queryKey: ["seo-settings"],
-    queryFn: getSeoSettings,
-  });
-
   if (!open) return null;
 
   const allMenuItems: MenuItem[] = [
@@ -161,8 +154,6 @@ export function AppSidebar() {
                   <Image
                     src={ "/logo.svg" }
                     alt={
-                      seoSettings.favicon.alt ||
-                      seoSettings.logo?.alt ||
                       "Logo"
                     }
                     width={120}
