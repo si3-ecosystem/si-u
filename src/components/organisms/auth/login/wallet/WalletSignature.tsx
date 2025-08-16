@@ -28,6 +28,14 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
   const router = useRouter();
   const { signMessage } = useSignMessage();
 
+  // Debug logging
+  console.log('[WalletSignature] Component props:', {
+    walletAddress,
+    walletName,
+    addressType: typeof walletAddress,
+    addressLength: walletAddress?.length
+  });
+
   const [error, setError] = useState<string>("");
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
@@ -38,6 +46,13 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
     setError("");
 
     try {
+      // Validate wallet address before proceeding
+      if (!walletAddress || typeof walletAddress !== 'string' || walletAddress.trim() === '') {
+        throw new Error('Invalid wallet address. Please reconnect your wallet.');
+      }
+
+      console.log('[WalletSignature] Requesting signature for address:', walletAddress);
+
       // Request signature message from backend
       const signatureResponse = await UnifiedAuthService.requestWalletSignature(
         walletAddress
@@ -64,11 +79,18 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
         signature
       );
 
+      console.log('[WalletSignature] Wallet verification successful:', verifyResponse.data);
+
       // Handle successful authentication
       onSuccess?.(verifyResponse.data);
 
       setIsRedirecting(true);
-      setTimeout(() => router.push("/"), 1000);
+
+      // Wait a bit longer for auth state to update, then redirect to dashboard
+      setTimeout(() => {
+        console.log('[WalletSignature] Redirecting to dashboard...');
+        router.replace("/dashboard");
+      }, 1500);
     } catch (error: any) {
       setError(
         error.message || "Failed to authenticate wallet. Please try again."

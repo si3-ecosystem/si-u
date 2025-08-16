@@ -73,12 +73,32 @@ export async function middleware(request: NextRequest) {
   // ✅ Use the passed request for cookie access
   const user = await verifyJwtToken(request);
 
+  // If JWT verification failed but cookie exists, clear it
+  const jwtCookie = request.cookies.get("si3-jwt");
+  if (!user && jwtCookie?.value) {
+    console.log("[Middleware] Invalid JWT detected, clearing cookie and redirecting to login");
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("si3-jwt", "", {
+      expires: new Date(0),
+      path: "/",
+    });
+    return response;
+  }
 
   const isAuthenticated = !!user;
   const isAdmin = isAuthenticated && user?.roles?.includes("admin");
   const isGuide = isAuthenticated && user?.roles?.includes("guide");
   const isPartner = isAuthenticated && user?.roles?.includes("partner");
   const isVerified = isAuthenticated && user?.isVerified;
+
+  // Debug logging for auth state
+  console.log(`[Middleware] ${pathname} - Auth state:`, {
+    isAuthenticated,
+    isVerified,
+    hasUser: !!user,
+    userEmail: user?.email,
+    cookies: request.cookies.getAll().map(c => ({ name: c.name, hasValue: !!c.value }))
+  });
 
   // Helper function to get default dashboard based on user role
   const getDefaultDashboard = () => {
@@ -94,7 +114,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Prevent access to login pages if already logged in and verified
-  if (PUBLIC_AUTH_ROUTES.includes(pathname) && isAuthenticated && isVerified) {
+  // Add extra validation to prevent redirect loops
+  if (PUBLIC_AUTH_ROUTES.includes(pathname) && isAuthenticated && isVerified && user?._id) {
+    console.log(`[Middleware] Redirecting authenticated user from ${pathname} to dashboard`);
     return NextResponse.redirect(new URL(getDefaultDashboard(), request.url));
   }
 
@@ -189,9 +211,11 @@ async function verifyJwtToken(
     const jwtCookie = request.cookies.get("si3-jwt");
 
     if (!jwtCookie?.value) {
-      console.log("No JWT cookie found");
+      console.log("[Middleware] No JWT cookie found");
       return null;
     }
+
+    console.log("[Middleware] JWT cookie found, attempting verification...");
 
     const jwtSecret = process.env.JWT_SECRET || "iqwejiowjdekasdaslkdjlkasjedkwqjeiwqp;zMedjiwerpqweiq-dkflnlka!kjekjd@kxlkjvflkxjfkjklxjvkl";
     if (!jwtSecret) {
@@ -214,20 +238,21 @@ async function verifyJwtToken(
       secret
     );
 
+    console.log("[Middleware] JWT verification successful for user:", payload.email);
     return payload;
   } catch (err) {
     // More detailed error logging
     if (err instanceof Error) {
-      console.error("JWT verification failed:", {
+      console.error("[Middleware] JWT verification failed:", {
         name: err.name,
         message: err.message,
-        stack: err.stack,
+        cookieLength: jwtCookie?.value?.length || 0,
       });
     } else {
-      console.error("JWT verification failed with unknown error:", err);
+      console.error("[Middleware] JWT verification failed with unknown error:", err);
     }
 
-    // Clear the invalid cookie by returning null
+    // Return null to indicate invalid token
     return null;
   }
 }
