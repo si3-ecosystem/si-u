@@ -379,6 +379,61 @@ export class UnifiedAuthService {
   }
 
   /**
+   * Send email OTP for login
+   */
+  static async sendEmailOTP(email: string): Promise<ApiResponse> {
+    try {
+      console.log('[AuthService] Sending email OTP to:', email);
+
+      const response = await apiClient.post('/auth/email/send-otp', {
+        email: email.trim()
+      });
+
+      console.log('[AuthService] Email OTP sent successfully');
+      return response;
+    } catch (error) {
+      console.error('[AuthService] Send email OTP error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send email verification OTP to current user's email
+   */
+  static async sendEmailVerification(): Promise<ApiResponse> {
+    try {
+      console.log('[AuthService] Sending verification to current user email');
+
+      const response = await apiClient.post('/auth/send-verification');
+
+      console.log('[AuthService] Email verification sent successfully');
+      return response;
+    } catch (error) {
+      console.error('[AuthService] Send email verification error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send email verification OTP to a new email address
+   */
+  static async sendEmailVerificationToNewEmail(email: string): Promise<ApiResponse> {
+    try {
+      console.log('[AuthService] Sending verification to new email:', email);
+
+      const response = await apiClient.post('/auth/send-verification-new-email', {
+        email: email.trim()
+      });
+
+      console.log('[AuthService] New email verification sent successfully');
+      return response;
+    } catch (error) {
+      console.error('[AuthService] Send new email verification error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Logout user
    */
   static async logout(options: { redirect?: boolean } = { redirect: false }): Promise<void> {
