@@ -14,14 +14,12 @@ export function useAuthInitializer() {
   useEffect(() => {
     // Only initialize if user is not already initialized
     if (currentUser.isInitialized) {
-      console.log('[useAuthInitializer] Already initialized, skipping');
       return;
     }
 
     // Use the unified auth service to initialize (it handles race conditions internally)
     const initializeAuth = async () => {
       try {
-        console.log('[useAuthInitializer] Attempting to initialize authentication');
         await UnifiedAuthService.initialize();
       } catch (error) {
         console.error('[useAuthInitializer] Failed to initialize auth:', error);

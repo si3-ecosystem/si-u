@@ -230,7 +230,13 @@ const Live = () => {
         {/* Live Cards */}
         {validDetails.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <Suspense>
+            <Suspense fallback={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="w-full h-48 bg-gray-200 animate-pulse rounded-lg"></div>
+                ))}
+              </div>
+            }>
               {validDetails.map((item, index) => (
                 <div key={`${item.title}-${index}`} className="w-full">
                   <Cards {...item} />

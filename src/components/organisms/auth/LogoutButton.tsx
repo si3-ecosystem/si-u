@@ -25,16 +25,35 @@ const LogoutButton = () => {
     try {
       setIsLoading(true);
 
+      console.log('[LogoutButton] Starting logout process...');
+
       // Use UnifiedAuthService for proper logout
       await UnifiedAuthService.logout();
 
       dispatch(setLogoutModalOpen(false));
-      router.push("/login");
+
+      console.log('[LogoutButton] Logout complete, forcing redirect...');
+
+      // Force immediate redirect with page reload to ensure clean state
+      if (typeof window !== 'undefined') {
+        // Clear any remaining cookies manually as backup
+        document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+        // Force redirect with replace to prevent back navigation
+        window.location.replace('/login');
+      }
 
     } catch (error) {
       console.error('Logout error:', error);
       dispatch(setLogoutModalOpen(false));
-      router.push("/login");
+
+      // Force redirect even on error
+      if (typeof window !== 'undefined') {
+        console.log('[LogoutButton] Redirecting to login page (error case)');
+        // Clear cookies manually
+        document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.replace('/login');
+      }
     } finally {
       setIsLoading(false);
     }

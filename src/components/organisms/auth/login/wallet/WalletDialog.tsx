@@ -321,6 +321,11 @@ export function WalletDialog({
         {
           onSuccess: (data) => {
             setIsConnecting(false);
+            console.log('[WalletDialog] Wallet connection success:', {
+              accounts: data.accounts,
+              firstAccount: data.accounts[0],
+              connectorName: selectedConnector.name
+            });
             onWalletConnected(data.accounts[0], selectedConnector.name);
             onOpenChange(false);
           },

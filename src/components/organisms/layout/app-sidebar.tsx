@@ -159,17 +159,23 @@ export function AppSidebar() {
           <div className="flex items-center justify-between w-full">
             <Link href="/" className={cn(!open ? " " : "")}>
               <div className="px-4">
-                <Image
-                  src={urlForImage(seoSettings?.favicon)?.src || ""}
-                  alt={
-                    seoSettings?.favicon?.alt ||
-                    seoSettings?.logo?.alt ||
-                    "Logo"
-                  }
-                  width={120}
-                  height={40}
-                  className="h-10 w-auto object-contain"
-                />
+                {seoSettings?.favicon && urlForImage(seoSettings.favicon)?.src ? (
+                  <Image
+                    src={urlForImage(seoSettings.favicon)?.src || "/placeholder-logo.png"}
+                    alt={
+                      seoSettings.favicon.alt ||
+                      seoSettings.logo?.alt ||
+                      "Logo"
+                    }
+                    width={120}
+                    height={40}
+                    className="h-10 w-auto object-contain"
+                  />
+                ) : (
+                  <div className="h-10 w-[120px] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                    Logo
+                  </div>
+                )}
               </div>
             </Link>
             <SidebarTrigger />

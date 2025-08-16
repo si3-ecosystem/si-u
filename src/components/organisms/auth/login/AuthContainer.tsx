@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import EtherMail from "./EtherMail";
 import LoginAuthContainer from "./LoginAuthContainer";
@@ -11,6 +11,7 @@ import LoginMail from "./email/LoginMail";
 import InjectedWallet from "./wallet/InjectedWallet";
 import WalletSignature from "./wallet/WalletSignature";
 import { UnifiedAuthService } from "@/services/authService";
+import { AuthDebugger } from "@/utils/debugAuth";
 
 type AuthState = "initial" | "otp" | "wallet_signature";
 
@@ -29,19 +30,33 @@ const AuthContainer = () => {
   const [authState, setAuthState] = useState<AuthState>("initial");
   const [walletData, setWalletData] = useState<WalletData | null>(null);
 
+  // Handle forced login state and clear redirect loop flags
+  useEffect(() => {
+    if (AuthDebugger.isForcedLogin()) {
+      console.log('[AuthContainer] Forced login detected, clearing flags');
+      AuthDebugger.clearForcedLogin();
+      AuthDebugger.logAllCookies();
+    }
+  }, []);
+
   const handleEmailSubmit = useCallback((email: string) => {
     setUserEmail(email);
     setAuthState("otp");
   }, []);
 
   const handleAuthSuccess = useCallback((data: AuthData) => {
-    // Use UnifiedAuthService to handle auth success
-    if (data.token && data.user) {
-      UnifiedAuthService.applyAuthUpdate({ user: data.user, token: data.token });
-    }
+    // Auth update is already handled by the individual auth methods
+    // No need to call applyAuthUpdate again here as it would overwrite the normalized data
+    console.log('[AuthContainer] Auth success callback - auth already applied by service');
   }, []);
 
   const handleWalletConnected = useCallback((address: string, name: string) => {
+    console.log('[AuthContainer] Wallet connected:', {
+      address,
+      name,
+      addressType: typeof address,
+      addressLength: address?.length
+    });
     setWalletData({ address, name });
     setAuthState("wallet_signature");
   }, []);

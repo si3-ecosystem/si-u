@@ -148,7 +148,88 @@ export class UnifiedAuthService {
   }
 
   /**
-   * Login with wallet signature
+   * Request wallet signature message from backend
+   */
+  static async requestWalletSignature(address: string): Promise<{ data: { message: string } }> {
+    try {
+      console.log('[AuthService] Requesting wallet signature for address:', address);
+
+      // Validate address before sending
+      if (!address || typeof address !== 'string') {
+        throw new Error('Invalid wallet address provided');
+      }
+
+      const requestBody = {
+        wallet_address: address.trim(),
+      };
+
+      console.log('[AuthService] Sending request body:', requestBody);
+
+      const response = await apiClient.post('/auth/wallet/request-signature', requestBody);
+
+      if (response.status === 'success' && response.data) {
+        return { data: response.data };
+      }
+
+      throw new Error('Failed to get signature message');
+    } catch (error) {
+      console.error('[AuthService] Wallet signature request error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify wallet signature and complete authentication
+   */
+  static async verifyWalletSignature(address: string, signature: string): Promise<{ data: any }> {
+    try {
+      const response = await apiClient.post<LoginResponse>('/auth/wallet/verify-signature', {
+        wallet_address: address,
+        signature,
+      });
+
+      if (response.status === 'success' && response.data) {
+        console.log('[AuthService] Wallet verification response:', {
+          hasUser: !!response.data.user,
+          hasToken: !!response.data.token,
+          userEmail: response.data.user?.email,
+          userId: response.data.user?.id,
+          user_Id: response.data.user?._id,
+          fullUserData: response.data.user
+        });
+
+        // Normalize user data - ensure _id field exists
+        const normalizedUser = {
+          ...response.data.user,
+          _id: response.data.user._id || response.data.user.id
+        };
+
+        console.log('[AuthService] Normalized user data:', {
+          hasId: !!normalizedUser.id,
+          has_Id: !!normalizedUser._id,
+          userId: normalizedUser.id,
+          user_Id: normalizedUser._id
+        });
+
+        // Apply auth update using the unified method
+        this.applyAuthUpdate({ user: normalizedUser, token: response.data.token });
+
+        console.log('[AuthService] Auth update applied, checking stored token...');
+        const storedToken = this.getStoredToken();
+        console.log('[AuthService] Stored token after update:', !!storedToken);
+
+        return { data: response.data };
+      }
+
+      throw new Error('Wallet login failed');
+    } catch (error) {
+      console.error('[AuthService] Wallet signature verification error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Login with wallet signature (legacy method for backward compatibility)
    */
   static async loginWithWallet(address: string, signature: string): Promise<LoginResponse> {
     try {
@@ -162,7 +243,7 @@ export class UnifiedAuthService {
         return response.data;
       }
 
-      throw new Error('Wallet login failed');
+      throw new Error('Invalid response from server');
     } catch (error) {
       console.error('[AuthService] Wallet login error:', error);
       throw error;
@@ -300,7 +381,7 @@ export class UnifiedAuthService {
   /**
    * Logout user
    */
-  static async logout(): Promise<void> {
+  static async logout(options: { redirect?: boolean } = { redirect: false }): Promise<void> {
     try {
       // Call logout endpoint
       await apiClient.post('/auth/logout');
@@ -309,6 +390,12 @@ export class UnifiedAuthService {
     } finally {
       // Clear all authentication data
       this.clearAllAuthData();
+
+      // Optionally redirect to login page
+      if (options.redirect && typeof window !== 'undefined') {
+        console.log('[AuthService] Redirecting to login page after logout');
+        window.location.href = '/login';
+      }
     }
   }
 
@@ -333,9 +420,26 @@ export class UnifiedAuthService {
       // Clear sessionStorage
       sessionStorage.clear();
 
-      // Clear auth-related cookies
-      document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      // Clear auth-related cookies with all possible path combinations
+      const cookiesToClear = ['si3-jwt', 'auth-token', 'token'];
+      const paths = ['/', '/login', '/dashboard', '/admin', '/profile', '/settings'];
+      const domains = [window.location.hostname, `.${window.location.hostname}`, 'localhost'];
+
+      cookiesToClear.forEach(cookieName => {
+        paths.forEach(path => {
+          domains.forEach(domain => {
+            // Clear with domain
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain}; SameSite=Lax;`;
+            // Clear without domain
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; SameSite=Lax;`;
+          });
+        });
+
+        // Also clear with no path specified
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax;`;
+      });
+
+      console.log('[AuthService] All cookies and storage cleared');
     }
 
     // Clear React Query cache if available
@@ -357,26 +461,7 @@ export class UnifiedAuthService {
     };
   }
 
-  /**
-   * Apply auth update from API responses that include token and/or user
-   */
-  static applyAuthUpdate(data: { token?: string; user?: UserData }): void {
-    try {
-      if ((data as any)?.token) {
-        this.setToken((data as any).token);
-      }
-      if (data?.user) {
-        const userData = {
-          ...data.user,
-          isEmailVerified: (data.user as any).isEmailVerified ?? (data.user as any).isVerified ?? false,
-          isVerified: (data.user as any).isVerified ?? (data.user as any).isEmailVerified ?? false,
-        } as UserData;
-        store.dispatch(forceUpdateUser(userData));
-      }
-    } catch (e) {
-      console.error('[AuthService] Failed to apply auth update', e);
-    }
-  }
+  // Removed duplicate applyAuthUpdate method - using the unified one below
 
   /**
    * Check if user is authenticated
@@ -419,20 +504,68 @@ export class UnifiedAuthService {
    */
   private static setToken(token: string): void {
     if (typeof window !== 'undefined') {
+      // Store in localStorage
       localStorage.setItem(this.TOKEN_KEY, token);
+
+      // Also store in cookie for middleware consistency
+      const expires = new Date();
+      expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+      document.cookie = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+
+      console.log('[AuthService] Token stored in both localStorage and cookie');
     }
   }
 
   private static getStoredToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(this.TOKEN_KEY);
+      // First check localStorage
+      const localStorageToken = localStorage.getItem(this.TOKEN_KEY);
+      if (localStorageToken) {
+        return localStorageToken;
+      }
+
+      // If not in localStorage, check cookies as fallback
+      const cookieToken = this.getTokenFromCookie();
+      if (cookieToken) {
+        console.log('[AuthService] Found token in cookie, syncing to localStorage');
+        // Sync cookie token to localStorage for consistency
+        localStorage.setItem(this.TOKEN_KEY, cookieToken);
+        return cookieToken;
+      }
     }
+    return null;
+  }
+
+  /**
+   * Get token from cookie as fallback
+   */
+  private static getTokenFromCookie(): string | null {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      const cookies = document.cookie.split(';');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === this.TOKEN_KEY && value) {
+          return decodeURIComponent(value);
+        }
+      }
+    } catch (error) {
+      console.error('[AuthService] Error reading token from cookie:', error);
+    }
+
     return null;
   }
 
   private static clearToken(): void {
     if (typeof window !== 'undefined') {
+      // Clear from localStorage
       localStorage.removeItem(this.TOKEN_KEY);
+
+      // Clear from cookie
+      document.cookie = `${this.TOKEN_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
+
+      console.log('[AuthService] Token cleared from both localStorage and cookie');
     }
   }
 
@@ -521,7 +654,12 @@ export class UnifiedAuthService {
       this.setToken(authData.token);
 
       // 2. Update Redux state
-      store.dispatch(setUser(authData.user));
+      console.log('[AuthService] Dispatching forceUpdateUser with:', {
+        hasId: !!authData.user._id,
+        userId: authData.user._id,
+        userEmail: authData.user.email
+      });
+      store.dispatch(forceUpdateUser(authData.user));
 
       // 3. Invalidate user-specific cache for new user data
       this.invalidateUserCache();

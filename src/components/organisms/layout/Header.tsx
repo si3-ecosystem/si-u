@@ -92,12 +92,12 @@ export function Header() {
   const isUserReady = isClient && currentUser?.isInitialized;
   const username = isUserReady
     ? getDisplayUsername(currentUser?.user)
-    : "No username";
+    : "Loading...";
   const walletAddress = isUserReady ? currentUser?.user?.walletAddress : null;
   const subtext =
     isUserReady && walletAddress
       ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth`
-      : "user.siher.eth";
+      : "Loading...";
   const avatarUrl = isUserReady
     ? currentUser?.user?.avatar || "/placeholder.png"
     : "/placeholder.png";
@@ -120,16 +120,20 @@ export function Header() {
 
         <Link href="/" className={cn(!open ? " md:block" : "md:hidden")}>
           <div className="px-4">
-            <Image
-              src={
-                urlForImage(seoSettings?.favicon)?.src || ""
-              }
-              alt={seoSettings?.favicon?.alt || "Logo"}
-              width={120}
-              height={40}
-              className="h-10 w-auto object-contain"
-              priority
-            />
+            {seoSettings?.favicon && urlForImage(seoSettings.favicon)?.src ? (
+              <Image
+                src={urlForImage(seoSettings.favicon)?.src || "/placeholder-logo.png"}
+                alt={seoSettings.favicon.alt || "Logo"}
+                width={120}
+                height={40}
+                className="h-10 w-auto object-contain"
+                priority
+              />
+            ) : (
+              <div className="h-10 w-[120px] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                Logo
+              </div>
+            )}
           </div>
         </Link>
       </div>
