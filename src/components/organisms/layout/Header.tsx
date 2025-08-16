@@ -5,14 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Grid, User, Settings } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
 import { getDisplayUsername } from "@/lib/utils/username";
-import { getSeoSettings } from "@/lib/sanity/client";
-import { urlForImage } from "@/lib/sanity/image";
 
 // import {
 //   Notification,
@@ -77,12 +74,6 @@ export function Header() {
   const currentUser = useAppSelector((state) => state.user);
   const [isClient, setIsClient] = React.useState(false);
 
-  // Fetch SEO settings for logo
-  const { data: seoSettings } = useQuery({
-    queryKey: ["seo-settings"],
-    queryFn: getSeoSettings,
-  });
-
   // Ensure client-side rendering for user data to prevent hydration mismatch
   React.useEffect(() => {
     setIsClient(true);
@@ -120,20 +111,14 @@ export function Header() {
 
         <Link href="/" className={cn(!open ? " md:block" : "md:hidden")}>
           <div className="px-4">
-            {seoSettings?.favicon && urlForImage(seoSettings.favicon)?.src ? (
-              <Image
-                src={urlForImage(seoSettings.favicon)?.src || "/placeholder-logo.png"}
-                alt={seoSettings.favicon.alt || "Logo"}
-                width={120}
-                height={40}
-                className="h-10 w-auto object-contain"
-                priority
-              />
-            ) : (
-              <div className="h-10 w-[120px] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-                Logo
-              </div>
-            )}
+            <Image
+              src={"/logo.svg"}
+              alt={"Logo"}
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </div>
         </Link>
       </div>
