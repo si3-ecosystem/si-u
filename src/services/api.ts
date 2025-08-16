@@ -29,6 +29,7 @@ export class ApiClient {
         ...UnifiedAuthService.getAuthHeaders(),
         ...options.headers,
       },
+      credentials: 'include', // Include cookies for authentication
       ...options,
     };
 

@@ -48,6 +48,10 @@ export class UnifiedAuthService {
 
     try {
       const result = await this.initializationPromise;
+      console.log('[AuthService] Initialization completed:', {
+        success: result,
+        userLoggedIn: store.getState().user.isLoggedIn
+      });
       return result;
     } finally {
       this.isInitializing = false;
@@ -77,6 +81,12 @@ export class UnifiedAuthService {
       }
 
       // Decode and validate token
+      console.log('[AuthService] Decoding token:', {
+        tokenLength: token.length,
+        tokenStart: token.substring(0, 50) + '...',
+        tokenEnd: '...' + token.substring(token.length - 50)
+      });
+
       const payload = this.decodeToken(token);
       if (!payload) {
         console.log('[AuthService] Failed to decode token, clearing');
@@ -84,6 +94,15 @@ export class UnifiedAuthService {
         store.dispatch(initializeUser({}));
         return false;
       }
+
+      console.log('[AuthService] Decoded token payload:', {
+        _id: payload._id,
+        email: payload.email,
+        isVerified: payload.isVerified,
+        wallet_address: payload.wallet_address,
+        exp: payload.exp,
+        iat: payload.iat
+      });
 
       // Check if token is expired
       if (this.isTokenExpired(payload)) {
@@ -111,7 +130,26 @@ export class UnifiedAuthService {
       // Fetch full user profile to get complete data
       try {
         console.log('[AuthService] Fetching complete user profile...');
-        await this.refreshUserData();
+        const freshUserData = await this.forceRefreshUserData();
+
+        console.log('[AuthService] Fresh user data received:', {
+          email: freshUserData.email,
+          tokenEmail: basicUserData.email,
+          isVerified: freshUserData.isVerified
+        });
+
+        // Check if the token data is stale compared to API data
+        if (freshUserData && freshUserData.email && freshUserData.email !== basicUserData.email) {
+          console.log('[AuthService] Token data is stale, forcing token refresh:', {
+            tokenEmail: basicUserData.email,
+            apiEmail: freshUserData.email
+          });
+
+          // Force a token refresh to get updated JWT
+          await this.refreshToken();
+        } else {
+          console.log('[AuthService] Token data is current, no refresh needed');
+        }
       } catch (error) {
         console.warn('[AuthService] Failed to fetch complete profile, using token data:', error);
       }
@@ -275,14 +313,29 @@ export class UnifiedAuthService {
    */
   static async forceRefreshUserData(): Promise<UserData> {
     try {
-      const response = await apiClient.get<UserData>('/auth/me');
+      const response = await apiClient.get('/auth/me');
+
+      console.log('[AuthService] forceRefreshUserData response:', {
+        status: response.status,
+        hasData: !!response.data,
+        dataStructure: response.data ? Object.keys(response.data) : 'no data'
+      });
 
       if (response.status === 'success' && response.data) {
+        // Handle the correct API response structure: { status: 'success', data: { user: {...} } }
+        const rawUserData = response.data.user || response.data;
+
+        console.log('[AuthService] Raw user data from API:', {
+          email: rawUserData.email,
+          isVerified: rawUserData.isVerified,
+          hasId: !!(rawUserData._id || rawUserData.id)
+        });
 
         const userData = {
-          ...response.data,
-          isEmailVerified: response.data.isVerified ?? response.data.isVerified ?? false,
-          isVerified: response.data.isVerified ?? false,
+          ...rawUserData,
+          _id: rawUserData._id || rawUserData.id, // Ensure _id field exists
+          isEmailVerified: rawUserData.isVerified ?? false,
+          isVerified: rawUserData.isVerified ?? false,
         };
 
         if (userData.walletInfo && !userData.walletInfo.address) {
@@ -429,6 +482,30 @@ export class UnifiedAuthService {
       return response;
     } catch (error) {
       console.error('[AuthService] Send new email verification error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify email with OTP code
+   */
+  static async verifyEmail(otp: string): Promise<ApiResponse> {
+    try {
+      console.log('[AuthService] Verifying email with OTP');
+
+      const response = await apiClient.post('/auth/verify-email', {
+        otp: otp.trim()
+      });
+
+      if (response.status === 'success' && response.data) {
+        // Refresh user data after successful verification
+        await this.forceRefreshUserData();
+        console.log('[AuthService] Email verified successfully');
+      }
+
+      return response;
+    } catch (error) {
+      console.error('[AuthService] Email verification error:', error);
       throw error;
     }
   }
@@ -592,6 +669,48 @@ export class UnifiedAuthService {
   }
 
   /**
+   * Check if token data is stale compared to API data
+   */
+  static async isTokenDataStale(): Promise<boolean> {
+    try {
+      const token = this.getStoredToken();
+      if (!token) return false;
+
+      const payload = this.decodeToken(token);
+      if (!payload) return false;
+
+      // Fetch current data from API
+      const response = await apiClient.get('/auth/me');
+      if (response.data?.status === 'success' && response.data?.data) {
+        const apiData = response.data.data;
+
+        // Compare key fields
+        const isStale = (
+          payload.email !== apiData.email ||
+          payload.isVerified !== apiData.isVerified ||
+          payload.wallet_address !== apiData.wallet_address
+        );
+
+        if (isStale) {
+          console.log('[AuthService] Token data is stale:', {
+            tokenEmail: payload.email,
+            apiEmail: apiData.email,
+            tokenVerified: payload.isVerified,
+            apiVerified: apiData.isVerified
+          });
+        }
+
+        return isStale;
+      }
+
+      return false;
+    } catch (error) {
+      console.warn('[AuthService] Failed to check token staleness:', error);
+      return false;
+    }
+  }
+
+  /**
    * Get token from cookie as fallback
    */
   private static getTokenFromCookie(): string | null {
@@ -649,6 +768,11 @@ export class UnifiedAuthService {
    */
   static getAuthHeaders(): Record<string, string> {
     const token = this.getStoredToken();
+    console.log('[AuthService] Getting auth headers:', {
+      hasToken: !!token,
+      tokenLength: token?.length,
+      environment: process.env.NODE_ENV
+    });
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
@@ -740,6 +864,76 @@ export class UnifiedAuthService {
       isAuthenticated: this.isAuthenticated(),
       token,
     };
+  }
+
+  /**
+   * Force clear all cached data and reinitialize from API
+   */
+  static async forceClearAndReinitialize(): Promise<boolean> {
+    try {
+      console.log('[AuthService] Force clearing all cached data and reinitializing...');
+
+      // Clear Redux state first
+      store.dispatch(resetUser());
+
+      // Clear any cached data
+      this.invalidateUserCache();
+
+      // Get fresh token and data from API
+      const token = this.getStoredToken();
+      if (!token) {
+        console.log('[AuthService] No token found for reinitialization');
+        return false;
+      }
+
+      // Fetch fresh user data directly from API
+      const response = await apiClient.get('/auth/me');
+
+      console.log('[AuthService] forceClearAndReinitialize API response:', {
+        status: response.status,
+        hasData: !!response.data,
+        dataKeys: response.data ? Object.keys(response.data) : 'no data',
+        hasUser: !!(response.data?.user),
+        hasDirectData: !!(response.data?.data)
+      });
+
+      if (response.status === 'success' && response.data) {
+        // Handle the correct API response structure: { status: 'success', data: { user: {...} } }
+        const freshUserData = response.data.user || response.data.data || response.data;
+
+        if (!freshUserData) {
+          console.error('[AuthService] No user data found in API response:', response.data);
+          throw new Error('No user data found in API response');
+        }
+
+        // Normalize the user data (ensure _id field exists)
+        const normalizedUser = {
+          ...freshUserData,
+          _id: freshUserData._id || freshUserData.id
+        };
+
+        console.log('[AuthService] Reinitializing with fresh API data:', {
+          email: normalizedUser.email,
+          isVerified: normalizedUser.isVerified,
+          hasId: !!normalizedUser._id,
+          dataSource: response.data.user ? 'response.data.user' : response.data.data ? 'response.data.data' : 'response.data'
+        });
+
+        // Force update with fresh data
+        store.dispatch(forceUpdateUser(normalizedUser));
+
+        // Emit refresh event
+        this.emitAuthEvent('refresh', normalizedUser);
+
+        console.log('[AuthService] Force reinitialization completed successfully');
+        return true;
+      }
+
+      throw new Error(`Failed to get fresh user data - API returned status: ${response.status}`);
+    } catch (error) {
+      console.error('[AuthService] Force reinitialization failed:', error);
+      return false;
+    }
   }
 
   /**
