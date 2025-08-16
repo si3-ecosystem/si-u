@@ -124,7 +124,16 @@ const userSlice = createSlice({
       addDebugLog(state, 'initializeUser', userData);
 
       state.user = { ...userData };
-      state.isLoggedIn = !!userData._id;
+      // Ensure login state is properly set when we have valid user data
+      const hasValidUser = !!(userData._id && userData.email);
+      state.isLoggedIn = hasValidUser;
+
+      console.log('[UserSlice] initializeUser - setting isLoggedIn:', {
+        hasValidUser,
+        hasId: !!userData._id,
+        hasEmail: !!userData.email,
+        isLoggedIn: hasValidUser
+      });
       state.isInitialized = true;
       state.lastUpdated = Date.now();
 
