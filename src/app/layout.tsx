@@ -1,6 +1,9 @@
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
 
+// Initialize console suppression for production
+import "@/lib/utils/init-console-suppression";
+
 import "./globals.css";
 
 import ReduxProvider from "@/providers/ReduxProvider";

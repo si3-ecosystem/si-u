@@ -30,7 +30,6 @@ import LogoutButton from "../auth/LogoutButton";
 import { useQuery } from "@tanstack/react-query";
 import { getSeoSettings } from "@/lib/sanity/client";
 import Image from "next/image";
-import { urlForImage } from "@/lib/sanity/image";
 
 // Define types for menu items
 interface MenuItem {
@@ -159,9 +158,8 @@ export function AppSidebar() {
           <div className="flex items-center justify-between w-full">
             <Link href="/" className={cn(!open ? " " : "")}>
               <div className="px-4">
-                {seoSettings?.favicon && urlForImage(seoSettings.favicon)?.src ? (
                   <Image
-                    src={urlForImage(seoSettings.favicon)?.src || "/placeholder-logo.png"}
+                    src={ "/logo.svg" }
                     alt={
                       seoSettings.favicon.alt ||
                       seoSettings.logo?.alt ||
@@ -171,11 +169,7 @@ export function AppSidebar() {
                     height={40}
                     className="h-10 w-auto object-contain"
                   />
-                ) : (
-                  <div className="h-10 w-[120px] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-                    Logo
-                  </div>
-                )}
+               
               </div>
             </Link>
             <SidebarTrigger />
