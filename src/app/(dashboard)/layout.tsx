@@ -1,5 +1,8 @@
 "use client";
 
+// Initialize console suppression for production
+import "@/lib/utils/init-console-suppression";
+
 import { Header } from "@/components/organisms/layout/Header";
 import { AppSidebar } from "@/components/organisms/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
