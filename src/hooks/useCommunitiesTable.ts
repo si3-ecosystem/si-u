@@ -31,7 +31,7 @@ export function useCommunitiesTable() {
   const [location, setLocation] = useState("all");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 12,
   });
 
   // Filtering logic
