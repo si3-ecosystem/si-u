@@ -96,12 +96,12 @@ const subMenuGroups: SubMenuGroup[] = [
     title: "GROW3DGE PROGRAM",
     items: [
       {
-        title: "Grow3dge Sessions",
+        title: "Sessions",
         icon: Presentation,
         href: "/grow3dge/grow3dge-sessions",
       },
       {
-        title: "Grow3dge Idea Labs",
+        title: "Idea Labs",
         icon: Brain,
         href: "/grow3dge/ideas-lab",
       },
@@ -151,16 +151,13 @@ export function AppSidebar() {
           <div className="flex items-center justify-between w-full">
             <Link href="/" className={cn(!open ? " " : "")}>
               <div className="px-4">
-                  <Image
-                    src={ "/logo.svg" }
-                    alt={
-                      "Logo"
-                    }
-                    width={120}
-                    height={40}
-                    className="h-10 w-auto object-contain"
-                  />
-               
+                <Image
+                  src={"/logo.svg"}
+                  alt={"Logo"}
+                  width={120}
+                  height={40}
+                  className="!h-6 sm:!h-8 w-auto object-contain"
+                />
               </div>
             </Link>
             <SidebarTrigger />

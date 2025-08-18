@@ -19,9 +19,8 @@ export function SessionBanner({
 }: Props) {
   const backgroundImage = data?.background && urlForImage(data.background)?.src;
 
-
   return (
-    <div className="w-full min-h-[204px] md:min-h-[240px] items-center flex px-4 lg:px-6 py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+    <div className="w-full min-h-[204px] md:min-h-[240px] px-4 lg:px-6 items-center flex py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
       {backgroundImage && (
         <Image
           src={backgroundImage}

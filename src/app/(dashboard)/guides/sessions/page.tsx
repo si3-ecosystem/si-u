@@ -24,8 +24,8 @@ export default function SessionsPage() {
 
   return (
     <div className="">
-      <GuidesBanner data={data} />
-      <WorkShops guides={data.guides} />
+      <GuidesBanner data={data.banner || undefined} />
+      <WorkShops data={data} />
     </div>
   );
 }

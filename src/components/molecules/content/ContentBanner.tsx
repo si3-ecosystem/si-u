@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { urlForImage } from "@/lib/sanity/image";
 import { cn } from "@/lib/utils";
 
 interface ContentBannerProps {
@@ -20,77 +19,45 @@ export function ContentBanner({
   backgroundImage,
   // thumbnailImage,
   variant = "default",
-  overlay = true,
-  className = "",
   children,
 }: ContentBannerProps) {
-  const backgroundImageUrl =
-    backgroundImage && urlForImage(backgroundImage)?.src;
-  // const thumbnailImageUrl = thumbnailImage && urlForImage(thumbnailImage)?.src;
-
-  const variantClasses = {
-    default: "min-h-[240px] md:min-h-[280px]",
-    compact: "min-h-[180px] md:min-h-[220px]",
-    hero: "min-h-[320px] md:min-h-[400px] lg:min-h-[480px]",
-  };
- 
-  console.log("backgroundImageUrl",backgroundImageUrl)
-
   return (
-    <section className={cn("w-full relative", className)}>
-      <div
-        className={cn(
-          "w-full flex items-center px-4 lg:px-6 py-6 lg:py-8 relative z-10 ",
-          variantClasses[variant]
-        )}
-      >
-        {/* Background Image */}
-        {backgroundImageUrl && (
-          <>
-            <Image
-              src={backgroundImageUrl}
-              alt="Background"
-              fill
-              className="absolute inset-0 z-0 object-cover object-center "
-              priority={variant === "hero"}
-            />
-            {overlay && (
-              <div className="absolute inset-0 z-0 bg-black/20 rounded-lg" />
+    <div className="w-full min-h-[204px] md:min-h-[240px] px-4 lg:px-6 items-center flex py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+      {backgroundImage && (
+        <Image
+          src={backgroundImage}
+          alt="background"
+          fill
+          className="w-full absolute inset-0 z-0  object-cover object-center"
+        />
+      )}
+      <div className="w-full flex items-center gap-6 z-10 relative">
+        {/* Text Content */}
+        <div className="flex-1 min-w-0">
+          <h1
+            className={cn(
+              "font-bold mb-3 leading-tight text-white",
+              variant === "hero"
+                ? "text-3xl lg:text-4xl xl:text-5xl"
+                : "text-2xl lg:text-3xl"
             )}
-          </>
-        )}
+          >
+            {title}
+          </h1>
 
-        {/* Content Container */}
-        <div className="w-full flex items-center gap-6 z-10 relative">
-          {/* Text Content */}
-          <div className="flex-1 min-w-0">
-            <h1
-              className={cn(
-                "font-bold mb-3 leading-tight text-white",
-                variant === "hero"
-                  ? "text-3xl lg:text-4xl xl:text-5xl"
-                  : "text-2xl lg:text-3xl"
-              )}
-            >
-              {title}
-            </h1>
+          <p
+            className={cn(
+              "leading-relaxed max-w-3xl text-white",
+              variant === "hero" ? "text-lg lg:text-xl" : "text-base lg:text-lg"
+            )}
+          >
+            {description}
+          </p>
 
-            <p
-              className={cn(
-                "leading-relaxed max-w-3xl text-white",
-                variant === "hero"
-                  ? "text-lg lg:text-xl"
-                  : "text-base lg:text-lg"
-              )}
-            >
-              {description}
-            </p>
-
-            {/* Additional content */}
-            {children && <div className="mt-4">{children}</div>}
-          </div>
+          {/* Additional content */}
+          {children && <div className="mt-4">{children}</div>}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

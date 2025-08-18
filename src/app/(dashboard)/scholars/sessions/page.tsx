@@ -38,8 +38,6 @@ export default function SIUSession() {
     refetchOnWindowFocus: false,
   });
 
-  console.log("data", data);
-
   const { data: sessionPageData, isLoading: isSessionPageLoading } =
     useQuery<SessionSchema>({
       queryKey: ["getSessionsPageData"],

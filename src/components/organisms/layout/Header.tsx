@@ -116,7 +116,7 @@ export function Header() {
               alt={"Logo"}
               width={120}
               height={40}
-              className="h-10 w-auto object-contain"
+              className="h-6 sm:h-8 w-auto object-contain"
               priority
             />
           </div>

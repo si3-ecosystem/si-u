@@ -11,6 +11,7 @@ import { CommentNotifications } from "@/components/molecules/comment/CommentNoti
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
+import { urlForImage } from "@/lib/sanity/image";
 
 function EnhancedContentListing({
   items,
@@ -78,14 +79,14 @@ export default function Grow3dgeIdeaLabPage() {
         <ContentBanner
           title="Grow3dge Ideas Lab"
           description="Exclusive innovation hub for our partner community"
-          backgroundImage={data.banner?.background}
+          backgroundImage={urlForImage(data.banner?.background)?.src}
           thumbnailImage={data.banner?.thumbnail}
           variant="default"
           textColor="dark"
           className="mb-8"
         />
 
-        <div className="px-4 lg:px-6 pb-16">
+        <div className="px-4 mt-11 lg:px-6 pb-16">
           <div className="max-w-2xl mx-auto text-center py-16">
             <Alert className="border-amber-200 bg-amber-50">
               <Lock className="h-4 w-4 text-amber-600" />
