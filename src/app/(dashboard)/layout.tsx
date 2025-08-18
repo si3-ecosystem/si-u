@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ErrorBoundaryWrapper, LayoutErrorFallback } from "@/components/ErrorBoundary";
 import { AuthDebugger } from "@/utils/debugAuth";
+import { AnalyticsWrapper } from "@/components/AnalyticsWrapper";
 
 export default function DashboardLayout({
   children,
@@ -86,7 +87,7 @@ export default function DashboardLayout({
     <ErrorBoundaryWrapper fallback={LayoutErrorFallback}>
       <SidebarProvider className="flex w-full @container/layout">
         <AppSidebar />
-
+        <AnalyticsWrapper/>
         <SidebarInset className="w-full flex-1 bg-[#f6f6f6]">
           <Header />
 
