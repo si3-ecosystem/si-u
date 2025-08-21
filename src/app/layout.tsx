@@ -31,8 +31,6 @@ export default function RootLayout({
           <ReduxProvider>
             <AuthInitializer>
             <AnalyticsProvider writeKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmlnaW4iOiJodHRwczovL2FwcC5zaTMuc3BhY2UvIiwicHJvamVjdF9pZCI6ImtzOEhVX0t5S29TVThPS2o5SG01QyIsImlhdCI6MTc1NTU0MjEzMH0.5Ek4-N2UM4nESbagZk9--H5Rm2iXYlqe0UFVidqK8jk'>
-
-
               <TanstackClientProvider>
                 {children}
                 <Toaster />

@@ -10,7 +10,6 @@ import LoginMail from "./email/LoginMail";
 
 import InjectedWallet from "./wallet/InjectedWallet";
 import WalletSignature from "./wallet/WalletSignature";
-import { UnifiedAuthService } from "@/services/authService";
 import { AuthDebugger } from "@/utils/debugAuth";
 
 type AuthState = "initial" | "otp" | "wallet_signature";
@@ -20,10 +19,6 @@ interface WalletData {
   name: string;
 }
 
-interface AuthData {
-  token?: string;
-  user?: any;
-}
 
 const AuthContainer = () => {
   const [userEmail, setUserEmail] = useState<string>("");
@@ -44,7 +39,7 @@ const AuthContainer = () => {
     setAuthState("otp");
   }, []);
 
-  const handleAuthSuccess = useCallback((data: AuthData) => {
+  const handleAuthSuccess = useCallback(() => {
     // Auth update is already handled by the individual auth methods
     // No need to call applyAuthUpdate again here as it would overwrite the normalized data
     console.log('[AuthContainer] Auth success callback - auth already applied by service');
