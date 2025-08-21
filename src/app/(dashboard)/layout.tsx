@@ -1,8 +1,5 @@
 "use client";
 
-// Initialize console suppression for production
-import "@/lib/utils/init-console-suppression";
-
 import { Header } from "@/components/organisms/layout/Header";
 import { AppSidebar } from "@/components/organisms/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -22,12 +19,10 @@ export default function DashboardLayout({
   const [isClient, setIsClient] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
 
-  // Ensure client-side rendering to prevent hydration mismatch
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Client-side auth guard - only run once per session
   useEffect(() => {
     if (!isClient || hasRedirected) return;
 
@@ -37,7 +32,6 @@ export default function DashboardLayout({
       return;
     }
 
-    // Only check after initialization is complete
     if (currentUser.isInitialized) {
       const isAuthenticated = !!currentUser.user?._id;
 
@@ -49,7 +43,6 @@ export default function DashboardLayout({
     }
   }, [isClient, currentUser.isInitialized, currentUser.user?._id, router, hasRedirected]);
 
-  // Show loading or nothing during SSR and initial client render
   if (!isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -58,7 +51,6 @@ export default function DashboardLayout({
     );
   }
 
-  // Don't render dashboard if not authenticated (after client-side check)
   if (currentUser.isInitialized && !currentUser.user?._id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -70,7 +62,6 @@ export default function DashboardLayout({
     );
   }
 
-  // Show loading while auth is initializing
   if (!currentUser.isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen">

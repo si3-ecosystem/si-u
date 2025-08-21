@@ -1,18 +1,9 @@
-"use client";
-
-import { Blocks } from "lucide-react";
-
 export default function Loading() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-slate-50 dark:from-background dark:to-slate-950">
-      <div className="relative">
-        <div className="absolute inset-0 blur-xl bg-blue-500/20 rounded-full transform scale-150 animate-pulse"></div>
-
-        <div className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 p-5 rounded-full relative z-10 shadow-lg border border-slate-200 dark:border-slate-700">
-          <div className="animate-spin">
-            <Blocks className="h-10 w-10 text-blue-500" />
-          </div>
-        </div>
+    <div className="w-full bg-white min-h-[calc(100vh-9rem)] flex items-center justify-center">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p className="text-gray-600">Loading settings...</p>
       </div>
     </div>
   );
