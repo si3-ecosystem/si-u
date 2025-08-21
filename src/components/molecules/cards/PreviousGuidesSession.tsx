@@ -12,7 +12,7 @@ export function PreviousGuidesSessionCard({
 }) {
   return (
     <>
-      <Card className="bg-white p-3 rounded-lg  overflow-hidden sm:max-w-[358px] sm:w-full">
+      <Card className="bg-white p-3 rounded-lg  w-full">
         <div className="relative mb-4 rounded-lg overflow-hidden">
           <Image
             src="/guides/previoussession.png"
@@ -22,40 +22,42 @@ export function PreviousGuidesSessionCard({
             className="w-full h-44 object-cover"
           />
         </div>
-        <div className="px-3 pb-3">
-          <h3 className="text-base font-medium text-black mb-2">
-            {session.title}
-          </h3>
-          <p className="text-gray-600 text-sm">{session.description}</p>
-          <p className="text-gray-500 text-xs ">
-            {moment(session.date).format("YYYY-MM-DD")}
-          </p>
+        <div className="px-3 pb-3 flex flex-col justify-between">
+          <div className="flex flex-col">
+            <h3 className="text-base font-medium text-black mb-2">
+              {session.title}
+            </h3>
+            <p className="text-gray-600 text-sm line-clamp-3">{session.description}</p>
+            <p className="text-gray-500 text-xs ">
+              {moment(session.date).format("YYYY-MM-DD")}
+            </p>
 
-          <div className="flex items-center justify-between w-full gap-4 mt-4">
-            <div className="flex flex-col">
-              <p className="text-xs">Guided by:</p>
-              <p className="text-sm">{session.guideName}</p>
-            </div>
-            <div className="flex flex-col">
-              <p className="text-xs">In partnership with:</p>
-              {session?.partner && (
-                <div>
-                  <Image
-                    src={
-                      urlForImage(session?.partner?.logo)?.src ||
-                      "/card_placeholder.png"
-                    }
-                    alt={session.partner?.title || ""}
-                    width={320}
-                    height={180}
-                    className="w-full h-[30px] object-contain"
-                  />
-                </div>
-              )}
+            <div className="flex items-center justify-between w-full gap-4 mt-4">
+              <div className="flex flex-col">
+                <p className="text-xs">Guided by:</p>
+                <p className="text-sm">{session.guideName}</p>
+              </div>
+              <div className="flex flex-col">
+                <p className="text-xs">In partnership with:</p>
+                {session?.partner && (
+                  <div className="">
+                    <Image
+                      src={
+                        urlForImage(session?.partner?.logo)?.src ||
+                        "/card_placeholder.png"
+                      }
+                      alt={session.partner?.title || ""}
+                      width={320}
+                      height={180}
+                      className="w-full h-[24px] object-contain"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <Link href={`/guides/sessions/${session._id}`}>
-            <button className="w-full py-2 mt-4 text-center border border-gray-300 rounded-md text-sm font-medium hover:bg-black hover:text-white transition-colors">
+            <button className="w-full py-2 mt-8 text-center border border-gray-300 rounded-md text-sm font-medium hover:bg-black hover:text-white transition-colors">
               Watch Replay
             </button>
           </Link>

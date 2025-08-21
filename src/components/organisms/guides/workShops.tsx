@@ -62,7 +62,7 @@ export default function WorkShops({ data }: WorkShopsProps) {
               </div>
             </RSVPErrorBoundary>
           ) : (
-            <div className="flex flex-wrap gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {previousSessions.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 w-full">No previous sessions.</div>
               ) : (
