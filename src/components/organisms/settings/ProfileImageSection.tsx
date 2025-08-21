@@ -1,15 +1,9 @@
-/**
- * ProfileImageSection Component
- * Section for managing profile image in settings page
- */
-
 "use client";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User } from 'lucide-react';
-import { ProfileImageUpload } from '@/components/organisms/profile/ProfileImageUpload';
-import { useAppSelector } from '@/redux/store';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { User } from "lucide-react";
+import { ProfileImageUpload } from "@/components/organisms/profile/ProfileImageUpload";
 
 interface ProfileImageSectionProps {
   onImageUpdate?: (imageUrl: string, userData: any) => void;
@@ -20,15 +14,13 @@ export function ProfileImageSection({
   onImageUpdate,
   onError,
 }: ProfileImageSectionProps) {
-  const currentUser = useAppSelector(state => state.user.user);
-
   const handleImageSuccess = (imageUrl: string, userData: any) => {
-    console.log('Profile image updated successfully:', { imageUrl, userData });
+    console.log("Profile image updated successfully:", { imageUrl, userData });
     onImageUpdate?.(imageUrl, userData);
   };
 
   const handleImageError = (error: string) => {
-    console.error('Profile image upload error:', error);
+    console.error("Profile image upload error:", error);
     onError?.(error);
   };
 
@@ -42,10 +34,6 @@ export function ProfileImageSection({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Upload a profile image to personalize your account. Your image will be stored securely on IPFS.
-          </p>
-          
           <div className="flex justify-center">
             <ProfileImageUpload
               size="xl"

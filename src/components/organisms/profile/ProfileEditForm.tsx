@@ -13,6 +13,7 @@ import { StepperProgress } from "./components/StepperProgress";
 import { EmailVerificationStep } from "./steps/EmailVerificationStep";
 import { OTPVerificationStep } from "./steps/OTPVerificationStep";
 import { ProfileUpdateStep } from "./steps/ProfileUpdateStep";
+import { ProfileCompleteView } from "./steps/ProfileCompleteView";
 
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { useOTPVerification } from "@/hooks/useOTPVerification";
@@ -26,12 +27,34 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function ProfileEditForm() {
-  const { profile, updateProfile, isUpdating, isLoading } = useProfile();
+  const { profile, updateProfile, isUpdating } = useProfile();
   const [isClient, setIsClient] = useState(false);
 
   const stepManager = useProfileFormSteps({ profile, isClient });
   const emailVerification = useEmailVerification({ profile });
   const otpVerification = useOTPVerification();
+
+  // Check if profile is complete
+  const isProfileComplete = React.useMemo(() => {
+    if (!profile || !isClient) return false;
+
+    const isEmailVerified = profile?.isVerified || profile?.isEmailVerified || false;
+    const hasUsername = profile?.username && profile.username.length >= 2;
+    const hasRealEmail = profile?.email && !profile.email.includes("@wallet.temp") && !profile.email.endsWith(".temp");
+
+    console.log('🔍 Profile completion check:', {
+      profile: !!profile,
+      isClient,
+      isEmailVerified,
+      hasUsername,
+      hasRealEmail,
+      username: profile?.username,
+      email: profile?.email,
+      isComplete: isEmailVerified && hasUsername && hasRealEmail
+    });
+
+    return isEmailVerified && hasUsername && hasRealEmail;
+  }, [profile, isClient]);
 
   useEffect(() => {
     setIsClient(true);
@@ -50,7 +73,7 @@ export function ProfileEditForm() {
     defaultValues: stableProfileData,
   });
 
-  const { reset, getValues } = form;
+  const { reset } = form;
 
   useEffect(() => {
     if (stableProfileData.email || stableProfileData.username) {
@@ -156,12 +179,16 @@ export function ProfileEditForm() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg lg:text-xl font-bold">
-            {stepManager.currentStep === "profile"
+            {isProfileComplete
+              ? "Profile Settings"
+              : stepManager.currentStep === "profile"
               ? "Complete Your Profile"
               : "Edit Profile"}
           </CardTitle>
           <p className="text-gray-600">
-            {stepManager.currentStep === "profile"
+            {isProfileComplete
+              ? "Manage your profile information"
+              : stepManager.currentStep === "profile"
               ? "Finalize your profile with a username"
               : "Update your personal information"}
           </p>
@@ -169,45 +196,57 @@ export function ProfileEditForm() {
 
         <CardContent>
           <div className="border border-gray-200 rounded-lg p-4">
-            {stepManager.currentStep !== "profile" && (
-              <StepperProgress currentStep={stepManager.currentStep} />
-            )}
-
-            {/* Step 1: Email */}
-            {stepManager.currentStep === "email" && (
-              <EmailVerificationStep
+            {/* Show ProfileCompleteView if profile is complete */}
+            {isProfileComplete ? (
+              <ProfileCompleteView
                 form={form}
                 profile={profile}
-                hasTemporaryEmail={stepManager.hasTemporaryEmail}
-                isEmailVerified={stepManager.isEmailVerified}
-                isSendingOTP={emailVerification.isSendingOTP}
-                onSubmit={onSubmit}
-              />
-            )}
-
-            {/* Step 2: Verify OTP */}
-            {stepManager.currentStep === "verify" && (
-              <OTPVerificationStep
-                pendingEmail={emailVerification.pendingEmail}
-                otpCode={otpVerification.otpCode}
-                setOtpCode={otpVerification.setOtpCode}
-                isVerifyingOTP={otpVerification.isVerifyingOTP}
-                isSendingOTP={emailVerification.isSendingOTP}
-                onVerifyOTP={handleVerifyOTP}
-                onResendOTP={handleResendOTP}
-                onGoBack={stepManager.goBackToEmail}
-              />
-            )}
-
-            {/* Step 3: Profile Update */}
-            {stepManager.currentStep === "profile" && (
-              <ProfileUpdateStep
-                form={form}
-                profile={profile}
-                pendingEmail={emailVerification.pendingEmail}
                 isUpdating={isUpdating}
-                onSubmit={onSubmit}
+                onSubmit={handleProfileSubmit}
               />
+            ) : (
+              <>
+                {stepManager.currentStep !== "profile" && (
+                  <StepperProgress currentStep={stepManager.currentStep} />
+                )}
+
+                {/* Step 1: Email */}
+                {stepManager.currentStep === "email" && (
+                  <EmailVerificationStep
+                    form={form}
+                    profile={profile}
+                    hasTemporaryEmail={stepManager.hasTemporaryEmail}
+                    isEmailVerified={stepManager.isEmailVerified}
+                    isSendingOTP={emailVerification.isSendingOTP}
+                    onSubmit={onSubmit}
+                  />
+                )}
+
+                {/* Step 2: Verify OTP */}
+                {stepManager.currentStep === "verify" && (
+                  <OTPVerificationStep
+                    pendingEmail={emailVerification.pendingEmail}
+                    otpCode={otpVerification.otpCode}
+                    setOtpCode={otpVerification.setOtpCode}
+                    isVerifyingOTP={otpVerification.isVerifyingOTP}
+                    isSendingOTP={emailVerification.isSendingOTP}
+                    onVerifyOTP={handleVerifyOTP}
+                    onResendOTP={handleResendOTP}
+                    onGoBack={stepManager.goBackToEmail}
+                  />
+                )}
+
+                {/* Step 3: Profile Update */}
+                {stepManager.currentStep === "profile" && (
+                  <ProfileUpdateStep
+                    form={form}
+                    profile={profile}
+                    pendingEmail={emailVerification.pendingEmail}
+                    isUpdating={isUpdating}
+                    onSubmit={onSubmit}
+                  />
+                )}
+              </>
             )}
           </div>
         </CardContent>

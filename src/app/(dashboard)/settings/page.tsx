@@ -6,42 +6,35 @@ import { useAppSelector } from "@/redux/store";
 import { UnifiedAuthService } from "@/services/authService";
 
 export default function SettingsPage() {
-  const currentUser = useAppSelector(state => state.user);
+  const currentUser = useAppSelector((state) => state.user);
   const hasInitializedRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Only run once when component mounts
     if (hasInitializedRef.current) {
-      console.log('[SettingsPage] Already initialized, skipping refresh...');
       return;
     }
 
     const refreshUserData = async () => {
       try {
-        console.log('[SettingsPage] One-time user data refresh on settings page load...');
-
-        // Simple refresh without clearing state - just ensure we have fresh data
         await UnifiedAuthService.forceRefreshUserData();
-        console.log('[SettingsPage] User data refreshed successfully');
 
         hasInitializedRef.current = true;
         setIsLoading(false);
       } catch (error) {
-        console.log('[SettingsPage] Error during data refresh:', error);
-        hasInitializedRef.current = true; // Still mark as initialized to prevent loops
+        console.log("[SettingsPage] Error during data refresh:", error);
+        hasInitializedRef.current = true;
         setIsLoading(false);
       }
     };
 
-    // Only refresh if user is logged in
     if (currentUser.isLoggedIn) {
       refreshUserData();
     } else {
-      hasInitializedRef.current = true; // Mark as initialized even if not logged in
+      hasInitializedRef.current = true;
       setIsLoading(false);
     }
-  }, []); // Empty dependency array - only run once on mount
+  }, []);
 
   if (isLoading) {
     return (
