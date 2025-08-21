@@ -56,6 +56,14 @@ export interface GuidesSession {
   guideName: string;
   guideImage?: SanityImage;
   language?: string;
+  // Updated to support multiple partners
+  partners?: Array<{
+    _id: string;
+    name: string;
+    title?: string; // Keep for backward compatibility
+    logo: SanityImage;
+  }>;
+  // Legacy single partner field (deprecated but kept for backward compatibility)
   partner?: {
     _id: string;
     title: string;
@@ -104,4 +112,79 @@ export interface SiherGuidesSession {
   description: string;
   banner?: GuidesSessionBanner;
   guides: GuidesSession[];
+}
+
+// Grow3dge Category Interface
+export interface Grow3dgeCategory {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+    _type?: string;
+  };
+  icon?: SanityImage;
+}
+
+// Grow3dge Session Interface
+export interface Grow3dgeSession {
+  _id: string;
+  title: string;
+  description: string;
+  topicTitle: string;
+  topicDesc: string;
+  banner?: GuidesSessionBanner;
+  topics?: Grow3dgeCategory[]; // Changed to array
+  fixCards: FixCard[];
+}
+
+// Fix Card Interface (for grow3dge sessions)
+export interface FixCard {
+  _id: string;
+  title: string;
+  description: string;
+  category?: Grow3dgeCategory;
+  language?: string;
+  date?: string;
+  time?: string;
+  fixImage?: SanityImage;
+  guideName?: string;
+  guideImage?: SanityImage;
+  videoUrl?: string;
+  body?: any;
+  rsvpChannelLink?: string;
+  googleCalendarUrl?: string;
+  allowCancel?: boolean;
+  // Updated to support multiple partners
+  partners?: Array<{
+    _id: string;
+    name: string;
+    title?: string;
+    logo: SanityImage;
+  }>;
+  // Legacy single partner field (deprecated but kept for backward compatibility)
+  partner?: {
+    _id: string;
+    title: string;
+    logo: SanityImage;
+  };
+  pdfFile?: {
+    asset: {
+      url: string;
+      _type?: string;
+      _ref?: string;
+    };
+  };
+  pdfGuide?: {
+    enabled: boolean;
+    title: string;
+    type: 'download' | 'url';
+    downloadFile?: {
+      asset: {
+        url: string;
+        _type?: string;
+        _ref?: string;
+      };
+    };
+    shareableUrl?: string;
+  };
 }

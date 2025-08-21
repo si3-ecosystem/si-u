@@ -24,8 +24,25 @@ export function SessionCard({
   toggleDropdown,
   setOpenDropdownId,
 }: SessionCardProps) {
-  const partnersImage =
-    session?.partner?.logo && urlForImage(session?.partner?.logo)?.src;
+  // Handle both multiple partners and legacy single partner
+  const getPartnerLogos = () => {
+    if (session?.partners && session.partners.length > 0) {
+      return session.partners.map(partner => ({
+        src: urlForImage(partner.logo)?.src,
+        alt: partner.name || partner.title || "",
+        name: partner.name || partner.title || ""
+      }));
+    } else if (session?.partner) {
+      return [{
+        src: urlForImage(session.partner.logo)?.src,
+        alt: session.partner.title || "",
+        name: session.partner.title || ""
+      }];
+    }
+    return [];
+  };
+
+  const partnerLogos = getPartnerLogos();
 
   // RSVP functionality
   const { rsvp, rsvpStatus, hasRSVP, createRSVP, updateRSVP, deleteRSVP, isCreating, isUpdating, isDeleting, config } = useRSVP(session._id, session);
@@ -165,14 +182,28 @@ export function SessionCard({
                 <div className="text-xs text-[#333333]">
                   In partnership with
                 </div>
-                <div className="h-8 mt-1">
-                  <Image
-                    src={partnersImage || "/uniswap.png"}
-                    alt={session.partner?.title || ""}
-                    width={105}
-                    height={30}
-                    className="h-full w-auto object-contain"
-                  />
+                <div className="flex items-center gap-2 mt-1 h-8">
+                  {partnerLogos.length > 0 ? (
+                    partnerLogos.map((logo, index) => (
+                      <Image
+                        key={index}
+                        src={logo.src || "/uniswap.png"}
+                        alt={logo.alt}
+                        width={105}
+                        height={30}
+                        className="h-full w-auto object-contain"
+                        title={logo.name}
+                      />
+                    ))
+                  ) : (
+                    <Image
+                      src="/uniswap.png"
+                      alt="Partner"
+                      width={105}
+                      height={30}
+                      className="h-full w-auto object-contain"
+                    />
+                  )}
                 </div>
               </div>
             </div>
