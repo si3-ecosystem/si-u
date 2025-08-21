@@ -16,6 +16,7 @@ export interface UserProfile {
   phone?: string;
   bio?: string;
   avatar?: string;
+  profileImage?: string; // IPFS URL for profile image
   roles: string[];
   isVerified: boolean;
   newsletter: boolean;
@@ -44,6 +45,7 @@ export interface UpdateProfileRequest {
   lastName?: string;
   phone?: string;
   bio?: string;
+  profileImage?: string; // IPFS URL for profile image
   companyName?: string;
   companyAffiliation?: string;
   interests?: string[];

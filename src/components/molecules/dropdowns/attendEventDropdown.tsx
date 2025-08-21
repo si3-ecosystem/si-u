@@ -23,8 +23,6 @@ interface AttendEventDropdownProps {
 
 export function AttendEventDropdown({
   onClose,
-  eventId,
-  currentStatus,
   hasRSVP = false,
   hasValidEmail = true,
   isDeleting = false,
@@ -91,7 +89,7 @@ export function AttendEventDropdown({
           className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-800 transition-colors"
         >
           <X className="w-5 h-5" />
-          <span>Join the X Channel</span>
+          <span>Follow on X</span>
           <ChevronRight className="w-4 h-4 ml-auto" />
         </button>
 

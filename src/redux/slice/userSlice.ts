@@ -11,6 +11,7 @@ interface UserData {
   phone?: string;
   bio?: string;
   avatar?: string;
+  profileImage?: string; // IPFS URL for profile image
   roles?: string[];
   isVerified?: boolean;
   newsletter?: boolean;
@@ -85,6 +86,19 @@ const addDebugLog = (state: UserState, action: string, data: any, preservedField
 
 // Safe merge utility that preserves critical fields
 const safeMergeUserData = (currentUser: UserData, newData: UserData): UserData => {
+  console.log('🔄 safeMergeUserData called:', {
+    currentUser: {
+      profileImage: currentUser.profileImage,
+      avatar: currentUser.avatar,
+      _id: currentUser._id
+    },
+    newData: {
+      profileImage: newData.profileImage,
+      avatar: newData.avatar,
+      _id: newData._id
+    }
+  });
+
   const merged = { ...currentUser };
 
   // Merge new data, but preserve critical fields if they exist in current user
@@ -93,20 +107,43 @@ const safeMergeUserData = (currentUser: UserData, newData: UserData): UserData =
     const newValue = newData[typedKey];
     const currentValue = currentUser[typedKey];
 
+    // Debug specific fields
+    if (typedKey === 'profileImage') {
+      console.log('🖼️ Processing profileImage:', {
+        key: typedKey,
+        newValue,
+        currentValue,
+        isCritical: CRITICAL_FIELDS.includes(typedKey as any)
+      });
+    }
+
     // Special handling for username - always update if new data has it
     if (typedKey === 'username' && newValue) {
       merged[typedKey] = newValue;
+      console.log(`✅ Updated ${typedKey} (username special case):`, newValue);
     }
     // If it's a critical field and current value exists, only update if new value is truthy
     else if (CRITICAL_FIELDS.includes(typedKey as any) && currentValue) {
       if (newValue) {
         merged[typedKey] = newValue;
+        console.log(`✅ Updated critical field ${typedKey}:`, newValue);
+      } else {
+        console.log(`⚠️ Preserved critical field ${typedKey}:`, currentValue);
       }
       // Keep current value if new value is falsy
     } else {
       // For non-critical fields, always update
       merged[typedKey] = newValue;
+      if (typedKey === 'profileImage') {
+        console.log(`✅ Updated non-critical field ${typedKey}:`, newValue);
+      }
     }
+  });
+
+  console.log('🔄 safeMergeUserData result:', {
+    profileImage: merged.profileImage,
+    avatar: merged.avatar,
+    _id: merged._id
   });
 
   return merged;
@@ -180,6 +217,14 @@ const userSlice = createSlice({
       const updates = action.payload;
       const preservedFields: string[] = [];
 
+      console.log('🔄 Redux updateUserProfile called with:', updates);
+      console.log('🔍 Current state before merge:', {
+        profileImage: state.user.profileImage,
+        avatar: state.user.avatar,
+        _id: state.user._id,
+        email: state.user.email
+      });
+
       // Use safe merge to preserve critical fields
       const mergedUser = safeMergeUserData(state.user, updates);
 
@@ -190,10 +235,24 @@ const userSlice = createSlice({
         }
       });
 
+      console.log('🔄 Merged user data:', {
+        profileImage: mergedUser.profileImage,
+        avatar: mergedUser.avatar,
+        _id: mergedUser._id,
+        email: mergedUser.email
+      });
+
+      addDebugLog(state, 'updateUserProfile', updates, preservedFields);
 
       state.user = mergedUser;
       state.lastUpdated = Date.now();
       state.isLoggedIn = true; // Profile updates should maintain login state
+
+      console.log('✅ Redux state updated:', {
+        profileImage: state.user.profileImage,
+        avatar: state.user.avatar,
+        lastUpdated: state.lastUpdated
+      });
 
       // Update address if wallet_address changed
       if (mergedUser.wallet_address) {

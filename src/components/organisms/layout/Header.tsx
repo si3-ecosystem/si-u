@@ -10,6 +10,7 @@ import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
 import { getDisplayUsername } from "@/lib/utils/username";
+import { getProfileImageUrl } from "@/utils/profileImageUtils";
 
 // import {
 //   Notification,
@@ -90,7 +91,7 @@ export function Header() {
       ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth`
       : "Loading...";
   const avatarUrl = isUserReady
-    ? currentUser?.user?.avatar || "/placeholder.png"
+    ? getProfileImageUrl(currentUser?.user) || "/placeholder.png"
     : "/placeholder.png";
 
   // const handleMarkAllRead = () => {

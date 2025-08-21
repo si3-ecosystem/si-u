@@ -6,6 +6,7 @@ import { ProfileEditForm } from "@/components/organisms/profile/ProfileEditForm"
 import { AccountWalletSection } from "./AccountWalletSection";
 import { SupportSection } from "./SupportSection";
 import { NotificationSection } from "./NotificationSection";
+import { ProfileImageSection } from "./ProfileImageSection";
 // import { LogOut } from "lucide-react";
 
 export default function Settings() {
@@ -21,6 +22,14 @@ export default function Settings() {
     console.log("Wallet connected");
   };
 
+  const handleImageUpdate = (imageUrl: string, userData: any) => {
+    console.log("Profile image updated:", { imageUrl, userData });
+  };
+
+  const handleImageError = (error: string) => {
+    console.error("Profile image error:", error);
+  };
+
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,6 +42,10 @@ export default function Settings() {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 overflow-hidden">
           <div className=" space-y-6">
+            <ProfileImageSection
+              onImageUpdate={handleImageUpdate}
+              onError={handleImageError}
+            />
             <AccountWalletSection
               onDisconnectWallet={handleDisconnectWallet}
               onConnectWallet={handleConnectWallet}

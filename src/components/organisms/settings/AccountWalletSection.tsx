@@ -38,7 +38,6 @@ export function AccountWalletSection({
     copyWalletAddress,
   } = useWalletManagement();
 
-  console.log("isEmailVerified",isEmailVerified)
 
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 

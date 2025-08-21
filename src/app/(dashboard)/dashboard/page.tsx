@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDashboardBanner } from "@/lib/sanity/client";
 import Loading from "@/app/loading";
 import { getDisplayUsername } from "@/lib/utils/username";
+import { getProfileImageUrl } from "@/utils/profileImageUtils";
 
 const statsData = [
   {
@@ -101,7 +102,7 @@ export default function DashboardPage() {
     `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
     "user.siher.eth";
   const avatarUrl = isUserReady ?
-    (currentUser?.user?.avatar || "/placeholder.png") :
+    (getProfileImageUrl(currentUser?.user) || "/placeholder.png") :
     "/placeholder.png";
 
   const handleShareProfile = () => {
