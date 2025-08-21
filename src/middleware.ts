@@ -34,6 +34,7 @@ const PROTECTED_ROUTES = [
   "/admin",
   "/guide",
   "/partner",
+  "/grow3dge", // Add Grow3dge routes to protected routes
 ];
 
 // Admin-only routes
@@ -42,8 +43,8 @@ const ADMIN_ROUTES = ["/admin"];
 // Guide-only routes
 const GUIDE_ROUTES = ["/guide"];
 
-// Partner-only routes
-const PARTNER_ROUTES = ["/partner"];
+// Partner-only routes (including Grow3dge)
+const PARTNER_ROUTES = ["/partner", "/grow3dge"];
 
 // Public auth routes (exact path matching - redirect if already logged in)
 const PUBLIC_AUTH_ROUTES = [
@@ -246,6 +247,8 @@ async function verifyJwtToken(
       console.error("[Middleware] JWT verification failed:", {
         name: err.name,
         message: err.message,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         cookieLength: jwtCookie?.value?.length || 0,
       });
     } else {

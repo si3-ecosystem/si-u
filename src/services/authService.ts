@@ -511,6 +511,46 @@ export class UnifiedAuthService {
   }
 
   /**
+   * Verify email OTP for login (alias method for compatibility)
+   */
+  static async verifyEmailOTP(email: string, otp: string): Promise<ApiResponse> {
+    try {
+      console.log('[AuthService] Verifying email OTP for login:', email);
+
+      const response = await apiClient.post('/auth/email/verify-otp', {
+        email: email.trim(),
+        otp: otp.trim()
+      });
+
+      if (response.status === 'success' && response.data) {
+        console.log('[AuthService] Email OTP verification response:', {
+          hasUser: !!response.data.user,
+          hasToken: !!response.data.token,
+          userEmail: response.data.user?.email,
+          userId: response.data.user?.id,
+          user_Id: response.data.user?._id,
+        });
+
+        // Normalize user data - ensure _id field exists
+        const normalizedUser = {
+          ...response.data.user,
+          _id: response.data.user._id || response.data.user.id
+        };
+
+        // Apply auth update using the unified method
+        this.applyAuthUpdate({ user: normalizedUser, token: response.data.token });
+
+        console.log('[AuthService] Email OTP verification successful');
+      }
+
+      return response;
+    } catch (error) {
+      console.error('[AuthService] Email OTP verification error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Logout user
    */
   static async logout(options: { redirect?: boolean } = { redirect: false }): Promise<void> {
