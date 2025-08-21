@@ -26,6 +26,7 @@ export function useProfile() {
     phone: currentUser.user.phone,
     bio: currentUser.user.bio,
     avatar: currentUser.user.avatar,
+    profileImage: currentUser.user.profileImage,
     roles: currentUser.user.roles || [],
     isVerified: currentUser.user.isVerified || currentUser.user.isEmailVerified || false,
     isEmailVerified: currentUser.user.isEmailVerified || currentUser.user.isVerified || false,

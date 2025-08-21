@@ -101,7 +101,7 @@ const subMenuGroups: SubMenuGroup[] = [
         href: "/grow3dge/grow3dge-sessions",
       },
       {
-        title: "Idea Labs",
+        title: "Ideas Labs",
         icon: Brain,
         href: "/grow3dge/ideas-lab",
       },
