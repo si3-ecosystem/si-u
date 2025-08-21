@@ -117,6 +117,17 @@ export const guidesByIdQuery = groq`
       alt
     },
     language,
+    // Multiple partners support
+    partners[]->{
+      _id,
+      name,
+      logo {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
+    // Legacy single partner field (for backward compatibility)
     partner->{
       _id,
       name,
@@ -234,6 +245,17 @@ export const siherGuidesSessionQuery = groq`
         "ImageColor": asset->metadata.palette.dominant.background
       },
       language,
+      // Multiple partners support
+      partners[]->{
+        _id,
+        name,
+        logo {
+          ...,
+          "blurDataURL": asset->metadata.lqip,
+          "ImageColor": asset->metadata.palette.dominant.background
+        }
+      },
+      // Legacy single partner field (for backward compatibility)
       partner->{
         _id,
         title,
@@ -322,6 +344,17 @@ export const fixCardByIdQuery = (id: string) => `
     rsvpChannelLink,
     googleCalendarUrl,
     allowCancel,
+    // Multiple partners support
+    partners[]->{
+      _id,
+      name,
+      logo {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
+    // Legacy single partner field (for backward compatibility)
     partner->{_id, title, logo},
     downloadPdf,
     pdfFile{asset->{url}},
@@ -340,6 +373,9 @@ export const fixSessionsQuery = groq`
     _id,
     title,
     description,
+    // Add new topic fields
+    topicTitle,
+    topicDesc,
      banner->{
       title,
       description,
@@ -349,6 +385,17 @@ export const fixSessionsQuery = groq`
         "ImageColor": asset->metadata.palette.dominant.background
       },
       background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
+    // Add topics array for popular topics section
+    topics[]-> {
+      _id,
+      title,
+      slug,
+      icon {
         ...,
         "blurDataURL": asset->metadata.lqip,
         "ImageColor": asset->metadata.palette.dominant.background
@@ -378,6 +425,17 @@ export const fixSessionsQuery = groq`
       rsvpChannelLink,
       googleCalendarUrl,
       allowCancel,
+      // Multiple partners support
+      partners[]->{
+        _id,
+        name,
+        logo {
+          ...,
+          "blurDataURL": asset->metadata.lqip,
+          "ImageColor": asset->metadata.palette.dominant.background
+        }
+      },
+      // Legacy single partner field (for backward compatibility)
       partner->{
         _id,
         title,

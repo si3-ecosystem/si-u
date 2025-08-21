@@ -1,9 +1,19 @@
 import { SectionBanner } from "@/components/molecules/banners/SectionBanner";
 
-export function Banner({ data }: { data: any }) {
+interface BannerProps {
+  data: any;
+  globalFilter?: string;
+  setGlobalFilter?: (value: string) => void;
+}
+
+export function Banner({ data, globalFilter = "", setGlobalFilter = () => {} }: BannerProps) {
   return (
     <section className="w-full ">
-      <SectionBanner data={data} setGlobalFilter={() => {}} globalFilter="" />
+      <SectionBanner
+        data={data}
+        setGlobalFilter={setGlobalFilter}
+        globalFilter={globalFilter}
+      />
     </section>
   );
 }

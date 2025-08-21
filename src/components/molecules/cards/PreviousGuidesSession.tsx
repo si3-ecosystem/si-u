@@ -10,6 +10,26 @@ export function PreviousGuidesSessionCard({
 }: {
   session: GuidesSession;
 }) {
+  // Handle both multiple partners and legacy single partner
+  const getPartnerLogos = () => {
+    if (session?.partners && session.partners.length > 0) {
+      return session.partners.map(partner => ({
+        src: urlForImage(partner.logo)?.src,
+        alt: partner.name || partner.title || "",
+        name: partner.name || partner.title || ""
+      }));
+    } else if (session?.partner) {
+      return [{
+        src: urlForImage(session.partner.logo)?.src,
+        alt: session.partner.title || "",
+        name: session.partner.title || ""
+      }];
+    }
+    return [];
+  };
+
+  const partnerLogos = getPartnerLogos();
+
   return (
     <>
       <Card className="bg-white p-3 rounded-lg  w-full">
@@ -39,20 +59,29 @@ export function PreviousGuidesSessionCard({
               </div>
               <div className="flex flex-col">
                 <p className="text-xs">In partnership with:</p>
-                {session?.partner && (
-                  <div className="">
+                <div className="flex items-center gap-1 mt-1">
+                  {partnerLogos.length > 0 ? (
+                    partnerLogos.map((logo, index) => (
+                      <Image
+                        key={index}
+                        src={logo.src || "/card_placeholder.png"}
+                        alt={logo.alt}
+                        width={80}
+                        height={24}
+                        className="h-[24px] w-auto object-contain"
+                        title={logo.name}
+                      />
+                    ))
+                  ) : (
                     <Image
-                      src={
-                        urlForImage(session?.partner?.logo)?.src ||
-                        "/card_placeholder.png"
-                      }
-                      alt={session.partner?.title || ""}
-                      width={320}
-                      height={180}
-                      className="w-full h-[24px] object-contain"
+                      src="/card_placeholder.png"
+                      alt="Partner"
+                      width={80}
+                      height={24}
+                      className="h-[24px] w-auto object-contain"
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
