@@ -39,9 +39,7 @@ export default function SessionsPage() {
         />
 
         <div className="px-4 mt-11 lg:px-6 pb-16">
-          <div className="">
-            <WorkShops data={data} />
-          </div>
+          <WorkShops data={data} />
         </div>
       </div>
     </div>

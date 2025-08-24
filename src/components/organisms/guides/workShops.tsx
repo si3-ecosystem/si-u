@@ -19,7 +19,6 @@ export default function WorkShops({ data }: WorkShopsProps) {
 
   const { upcomingSessions, previousSessions } = useSiherGuidesSessions(data.guides);
 
-  console.log("upcomingSessions",data.guides)
 
   const toggleDropdown = (id: string) => {
     setOpenDropdownId(openDropdownId === id ? null : id);

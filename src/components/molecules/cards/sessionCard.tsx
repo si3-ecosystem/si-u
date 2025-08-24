@@ -27,17 +27,19 @@ export function SessionCard({
   // Handle both multiple partners and legacy single partner
   const getPartnerLogos = () => {
     if (session?.partners && session.partners.length > 0) {
-      return session.partners.map(partner => ({
+      return session.partners.map((partner) => ({
         src: urlForImage(partner.logo)?.src,
         alt: partner.name || partner.title || "",
-        name: partner.name || partner.title || ""
+        name: partner.name || partner.title || "",
       }));
     } else if (session?.partner) {
-      return [{
-        src: urlForImage(session.partner.logo)?.src,
-        alt: session.partner.title || "",
-        name: session.partner.title || ""
-      }];
+      return [
+        {
+          src: urlForImage(session.partner.logo)?.src,
+          alt: session.partner.title || "",
+          name: session.partner.title || "",
+        },
+      ];
     }
     return [];
   };
@@ -45,10 +47,22 @@ export function SessionCard({
   const partnerLogos = getPartnerLogos();
 
   // RSVP functionality
-  const { rsvp, rsvpStatus, hasRSVP, createRSVP, updateRSVP, deleteRSVP, isCreating, isUpdating, isDeleting, config } = useRSVP(session._id, session);
+  const {
+    rsvp,
+    rsvpStatus,
+    hasRSVP,
+    createRSVP,
+    updateRSVP,
+    deleteRSVP,
+    isCreating,
+    isUpdating,
+    isDeleting,
+    config,
+  } = useRSVP(session._id, session);
 
   // Calendar integration
-  const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } = useCalendarIntegration(session);
+  const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } =
+    useCalendarIntegration(session);
 
   const handleCancelAttendance = () => {
     deleteRSVP();
@@ -56,7 +70,7 @@ export function SessionCard({
 
   const handleDirectRSVP = () => {
     // Directly create RSVP with attending status
-    if (rsvp && rsvp._id && rsvp._id !== 'temp-id') {
+    if (rsvp && rsvp._id && rsvp._id !== "temp-id") {
       // Update existing RSVP to attending
       updateRSVP({ status: RSVPStatus.ATTENDING });
     } else {
@@ -64,20 +78,20 @@ export function SessionCard({
       createRSVP({
         eventId: session._id,
         status: RSVPStatus.ATTENDING,
-        guestCount: 1
+        guestCount: 1,
       });
     }
   };
 
-  const handleCalendarAdd = (type: 'google' | 'apple' | 'ics') => {
+  const handleCalendarAdd = (type: "google" | "apple" | "ics") => {
     switch (type) {
-      case 'google':
+      case "google":
         addToGoogleCalendar();
         break;
-      case 'apple':
+      case "apple":
         addToAppleCalendar();
         break;
-      case 'ics':
+      case "ics":
         downloadICSFile();
         break;
       default:
@@ -87,39 +101,39 @@ export function SessionCard({
 
   const handleJoinChannel = () => {
     // Try new location virtual link first, then fall back to legacy rsvpChannelLink
-    const channelLink = session.location?.virtualLink || session.rsvpChannelLink;
+    const channelLink =
+      session.location?.virtualLink || session.rsvpChannelLink;
 
     if (channelLink) {
-      window.open(channelLink, '_blank');
+      window.open(channelLink, "_blank");
     } else {
-      ErrorHandler.showInfo('Channel link not available');
+      ErrorHandler.showInfo("Channel link not available");
     }
   };
 
-
-
   const getButtonText = () => {
-    if (!config.isRSVPEnabled) return 'RSVP Disabled';
-    if (config.isDeadlinePassed) return 'RSVP Closed';
-    if (!config.hasValidEmail) return 'Update Email to RSVP';
-    if (isCreating || isUpdating || isDeleting) return 'Updating...';
+    if (!config.isRSVPEnabled) return "RSVP Disabled";
+    if (config.isDeadlinePassed) return "RSVP Closed";
+    if (!config.hasValidEmail) return "Update Email to RSVP";
+    if (isCreating || isUpdating || isDeleting) return "Updating...";
 
     switch (rsvpStatus) {
       case RSVPStatus.ATTENDING:
-        return config.requiresApproval ? 'Pending Approval' : 'Attending';
+        return config.requiresApproval ? "Pending Approval" : "Attending";
       case RSVPStatus.MAYBE:
-        return 'Maybe';
+        return "Maybe";
       case RSVPStatus.NOT_ATTENDING:
-        return 'Not Attending';
+        return "Not Attending";
       case RSVPStatus.WAITLISTED:
-        return 'Waitlisted';
+        return "Waitlisted";
       default:
-        return 'Attend Event';
+        return "Attend Event";
     }
   };
 
   const getButtonStyle = () => {
-    const baseStyle = "text-white border font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 max-lg:w-full max-lg:text-center";
+    const baseStyle =
+      "text-white border font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 max-lg:w-full max-lg:text-center";
 
     if (!config.isRSVPEnabled || config.isDeadlinePassed) {
       return `${baseStyle} border-gray-400 bg-gray-400 cursor-not-allowed`;
@@ -141,8 +155,8 @@ export function SessionCard({
 
   return (
     <Card className="p-4 w-full">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative w-full md:w-[227.995px] h-[156.606px] flex-shrink-0">
+      <div className="flex flex-col md:flex-row gap-4 h-full">
+        <div className="relative w-full md:w-[227.995px] flex-shrink-0">
           <div className="absolute bottom-2 bg-white text-xs px-2 py-1 rounded-full z-10 right-2">
             {session.language}
           </div>
@@ -165,11 +179,12 @@ export function SessionCard({
             </div>
             <div className="flex items-center gap-1 text-xs leading-5">
               <Clock className="w-5 h-5" />
-              <span>{session.time}</span>
+              <span>{moment(session.endDate).format("YYYY-MM-DD")}</span>
             </div>
           </div>
+          <p className="text-sm line-clamp-2">{session?.description}</p>
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between mt-4 h-full pb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6">
             <div className="flex items-center gap-14">
               <div>
                 <div className="text-xs text-[#333333]">Guided by:</div>
@@ -178,7 +193,7 @@ export function SessionCard({
                 </div>
               </div>
 
-              <div className="mt-2 md:mt-0">
+              <div className="">
                 <div className="text-xs text-[#333333]">
                   In partnership with
                 </div>
@@ -212,7 +227,14 @@ export function SessionCard({
               <button
                 onClick={() => toggleDropdown(session._id)}
                 className={getButtonStyle()}
-                disabled={isCreating || isUpdating || isDeleting || !config.isRSVPEnabled || config.isDeadlinePassed || !config.hasValidEmail}
+                disabled={
+                  isCreating ||
+                  isUpdating ||
+                  isDeleting ||
+                  !config.isRSVPEnabled ||
+                  config.isDeadlinePassed ||
+                  !config.hasValidEmail
+                }
               >
                 {getButtonText()}
               </button>
@@ -235,8 +257,6 @@ export function SessionCard({
           </div>
         </div>
       </div>
-
-
     </Card>
   );
 }
