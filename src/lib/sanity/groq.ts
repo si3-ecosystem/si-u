@@ -244,6 +244,11 @@ export const siherGuidesSessionQuery = groq`
         "blurDataURL": asset->metadata.lqip,
         "ImageColor": asset->metadata.palette.dominant.background
       },
+      backgroundImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
       language,
       // Multiple partners support
       partners[]->{

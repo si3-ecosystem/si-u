@@ -46,7 +46,7 @@ export function HighlightCard({
     }
   };
   return (
-    <div className="border border-gray-200 bg-white rounded-lg p-3 overflow-hidden sm:w-full sm:max-w-[320px]">
+    <div className="border border-gray-200 bg-white rounded-lg p-3 overflow-hidden ">
       {/* Image Section */}
       <div className="relative h-[178px] w-full rounded-lg overflow-hidden">
         <Image

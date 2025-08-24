@@ -23,7 +23,7 @@ const fallbackSessionPageData = {
 };
 
 import Loading from "@/app/loading";
-import { Banner } from "@/components/organisms/scholars/siUSessions/Banner";
+import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 import { HighlightedSessions } from "@/components/organisms/scholars/siUSessions/HighlightedSessions";
 import { PopularTopics } from "@/components/organisms/scholars/siUSessions/PopularTopics";
 import { useSessionTable } from "@/hooks/useSession";
@@ -71,51 +71,53 @@ export default function SIUSession() {
 
   return (
     <div className=" w-full  min-h-screen flex flex-col gap-8 lg:gap-16">
-      <Banner
-        data={
-          sessionPageData?.banner ?? {
-            title: "",
-            description: "",
-            thumbnail: {
-              _type: "image",
-              asset: { _ref: "", _type: "reference" },
-            },
-            background: {
-              _type: "image",
-              asset: { _ref: "", _type: "reference" },
-            },
-          }
+      <ContentBanner
+        title={sessionPageData?.banner?.title || "Grow3dge Ideas Lab"}
+        description={
+          sessionPageData?.banner?.description ||
+          "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"
         }
+        backgroundImage={sessionPageData?.banner?.background}
+        thumbnailImage={sessionPageData?.banner?.thumbnail}
+        variant="default"
+        textColor="dark"
+        className="mb-8"
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        showSearch={true}
       />
-      <PopularTopics
-        categoryCounts={categoryCounts}
-        data={sessionPageData ?? fallbackSessionPageData}
-        setSelectedCategory={setSelectedCategory}
-      />
-      <HighlightedSessions
-        title={sessionPageData?.siutitle ?? "Highlighted Sessions"}
-        description={sessionPageData?.siudescription || "Highlighted Sessions"}
-        rows={rows}
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        selectedCommunity={selectedCommunity}
-        setSelectedCommunity={setSelectedCommunity}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-        pageIndex={pageIndex}
-        pageCount={pageCount}
-        canPreviousPage={canPreviousPage}
-        canNextPage={canNextPage}
-        previousPage={previousPage}
-        nextPage={nextPage}
-        gotoPage={gotoPage}
-      />
+
+      <div className="space-y-11">
+        <PopularTopics
+          categoryCounts={categoryCounts}
+          data={sessionPageData ?? fallbackSessionPageData}
+          setSelectedCategory={setSelectedCategory}
+        />
+        <HighlightedSessions
+          title={sessionPageData?.siutitle ?? "Highlighted Sessions"}
+          description={
+            sessionPageData?.siudescription || "Highlighted Sessions"
+          }
+          rows={rows}
+          globalFilter={globalFilter}
+          setGlobalFilter={setGlobalFilter}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          selectedCommunity={selectedCommunity}
+          setSelectedCommunity={setSelectedCommunity}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          pageIndex={pageIndex}
+          pageCount={pageCount}
+          canPreviousPage={canPreviousPage}
+          canNextPage={canNextPage}
+          previousPage={previousPage}
+          nextPage={nextPage}
+          gotoPage={gotoPage}
+        />
+      </div>
     </div>
   );
 }

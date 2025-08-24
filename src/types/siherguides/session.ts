@@ -54,7 +54,7 @@ export interface GuidesSession {
   endDate?: string;
   time?: string;
   guideName: string;
-  guideImage?: SanityImage;
+  guideImage?: SanityImage | undefined;
   language?: string;
   // Updated to support multiple partners
   partners?: Array<{
@@ -149,6 +149,7 @@ export interface FixCard {
   fixImage?: SanityImage;
   guideName?: string;
   guideImage?: SanityImage;
+  backgroundImage?: SanityImage;
   videoUrl?: string;
   body?: any;
   rsvpChannelLink?: string;

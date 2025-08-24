@@ -13,17 +13,19 @@ export function PreviousGuidesSessionCard({
   // Handle both multiple partners and legacy single partner
   const getPartnerLogos = () => {
     if (session?.partners && session.partners.length > 0) {
-      return session.partners.map(partner => ({
+      return session.partners.map((partner) => ({
         src: urlForImage(partner.logo)?.src,
         alt: partner.name || partner.title || "",
-        name: partner.name || partner.title || ""
+        name: partner.name || partner.title || "",
       }));
     } else if (session?.partner) {
-      return [{
-        src: urlForImage(session.partner.logo)?.src,
-        alt: session.partner.title || "",
-        name: session.partner.title || ""
-      }];
+      return [
+        {
+          src: urlForImage(session.partner.logo)?.src,
+          alt: session.partner.title || "",
+          name: session.partner.title || "",
+        },
+      ];
     }
     return [];
   };
@@ -32,22 +34,32 @@ export function PreviousGuidesSessionCard({
 
   return (
     <>
-      <Card className="bg-white p-3 rounded-lg  w-full">
-        <div className="relative mb-4 rounded-lg overflow-hidden">
-          <Image
-            src="/guides/previoussession.png"
-            alt={session.title}
-            width={320}
-            height={180}
-            className="w-full h-44 object-cover"
-          />
+      <Card className="bg-white p-3 rounded-lg  w-full h-full">
+        <div className="relative mb-4 rounded-lg overflow-hidden ">
+            <Image
+              src={
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                urlForImage(session?.backgroundImage)?.src || "/card_placeholder.png"
+              }
+              alt={session.title}
+              width={320}
+              loading="lazy"
+              decoding="async"
+              title={session.title}
+              height={180}
+              className="w-full h-44 object-cover object-center rounded-lg"
+              
+            />
         </div>
         <div className="px-3 pb-3 flex flex-col justify-between">
           <div className="flex flex-col">
             <h3 className="text-base font-medium text-black mb-2">
               {session.title}
             </h3>
-            <p className="text-gray-600 text-sm line-clamp-3">{session.description}</p>
+            <p className="text-gray-600 text-sm line-clamp-3">
+              {session.description}
+            </p>
             <p className="text-gray-500 text-xs ">
               {moment(session.date).format("YYYY-MM-DD")}
             </p>

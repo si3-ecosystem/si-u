@@ -67,7 +67,7 @@ export function FilteredSessions({
         </div>
         
         {/* Search Filter */}
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <div className="relative">
             <input
               type="text"
@@ -85,7 +85,7 @@ export function FilteredSessions({
               </button>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6">

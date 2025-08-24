@@ -9,7 +9,6 @@ import { ContentListing } from "@/components/organisms/content/ContentListing";
 
 import { CommentNotifications } from "@/components/molecules/comment/CommentNotifications";
 import { useState } from "react";
-import { urlForImage } from "@/lib/sanity/image";
 
 function EnhancedContentListing({
   items,
@@ -84,7 +83,7 @@ export default function ScholarsIdeaLabPage() {
           data.description ||
           "Explore innovative ideas and research from our scholar community"
         }
-        backgroundImage={urlForImage(data?.banner?.background)?.src}
+        backgroundImage={(data?.banner?.background)}
         thumbnailImage={data?.banner?.thumbnail}
         variant="default"
         textColor="dark"
