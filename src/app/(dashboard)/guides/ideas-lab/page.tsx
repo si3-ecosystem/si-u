@@ -4,8 +4,8 @@ import { getIdeaLabsSessionData } from "@/lib/sanity/client";
 import { useIdeaLabs } from "@/hooks/useIdeaLabs";
 import type { IdeaLabsSession } from "@/types/idealabs_session";
 import Loading from "@/app/loading";
-import { Banner } from "@/components/organisms/guides/ideas-lab/Banner";
 import { Highlights } from "@/components/organisms/guides/ideas-lab/Highlights";
+import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 
 export default function IdeaLabsPage() {
   const { data, isLoading, error } = useQuery<IdeaLabsSession>({
@@ -26,22 +26,36 @@ export default function IdeaLabsPage() {
     );
 
   return (
-    <div className="">
-      <Banner data={data.banner ?? {}} />
-      <Highlights
-        title={data.title}
-        description={data.description}
-        categories={ideaLabs.categories}
-        activeTab={ideaLabs.activeTab}
-        setActiveTab={ideaLabs.setActiveTab}
-        pageRows={ideaLabs.pageRows}
-        pageCount={ideaLabs.pageCount}
-        pageIndex={ideaLabs.pageIndex}
-        canPreviousPage={ideaLabs.canPreviousPage}
-        canNextPage={ideaLabs.canNextPage}
-        previousPage={ideaLabs.previousPage}
-        nextPage={ideaLabs.nextPage}
+    <>
+      <ContentBanner
+        title={data?.banner?.title || "Grow3dge Ideas Lab"}
+        description={
+          data.banner?.description ||
+          "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"
+        }
+        backgroundImage={data.banner?.background}
+        thumbnailImage={data.banner?.thumbnail}
+        variant="default"
+        textColor="dark"
+        className="mb-8"
       />
-    </div>
+
+      <div className="px-4 mt-11 lg:px-6 pb-16">
+        <Highlights
+          title={data.title}
+          description={data.description}
+          categories={ideaLabs.categories}
+          activeTab={ideaLabs.activeTab}
+          setActiveTab={ideaLabs.setActiveTab}
+          pageRows={ideaLabs.pageRows}
+          pageCount={ideaLabs.pageCount}
+          pageIndex={ideaLabs.pageIndex}
+          canPreviousPage={ideaLabs.canPreviousPage}
+          canNextPage={ideaLabs.canNextPage}
+          previousPage={ideaLabs.previousPage}
+          nextPage={ideaLabs.nextPage}
+        />
+      </div>
+    </>
   );
 }

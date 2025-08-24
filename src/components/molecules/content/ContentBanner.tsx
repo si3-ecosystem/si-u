@@ -1,5 +1,8 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { urlForImage } from "@/lib/sanity/image";
+import { Card } from "@/components/ui/card";
+import { Search } from "lucide-react";
 
 interface ContentBannerProps {
   title: string;
@@ -11,6 +14,9 @@ interface ContentBannerProps {
   textColor?: "light" | "dark";
   className?: string;
   children?: React.ReactNode;
+  showSearch?: boolean;
+  globalFilter?: string;
+  setGlobalFilter?: (value: string) => void;
 }
 
 export function ContentBanner({
@@ -18,46 +24,65 @@ export function ContentBanner({
   description,
   backgroundImage,
   // thumbnailImage,
-  variant = "default",
   children,
+  showSearch = false,
+  globalFilter,
+  setGlobalFilter,
 }: ContentBannerProps) {
   return (
-    <div className="w-full min-h-[204px] md:min-h-[240px] px-4 lg:px-6 items-center flex py-4 lg:pb-0 lg:pt-6 relative z-10 rounded-lg">
+    <Card className="w-full min-h-[204px] md:min-h-[536px] px-8 lg:px-[120px] items-center flex py-8 lg:pb-0 lg:pt-6 relative z-10 !rounded-[30px] overflow-hidden">
       {backgroundImage && (
         <Image
-          src={backgroundImage}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignoreƒ
+          src={urlForImage(backgroundImage)?.src}
           alt="background"
           fill
-          className="w-full absolute inset-0 z-0  object-cover object-center"
+          className="w-full absolute inset-0 z-0  object-cover object-center "
         />
       )}
       <div className="w-full flex items-center gap-6 z-10 relative">
         {/* Text Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 !space-y-2">
           <h1
             className={cn(
-              "font-bold mb-3 leading-tight text-white",
-              variant === "hero"
-                ? "text-3xl lg:text-4xl xl:text-5xl"
-                : "text-2xl lg:text-3xl"
+              "font-bold mb-4 lg:mb-6 text-white text-3xl lg:text-[62px] leading-[64px]"
             )}
           >
             {title}
           </h1>
-
           <p
             className={cn(
-              "leading-relaxed max-w-3xl text-white",
-              variant === "hero" ? "text-lg lg:text-xl" : "text-base lg:text-lg"
+              " max-w-3xl text-xl lg:text-[30px] text-white leading-normal"
             )}
           >
             {description}
           </p>
 
+          {showSearch && (
+            <div className="mt-6">
+              <div className="flex items-center gap-2.5 w-fit rounded-full bg-white border border-transparent pl-4  pr-1 !mt-8">
+              <Search className="size-4 opacity-50" />
+              <input
+                type="search"
+                placeholder="Search Sessions"
+                value={globalFilter}
+                onChange={(e) =>
+                  setGlobalFilter && setGlobalFilter(e.target.value)
+                }
+                className="text-opacity-50 w-full sm:w-[259px] h-11 outline-none border-none"
+              />
+              <button className="text-base text-white font-normal px-4 py-2 rounded-full bg-brand">
+                Search
+              </button>
+            </div>
+            </div>
+          )}
+
           {/* Additional content */}
-          {children && <div className="mt-4">{children}</div>}
+          {children && <div className="">{children}</div>}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

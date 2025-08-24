@@ -11,7 +11,6 @@ import { CommentNotifications } from "@/components/molecules/comment/CommentNoti
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
-import { urlForImage } from "@/lib/sanity/image";
 
 function EnhancedContentListing({
   items,
@@ -59,15 +58,21 @@ export default function Grow3dgeIdeaLabPage() {
 
   // Check if user has partner role
   const hasPartnerRole =
-    isClient && (currentUser?.user?.roles?.includes("partner") || currentUser?.user?.roles?.includes("admin"));
+    isClient &&
+    (currentUser?.user?.roles?.includes("partner") ||
+      currentUser?.user?.roles?.includes("admin"));
 
   if (isLoading) return <Loading />;
 
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Content</h1>
-        <p className="text-gray-600">Unable to load ideas lab data. Please try again later.</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Error Loading Content
+        </h1>
+        <p className="text-gray-600">
+          Unable to load ideas lab data. Please try again later.
+        </p>
       </div>
     );
   }
@@ -77,9 +82,10 @@ export default function Grow3dgeIdeaLabPage() {
     return (
       <div className="w-full min-h-screen">
         <ContentBanner
-          title="Grow3dge Ideas Lab"
-          description="Exclusive innovation hub for our partner community"
-          backgroundImage={urlForImage(data.banner?.background)?.src}
+          title={data.banner?.title || "Grow3dge Ideas Lab"}
+          description={data.banner?.description ||
+            "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"}
+          backgroundImage={(data.banner?.background?.asset?.src)}
           thumbnailImage={data.banner?.thumbnail}
           variant="default"
           textColor="dark"
@@ -94,13 +100,14 @@ export default function Grow3dgeIdeaLabPage() {
                 <div className="space-y-2">
                   <h3 className="font-semibold">Partner Access Required</h3>
                   <p>
-                    The Grow3dge Ideas Lab is exclusively available to our partner community.
-                    This space is designed for partners to collaborate, share insights, and
-                    contribute to innovative solutions.
+                    The Grow3dge Ideas Lab is exclusively available to our
+                    partner community. This space is designed for partners to
+                    collaborate, share insights, and contribute to innovative
+                    solutions.
                   </p>
                   <p className="text-sm">
-                    If you believe you should have access, please contact your account manager
-                    or reach out to our support team.
+                    If you believe you should have access, please contact your
+                    account manager or reach out to our support team.
                   </p>
                 </div>
               </AlertDescription>
@@ -125,37 +132,40 @@ export default function Grow3dgeIdeaLabPage() {
 
   return (
     <div className="w-full min-h-screen">
-        <ContentBanner
-          title={data.title || "Grow3dge Ideas Lab"}
-          description={data.description || "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"}
-          backgroundImage={data.banner?.background}
-          thumbnailImage={data.banner?.thumbnail}
-          variant="default"
-          textColor="dark"
-          className="mb-8"
-        />
+      <ContentBanner
+        title={data.title || "Grow3dge Ideas Lab"}
+        description={
+          data.description ||
+          "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"
+        }
+        backgroundImage={data.banner?.background}
+        thumbnailImage={data.banner?.thumbnail}
+        variant="default"
+        textColor="dark"
+        className="mb-8"
+      />
 
-        <div className=" pb-16">
-          <EnhancedContentListing
-            title="Latest Partner Innovations"
-            description="Discover cutting-edge research and collaborative opportunities exclusive to our partner network"
-            items={filteredItems}
-            categories={ideaLabs.categories}
-            activeCategory={ideaLabs.activeTab}
-            onCategoryChange={ideaLabs.setActiveTab}
-            basePath="/grow3dge/ideas-lab"
-            currentPage={ideaLabs.pageIndex + 1}
-            totalPages={ideaLabs.pageCount}
-            onPageChange={(page: number) => {
-              console.log('Navigate to page:', page);
-            }}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            isLoading={false}
-          />
-        </div>
+      <div className="mt-11  pb-16">
+        <EnhancedContentListing
+          title="Latest Partner Innovations"
+          description="Discover cutting-edge research and collaborative opportunities exclusive to our partner network"
+          items={filteredItems}
+          categories={ideaLabs.categories}
+          activeCategory={ideaLabs.activeTab}
+          onCategoryChange={ideaLabs.setActiveTab}
+          basePath="/grow3dge/ideas-lab"
+          currentPage={ideaLabs.pageIndex + 1}
+          totalPages={ideaLabs.pageCount}
+          onPageChange={(page: number) => {
+            console.log("Navigate to page:", page);
+          }}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          isLoading={false}
+        />
+      </div>
 
       {/* Global notifications */}
       <CommentNotifications />

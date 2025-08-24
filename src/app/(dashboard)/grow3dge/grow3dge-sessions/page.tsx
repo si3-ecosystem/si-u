@@ -1,5 +1,4 @@
 "use client";
-import { Banner } from "@/components/organisms/fixx/fixx-sessions/Banner";
 import { PopularTopics } from "@/components/organisms/grow3dge/grow3dge-sessions/PopularTopics";
 import { FilteredSessions } from "@/components/organisms/grow3dge/grow3dge-sessions/FilteredSessions";
 import { useFixSessions } from "@/hooks/useFixSessions";
@@ -9,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 import Loading from "@/app/loading";
+import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 
 export default function FixxSessionsPage() {
   const { loading, sessions } = useFixSessions();
@@ -70,40 +70,55 @@ export default function FixxSessionsPage() {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col gap-8 lg:gap-16">
-      <Banner
-        data={sessions?.banner}
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
-      />
-
-      <PopularTopics
-        data={{
-          topicTitle: sessions?.topicTitle || "Popular Topics",
-          topicDesc: sessions?.topicDesc || "Explore sessions by category and find content that interests you",
-          topics: sessions?.topics || [], // Array of topics
-        }}
-        categoryCounts={categoryCounts}
-        setSelectedCategory={setSelectedCategory}
-      />
-
-      <FilteredSessions
-        title={sessions?.title || "Grow3dge Sessions"}
+    <>
+      <ContentBanner
+        title={sessions?.banner?.title || "Grow3dge Ideas Lab"}
         description={
-          sessions?.description || "Explore our collection of partner sessions"
+          sessions.banner?.description ||
+          "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"
         }
-        sessions={filteredSessions}
-        selectedCategory={selectedCategory}
+        backgroundImage={sessions.banner?.background}
+        thumbnailImage={sessions.banner?.thumbnail}
+        variant="default"
+        textColor="dark"
+        className="mb-8"
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
-        pageIndex={pageIndex}
-        pageCount={pageCount}
-        canPreviousPage={canPreviousPage}
-        canNextPage={canNextPage}
-        previousPage={previousPage}
-        nextPage={nextPage}
-        gotoPage={gotoPage}
+        showSearch={true}
       />
-    </div>
+
+      <div className="px-4 mt-11 lg:px-6 pb-16">
+        <PopularTopics
+          data={{
+            topicTitle: sessions?.topicTitle || "Popular Topics",
+            topicDesc:
+              sessions?.topicDesc ||
+              "Explore sessions by category and find content that interests you",
+            topics: sessions?.topics || [], // Array of topics
+          }}
+          categoryCounts={categoryCounts}
+          setSelectedCategory={setSelectedCategory}
+        />
+
+        <FilteredSessions
+          title={sessions?.title || "Grow3dge Sessions"}
+          description={
+            sessions?.description ||
+            "Explore our collection of partner sessions"
+          }
+          sessions={filteredSessions}
+          selectedCategory={selectedCategory}
+          globalFilter={globalFilter}
+          setGlobalFilter={setGlobalFilter}
+          pageIndex={pageIndex}
+          pageCount={pageCount}
+          canPreviousPage={canPreviousPage}
+          canNextPage={canNextPage}
+          previousPage={previousPage}
+          nextPage={nextPage}
+          gotoPage={gotoPage}
+        />
+      </div>
+    </>
   );
 }
