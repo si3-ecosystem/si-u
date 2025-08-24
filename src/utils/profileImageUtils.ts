@@ -12,32 +12,23 @@ import { UserData } from '@/redux/slice/userSlice';
  * @returns Profile image URL or fallback
  */
 export function getProfileImageUrl(user?: UserData | null, fallbackUrl?: string): string | undefined {
-  console.log('🔍 getProfileImageUrl called with user:', {
-    hasUser: !!user,
-    profileImage: user?.profileImage,
-    avatar: user?.avatar,
-    fallbackUrl
-  });
+
 
   if (!user) {
-    console.log('🔍 getProfileImageUrl: No user, returning fallback:', fallbackUrl);
     return fallbackUrl;
   }
 
   // Prioritize the new profileImage field (IPFS) over the legacy avatar field
   if (user.profileImage) {
-    console.log('🔍 getProfileImageUrl: Using profileImage:', user.profileImage);
     return user.profileImage;
   }
 
   // Fall back to legacy avatar field
   if (user.avatar) {
-    console.log('🔍 getProfileImageUrl: Using avatar:', user.avatar);
     return user.avatar;
   }
 
   // Return fallback if provided
-  console.log('🔍 getProfileImageUrl: No images found, returning fallback:', fallbackUrl);
   return fallbackUrl;
 }
 
