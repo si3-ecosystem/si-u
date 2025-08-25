@@ -1,7 +1,6 @@
 import {
   ChromeIcon as Google,
   Apple,
-  X,
   XCircle,
   ChevronRight,
   Loader2,
@@ -27,7 +26,7 @@ export function AttendEventDropdown({
   hasValidEmail = true,
   isDeleting = false,
   onCalendarAdd,
-  onJoinChannel,
+  // onJoinChannel,
   onCancelAttendance,
   onOpenRSVPForm
 }: AttendEventDropdownProps) {
@@ -37,10 +36,10 @@ export function AttendEventDropdown({
     onClose();
   };
 
-  const handleChannelClick = () => {
-    onJoinChannel?.();
-    onClose();
-  };
+  // const handleChannelClick = () => {
+  //   onJoinChannel?.();
+  //   onClose();
+  // };
 
   const handleCancelClick = () => {
     onCancelAttendance?.();
@@ -80,16 +79,6 @@ export function AttendEventDropdown({
         >
           <Apple className="w-5 h-5" />
           <span>Add to Apple iCal</span>
-          <ChevronRight className="w-4 h-4 ml-auto" />
-        </button>
-
-        {/* Join the X Channel */}
-        <button
-          onClick={handleChannelClick}
-          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-800 transition-colors"
-        >
-          <X className="w-5 h-5" />
-          <span>Follow on X</span>
           <ChevronRight className="w-4 h-4 ml-auto" />
         </button>
 

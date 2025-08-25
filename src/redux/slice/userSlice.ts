@@ -221,6 +221,7 @@ const userSlice = createSlice({
       console.log('🔍 Current state before merge:', {
         profileImage: state.user.profileImage,
         avatar: state.user.avatar,
+        username: state.user.username,
         _id: state.user._id,
         email: state.user.email
       });
@@ -238,6 +239,7 @@ const userSlice = createSlice({
       console.log('🔄 Merged user data:', {
         profileImage: mergedUser.profileImage,
         avatar: mergedUser.avatar,
+        username: mergedUser.username,
         _id: mergedUser._id,
         email: mergedUser.email
       });
@@ -251,6 +253,7 @@ const userSlice = createSlice({
       console.log('✅ Redux state updated:', {
         profileImage: state.user.profileImage,
         avatar: state.user.avatar,
+        username: state.user.username,
         lastUpdated: state.lastUpdated
       });
 
