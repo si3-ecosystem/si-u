@@ -529,6 +529,9 @@ export const fixSessionsQuery = groq`
       rsvpChannelLink,
       googleCalendarUrl,
       allowCancel,
+      // External RSVP URLs
+      guidesRsvp,
+      fixRsvp,
       // Multiple partners support
       partners[]->{
         _id,
