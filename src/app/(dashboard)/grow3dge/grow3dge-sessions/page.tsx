@@ -1,6 +1,6 @@
 "use client";
 import { PopularTopics } from "@/components/organisms/grow3dge/grow3dge-sessions/PopularTopics";
-import { FilteredSessions } from "@/components/organisms/grow3dge/grow3dge-sessions/FilteredSessions";
+import Grow3dgeWorkShops from "@/components/organisms/grow3dge/Grow3dgeWorkShops";
 import { useFixSessions } from "@/hooks/useFixSessions";
 import { useGrow3dgeSessions } from "@/hooks/useGrow3dgeSessions";
 import { useAppSelector } from "@/redux/store";
@@ -29,16 +29,15 @@ export default function FixxSessionsPage() {
     setGlobalFilter,
     selectedCategory,
     setSelectedCategory,
-    pageIndex,
-    pageCount,
-    canPreviousPage,
-    canNextPage,
-    previousPage,
-    nextPage,
-    gotoPage,
     categoryCounts,
     filteredSessions,
   } = useGrow3dgeSessions(sessions?.fixCards || [], "");
+
+  // Create filtered session data for the workshops component
+  const filteredSessionData = sessions ? {
+    ...sessions,
+    fixCards: filteredSessions
+  } : null;
 
   if (loading) return <Loading />;
 
@@ -69,13 +68,21 @@ export default function FixxSessionsPage() {
     );
   }
 
+  if (!sessions) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        Error loading session data.
+      </div>
+    );
+  }
+
   return (
     <>
       <ContentBanner
-        title={sessions?.banner?.title || "Grow3dge Ideas Lab"}
+        title={sessions?.banner?.title || "Grow3dge Sessions"}
         description={
           sessions.banner?.description ||
-          "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"
+          "Exclusive innovation hub for our partner community to collaborate and access cutting-edge sessions"
         }
         backgroundImage={sessions.banner?.background}
         thumbnailImage={sessions.banner?.thumbnail}
@@ -98,25 +105,12 @@ export default function FixxSessionsPage() {
           }}
           categoryCounts={categoryCounts}
           setSelectedCategory={setSelectedCategory}
+          selectedCategory={selectedCategory}
         />
 
-        <FilteredSessions
-          title={sessions?.title || "Grow3dge Sessions"}
-          description={
-            sessions?.description ||
-            "Explore our collection of partner sessions"
-          }
-          sessions={filteredSessions}
+        <Grow3dgeWorkShops 
+          data={filteredSessionData || sessions} 
           selectedCategory={selectedCategory}
-          globalFilter={globalFilter}
-          setGlobalFilter={setGlobalFilter}
-          pageIndex={pageIndex}
-          pageCount={pageCount}
-          canPreviousPage={canPreviousPage}
-          canNextPage={canNextPage}
-          previousPage={previousPage}
-          nextPage={nextPage}
-          gotoPage={gotoPage}
         />
       </div>
     </>

@@ -336,16 +336,59 @@ export const fixCardByIdQuery = (id: string) => `
     category->{_id, title, slug},
     language,
     date,
+    endDate,
     time,
-    fixImage{
-      asset->{url}
+    fixImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
+    },
+    backgroundImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
     },
     guideName,
-    guideImage{
-      asset->{url}
+    guideImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
     },
     videoUrl,
     body,
+    featured,
+    // Enhanced RSVP Configuration
+    rsvpSettings {
+      enabled,
+      maxCapacity,
+      waitlistEnabled,
+      rsvpDeadline,
+      allowGuests,
+      maxGuestsPerRSVP,
+      requiresApproval,
+      collectContactInfo
+    },
+    emailSettings {
+      sendConfirmation,
+      confirmationTemplate,
+      reminderSchedule[] {
+        timing,
+        customMessage
+      }
+    },
+    location {
+      type,
+      venue,
+      address,
+      virtualLink,
+      accessInstructions
+    },
+    organizer {
+      name,
+      email,
+      phone
+    },
+    // Legacy fields (for backward compatibility)
     rsvpChannelLink,
     googleCalendarUrl,
     allowCancel,
@@ -360,8 +403,15 @@ export const fixCardByIdQuery = (id: string) => `
       }
     },
     // Legacy single partner field (for backward compatibility)
-    partner->{_id, title, logo},
-    downloadPdf,
+    partner->{
+      _id,
+      title,
+      logo {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
     pdfFile{asset->{url}},
     pdfGuide{
       enabled,
@@ -369,7 +419,7 @@ export const fixCardByIdQuery = (id: string) => `
       type,
       downloadFile{asset->{url}},
       shareableUrl
-    },
+    }
   }
 `;
 
@@ -381,6 +431,8 @@ export const fixSessionsQuery = groq`
     // Add new topic fields
     topicTitle,
     topicDesc,
+    sessionTitle,
+    sessionDescription,
      banner->{
       title,
       description,
@@ -421,12 +473,59 @@ export const fixSessionsQuery = groq`
       category->{_id, title, slug},
       language,
       date,
+      endDate,
       time,
-      fixImage,
+      fixImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      backgroundImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
       guideName,
-      guideImage,
+      guideImage {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
       videoUrl,
       body,
+      featured,
+      // Enhanced RSVP Configuration
+      rsvpSettings {
+        enabled,
+        maxCapacity,
+        waitlistEnabled,
+        rsvpDeadline,
+        allowGuests,
+        maxGuestsPerRSVP,
+        requiresApproval,
+        collectContactInfo
+      },
+      emailSettings {
+        sendConfirmation,
+        confirmationTemplate,
+        reminderSchedule[] {
+          timing,
+          customMessage
+        }
+      },
+      location {
+        type,
+        venue,
+        address,
+        virtualLink,
+        accessInstructions
+      },
+      organizer {
+        name,
+        email,
+        phone
+      },
+      // Legacy fields (for backward compatibility)
       rsvpChannelLink,
       googleCalendarUrl,
       allowCancel,
@@ -546,6 +645,8 @@ export const grow3dgeIdeasLabSessionQuery = groq`
     _id,
     title,
     description,
+    sessionTitle,
+    sessionDescription,
     banner-> {
       title,
       description,

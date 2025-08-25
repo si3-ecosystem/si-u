@@ -21,7 +21,7 @@ export default function IdeaLabsPage() {
   if (error || !data)
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        Error loading idea labs data.
+        Error loading Ideas Lab data.
       </div>
     );
 

@@ -131,6 +131,8 @@ export interface Grow3dgeSession {
   title: string;
   description: string;
   topicTitle: string;
+  sessionTitle:string;
+  sessionDescription:string;
   topicDesc: string;
   banner?: GuidesSessionBanner;
   topics?: Grow3dgeCategory[]; // Changed to array
