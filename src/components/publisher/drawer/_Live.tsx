@@ -291,20 +291,6 @@ const LiveFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 </button>
               )}
             </div>
-            {localLive.url && (
-              <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <div className="relative aspect-video w-full max-w-2xl mx-auto">
-                  <video
-                    src={localLive.url}
-                    controls
-                    className="w-full h-full rounded-lg shadow-sm"
-                  >
-                    <track kind="captions" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              </div>
-            )}
           </div>
         </section>
         {/* Crypto Wallet URL */}
