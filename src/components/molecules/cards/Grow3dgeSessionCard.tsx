@@ -47,12 +47,16 @@ export function Grow3dgeSessionCard({
 
   const partnerLogos = getPartnerLogos();
 
-  // RSVP functionality - cast session to compatible type
+  // Check if external RSVP URL is provided
+  const hasExternalRSVP = session.fixRsvp && session.fixRsvp.trim();
+
+  // RSVP functionality - cast session to compatible type (only used when no external RSVP URL)
   const sessionForRSVP = {
     ...session,
     guideName: session.guideName || "Unknown Guide",
   } as any;
 
+  const rsvpHookResult = useRSVP(session._id, sessionForRSVP);
   const {
     rsvp,
     rsvpStatus,
@@ -64,7 +68,23 @@ export function Grow3dgeSessionCard({
     isUpdating,
     isDeleting,
     config,
-  } = useRSVP(session._id, sessionForRSVP);
+  } = hasExternalRSVP ? {
+    rsvp: null,
+    rsvpStatus: null,
+    hasRSVP: false,
+    createRSVP: () => {},
+    updateRSVP: () => {},
+    deleteRSVP: () => {},
+    isCreating: false,
+    isUpdating: false,
+    isDeleting: false,
+    config: {
+      isRSVPEnabled: false,
+      isDeadlinePassed: false,
+      hasValidEmail: true,
+      requiresApproval: false,
+    },
+  } : rsvpHookResult;
 
   // Calendar integration
   const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } =
@@ -153,6 +173,11 @@ export function Grow3dgeSessionCard({
   };
 
   const getButtonText = () => {
+    // If external RSVP URL is provided, show simple "Register Now" text
+    if (hasExternalRSVP) {
+      return "Register Now";
+    }
+
     if (!config.isRSVPEnabled) return "RSVP Disabled";
     if (config.isDeadlinePassed) return "RSVP Closed";
     if (!config.hasValidEmail) return "Update Email to RSVP";
@@ -175,6 +200,11 @@ export function Grow3dgeSessionCard({
   const getButtonStyle = () => {
     const baseStyle =
       "text-white border font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 max-lg:w-full max-lg:text-center";
+
+    // If external RSVP URL is provided, use default black style
+    if (hasExternalRSVP) {
+      return `${baseStyle} border-black bg-black hover:bg-gray-800`;
+    }
 
     if (!config.isRSVPEnabled || config.isDeadlinePassed) {
       return `${baseStyle} border-gray-400 bg-gray-400 cursor-not-allowed`;
@@ -289,8 +319,17 @@ export function Grow3dgeSessionCard({
 
               <div className="relative">
                 <button
-                  onClick={() => toggleDropdown(session._id)}
+                  onClick={() => {
+                    // If external RSVP URL is provided, redirect to it
+                    if (hasExternalRSVP) {
+                      window.open(session.fixRsvp, '_blank');
+                      return;
+                    }
+                    // Otherwise, use the dropdown functionality
+                    toggleDropdown(session._id);
+                  }}
                   disabled={
+                    hasExternalRSVP ? false :
                     !config.isRSVPEnabled ||
                     config.isDeadlinePassed ||
                     isCreating ||
@@ -302,7 +341,7 @@ export function Grow3dgeSessionCard({
                   {getButtonText()}
                 </button>
 
-                {openDropdownId === session._id && (
+                {!hasExternalRSVP && openDropdownId === session._id && (
                   <AttendEventDropdown
                     onClose={() => setOpenDropdownId(null)}
                     eventId={session._id}

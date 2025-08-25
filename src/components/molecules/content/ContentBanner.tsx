@@ -30,7 +30,7 @@ export function ContentBanner({
   setGlobalFilter,
 }: ContentBannerProps) {
   return (
-    <Card className="w-full min-h-[204px] md:min-h-[536px] px-8 lg:px-[120px] items-center flex py-8 lg:pb-0 lg:pt-6 relative z-10 !rounded-[30px] overflow-hidden">
+    <Card className="w-full min-h-[204px] md:min-h-[340px] px-8 lg:px-[120px] items-center flex py-8 lg:pb-0 lg:pt-6 relative z-10 !rounded-[30px] overflow-hidden">
       {backgroundImage && (
         <Image
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -46,14 +46,14 @@ export function ContentBanner({
         <div className="flex-1 min-w-0 !space-y-2">
           <h1
             className={cn(
-              "font-bold mb-4 lg:mb-6 text-white text-3xl lg:text-[62px] leading-[64px]"
+              "font-bold mb-4 lg:mb-6 text-white text-3xl lg:text-[52px] leading-[64px]"
             )}
           >
             {title}
           </h1>
           <p
             className={cn(
-              " max-w-3xl text-xl lg:text-[30px] text-white leading-normal"
+              " max-w-3xl text-xl lg:text-[22px] text-white leading-normal"
             )}
           >
             {description}
