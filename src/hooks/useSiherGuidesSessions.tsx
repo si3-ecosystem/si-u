@@ -8,7 +8,8 @@ interface UseSiherGuidesSessionsResult {
 }
 
 export function useSiherGuidesSessions(
-  guides: GuidesSession[] | null | undefined
+  guides: GuidesSession[] | null | undefined,
+  globalFilter: string = ""
 ): UseSiherGuidesSessionsResult {
 
   const { upcomingSessions, previousSessions } = useMemo(() => {
@@ -16,11 +17,28 @@ export function useSiherGuidesSessions(
       return { upcomingSessions: [], previousSessions: [] };
     }
 
+    // First filter by search term if provided
+    let filteredGuides = guides;
+    if (globalFilter && globalFilter.trim()) {
+      const searchTerm = globalFilter.toLowerCase().trim();
+      filteredGuides = guides.filter((guide) => {
+        const title = guide.title?.toLowerCase() || "";
+        const description = guide.description?.toLowerCase() || "";
+        const guideName = guide.guideName?.toLowerCase() || "";
+        
+        return (
+          title.includes(searchTerm) ||
+          description.includes(searchTerm) ||
+          guideName.includes(searchTerm)
+        );
+      });
+    }
+
     const now = Date.now();
     const upcoming: GuidesSession[] = [];
     const previous: GuidesSession[] = [];
 
-    guides.forEach((guide) => {
+    filteredGuides.forEach((guide) => {
       if (!guide.date) {
         previous.push(guide);
         return;
@@ -55,7 +73,7 @@ export function useSiherGuidesSessions(
     });
 
     return { upcomingSessions: upcoming, previousSessions: previous };
-  }, [guides]);
+  }, [guides, globalFilter]);
 
   return {
     upcomingSessions,

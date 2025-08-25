@@ -11,13 +11,14 @@ import { RSVPErrorBoundary } from "@/components/molecules/errors/RSVPErrorBounda
 
 interface WorkShopsProps {
   data: SiherGuidesSession;
+  globalFilter?: string;
 }
 
-export default function WorkShops({ data }: WorkShopsProps) {
+export default function WorkShops({ data, globalFilter = "" }: WorkShopsProps) {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
-  const { upcomingSessions, previousSessions } = useSiherGuidesSessions(data.guides);
+  const { upcomingSessions, previousSessions } = useSiherGuidesSessions(data.guides, globalFilter);
 
 
   const toggleDropdown = (id: string) => {
@@ -47,7 +48,14 @@ export default function WorkShops({ data }: WorkShopsProps) {
               <div className="space-y-6">
                 {upcomingSessions.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    No upcoming sessions.
+                    {globalFilter ? (
+                      <>
+                        <p>No upcoming sessions found for &ldquo;{globalFilter}&rdquo;.</p>
+                        <p className="text-sm mt-2">Try adjusting your search term or browse all sessions.</p>
+                      </>
+                    ) : (
+                      "No upcoming sessions."
+                    )}
                   </div>
                 ) : (
                   upcomingSessions.map((session) => (
@@ -65,7 +73,16 @@ export default function WorkShops({ data }: WorkShopsProps) {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {previousSessions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 w-full">No previous sessions.</div>
+                <div className="text-center py-8 text-gray-500 w-full col-span-full">
+                  {globalFilter ? (
+                    <>
+                      <p>No previous sessions found for &ldquo;{globalFilter}&rdquo;.</p>
+                      <p className="text-sm mt-2">Try adjusting your search term or browse all sessions.</p>
+                    </>
+                  ) : (
+                    "No previous sessions."
+                  )}
+                </div>
               ) : (
                 previousSessions.map((session) => (
                   <PreviousGuidesSessionCard

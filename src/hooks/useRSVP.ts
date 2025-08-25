@@ -40,7 +40,13 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
       // Check if it's an email verification error
       const errorMessage = error?.message || error?.error?.message || '';
       if (errorMessage.includes('not verified') || errorMessage.includes('verify your email')) {
-        ErrorHandler.showWarning('Please verify your email address in your profile before RSVPing to events.');
+        ErrorHandler.showWarning('⚠️ Please verify your email address in your profile before RSVPing to events.');
+      } else if (errorMessage.includes('full') || errorMessage.includes('capacity')) {
+        ErrorHandler.showWarning('🚫 Sorry, this session is at full capacity. Try joining the waitlist!');
+      } else if (errorMessage.includes('deadline')) {
+        ErrorHandler.showWarning('⏰ RSVP deadline has passed for this session.');
+      } else if (errorMessage.includes('duplicate')) {
+        ErrorHandler.showInfo('📝 You\'ve already RSVPed for this session.');
       } else {
         ErrorHandler.handle(error, 'RSVP creation');
       }
@@ -48,11 +54,29 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
 
     onSuccess: (data) => {
       if (data.status === 'success') {
-        ErrorHandler.showSuccess('RSVP created successfully!');
+        const rsvp = data.data;
+        let message = 'RSVP created successfully!';
+        
+        // More specific success messages
+        if (rsvp?.status === RSVPStatus.ATTENDING) {
+          message = '🎉 You\'re attending! RSVP confirmed successfully.';
+        } else if (rsvp?.status === RSVPStatus.MAYBE) {
+          message = '🤔 Marked as "Maybe" - you can update this anytime.';
+        } else if (rsvp?.status === RSVPStatus.NOT_ATTENDING) {
+          message = '👋 Thanks for letting us know you can\'t attend.';
+        } else if (rsvp?.status === RSVPStatus.WAITLISTED) {
+          message = '⏳ You\'ve been added to the waitlist.';
+        }
+        
+        ErrorHandler.showSuccess(message);
 
         // Invalidate related queries to ensure fresh data
         queryClient.invalidateQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey: ['event-stats', eventId] });
+        // Also invalidate session lists to update the UI
+        queryClient.invalidateQueries({ queryKey: ['fixSessions'] });
+        queryClient.invalidateQueries({ queryKey: ['siher-guides-session'] });
+        queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
       }
     },
   });
@@ -65,7 +89,11 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
     onError: (error: any) => {
       const errorMessage = error?.message || error?.error?.message || '';
       if (errorMessage.includes('not verified') || errorMessage.includes('verify your email')) {
-        ErrorHandler.showWarning('Please verify your email address in your profile before updating RSVP.');
+        ErrorHandler.showWarning('⚠️ Please verify your email address in your profile before updating RSVP.');
+      } else if (errorMessage.includes('not found')) {
+        ErrorHandler.showWarning('🔍 RSVP not found. Please try creating a new RSVP.');
+      } else if (errorMessage.includes('deadline')) {
+        ErrorHandler.showWarning('⏰ Cannot update RSVP - deadline has passed.');
       } else {
         ErrorHandler.handle(error, 'RSVP update');
       }
@@ -73,9 +101,29 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
 
     onSuccess: (data) => {
       if (data.status === 'success') {
-        ErrorHandler.showSuccess('RSVP updated successfully!');
+        const rsvp = data.data;
+        let message = 'RSVP updated successfully!';
+        
+        // More specific success messages
+        if (rsvp?.status === RSVPStatus.ATTENDING) {
+          message = '✅ Updated to "Attending" - see you there!';
+        } else if (rsvp?.status === RSVPStatus.MAYBE) {
+          message = '🤔 Updated to "Maybe" - you can change this anytime.';
+        } else if (rsvp?.status === RSVPStatus.NOT_ATTENDING) {
+          message = '❌ Updated to "Not Attending" - thanks for the update.';
+        } else if (rsvp?.status === RSVPStatus.WAITLISTED) {
+          message = '⏳ You\'re now on the waitlist.';
+        }
+        
+        ErrorHandler.showSuccess(message);
+        
+        // Invalidate related queries to ensure fresh data
         queryClient.invalidateQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey: ['event-stats', eventId] });
+        // Also invalidate session lists to update the UI
+        queryClient.invalidateQueries({ queryKey: ['fixSessions'] });
+        queryClient.invalidateQueries({ queryKey: ['siher-guides-session'] });
+        queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
       }
     },
   });
@@ -87,16 +135,24 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
     onError: (error: any) => {
       const errorMessage = error?.message || error?.error?.message || '';
       if (errorMessage.includes('not verified') || errorMessage.includes('verify your email')) {
-        ErrorHandler.showWarning('Please verify your email address in your profile before canceling RSVP.');
+        ErrorHandler.showWarning('⚠️ Please verify your email address in your profile before canceling RSVP.');
+      } else if (errorMessage.includes('not found')) {
+        ErrorHandler.showInfo('🤷‍♂️ No RSVP found to cancel.');
       } else {
-        ErrorHandler.handle(error, 'RSVP deletion');
+        ErrorHandler.handle(error, 'RSVP cancellation');
       }
     },
 
     onSuccess: () => {
-      ErrorHandler.showSuccess('RSVP cancelled successfully!');
+      ErrorHandler.showSuccess('🚫 RSVP cancelled successfully - you can always RSVP again later!');
+      
+      // Invalidate related queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: ['event-stats', eventId] });
+      // Also invalidate session lists to update the UI
+      queryClient.invalidateQueries({ queryKey: ['fixSessions'] });
+      queryClient.invalidateQueries({ queryKey: ['siher-guides-session'] });
+      queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
     },
   });
 
@@ -148,7 +204,7 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
     // Actions
     createRSVP: (data: CreateRSVPRequest) => {
       if (!canUserRSVP()) {
-        ErrorHandler.showWarning('Please update your email address in your profile before RSVPing');
+        ErrorHandler.showWarning('📧 Please update your email address in your profile before RSVPing');
         if (typeof window !== 'undefined') {
           window.location.href = '/profile';
         }
@@ -158,7 +214,7 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
     },
     updateRSVP: (data: UpdateRSVPRequest) => {
       if (!canUserRSVP()) {
-        ErrorHandler.showWarning('Please update your email address in your profile before updating RSVP');
+        ErrorHandler.showWarning('📧 Please update your email address in your profile before updating RSVP');
         if (typeof window !== 'undefined') {
           window.location.href = '/profile';
         }
@@ -172,24 +228,24 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
       if (currentRSVP && currentRSVP._id && currentRSVP._id !== 'temp-id') {
         deleteRSVPMutation.mutate(currentRSVP._id);
       } else {
-        ErrorHandler.showWarning('No RSVP to cancel');
+        ErrorHandler.showWarning('🤷‍♂️ No RSVP to cancel');
       }
     },
 
     // Quick status update helper
     updateStatus: (status: RSVPStatus) => {
       if (!isRSVPEnabled) {
-        ErrorHandler.showWarning('RSVP is not enabled for this session');
+        ErrorHandler.showWarning('⚠️ RSVP is not enabled for this session');
         return;
       }
 
       if (isRSVPDeadlinePassed()) {
-        ErrorHandler.showWarning('RSVP deadline has passed');
+        ErrorHandler.showWarning('⏰ RSVP deadline has passed for this session');
         return;
       }
 
       if (!canUserRSVP()) {
-        ErrorHandler.showWarning('Please update your email address in your profile before RSVPing');
+        ErrorHandler.showWarning('📧 Please update your email address in your profile before RSVPing');
         // Optionally redirect to profile page
         if (typeof window !== 'undefined') {
           window.location.href = '/profile';

@@ -53,8 +53,20 @@ export function useProfile() {
       ErrorHandler.handle(error, 'Profile update');
     },
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      console.log('🎉 Profile update success - Response data:', data);
       ErrorHandler.showSuccess('Profile updated successfully!');
+
+      // If the response doesn't contain updated user data, force refresh from server
+      if (!data || !data.username) {
+        console.log('⚠️ API response missing updated user data, forcing refresh...');
+        try {
+          await UnifiedAuthService.forceRefreshUserData();
+          console.log('✅ User data refreshed successfully');
+        } catch (error) {
+          console.error('❌ Failed to refresh user data:', error);
+        }
+      }
 
       // Invalidate related queries (like RSVP queries that depend on user data)
       queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
@@ -70,8 +82,20 @@ export function useProfile() {
       ErrorHandler.handle(error, 'Email update');
     },
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      console.log('📧 Email update success - Response data:', data);
       ErrorHandler.showSuccess('Email updated successfully!');
+
+      // If the response doesn't contain updated user data, force refresh from server
+      if (!data || !data.email) {
+        console.log('⚠️ API response missing updated user data, forcing refresh...');
+        try {
+          await UnifiedAuthService.forceRefreshUserData();
+          console.log('✅ User data refreshed successfully');
+        } catch (error) {
+          console.error('❌ Failed to refresh user data:', error);
+        }
+      }
 
       // Invalidate RSVP queries since email validation affects RSVP
       queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
@@ -87,8 +111,20 @@ export function useProfile() {
       ErrorHandler.handle(error, 'Name update');
     },
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      console.log('👤 Name update success - Response data:', data);
       ErrorHandler.showSuccess('Name updated successfully!');
+
+      // If the response doesn't contain updated user data, force refresh from server
+      if (!data || !data.name) {
+        console.log('⚠️ API response missing updated user data, forcing refresh...');
+        try {
+          await UnifiedAuthService.forceRefreshUserData();
+          console.log('✅ User data refreshed successfully');
+        } catch (error) {
+          console.error('❌ Failed to refresh user data:', error);
+        }
+      }
 
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });

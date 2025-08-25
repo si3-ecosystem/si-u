@@ -122,9 +122,16 @@ const subMenuGroups: SubMenuGroup[] = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { open } = useSidebar();
+  const { open, isMobile, setOpenMobile } = useSidebar();
 
   if (!open) return null;
+
+  // Function to handle menu item clicks and close sidebar on mobile
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const allMenuItems: MenuItem[] = [
     ...mainMenuItems,
@@ -149,7 +156,7 @@ export function AppSidebar() {
       <Sidebar className={cn("border-r !bg-white border", !open && "!w-0")}>
         <SidebarHeader className="!py-8 !px-6 bg-white">
           <div className="flex items-center justify-between w-full">
-            <Link href="/" className={cn(!open ? " " : "")}>
+            <Link href="/" className={cn(!open ? " " : "")} onClick={handleLinkClick}>
               <div className="px-4">
                 <Image
                   src={"/logo.svg"}
@@ -167,7 +174,7 @@ export function AppSidebar() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
               {mainMenuItems.map((item) => (
-                <Link key={item.href} href={item.href}>
+                <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                   <Button
                     variant="ghost"
                     className={cn(
@@ -188,7 +195,7 @@ export function AppSidebar() {
                   {group.title}
                 </h3>
                 {group.items.map((item) => (
-                  <Link key={item.href} href={item.href}>
+                  <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                     <Button
                       variant="ghost"
                       className={cn(
@@ -213,7 +220,7 @@ export function AppSidebar() {
           </div>
         </SidebarContent>
         <SidebarFooter className="mt-auto px-6 !pb-5 !pt-4 gap-0 space-y-0 bg-white">
-          <Link href="/settings">
+          <Link href="/settings" onClick={handleLinkClick}>
             <Button
               variant="ghost"
               className="w-full justify-start h-11 !px-2.5"

@@ -83,9 +83,11 @@ export default function Grow3dgeIdeaLabPage() {
       <div className="w-full min-h-screen">
         <ContentBanner
           title={data.banner?.title || "Grow3dge Ideas Lab"}
-          description={data.banner?.description ||
-            "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"}
-          backgroundImage={(data.banner?.background?.asset?.src)}
+          description={
+            data.banner?.description ||
+            "Exclusive innovation hub for our partner community to collaborate and share cutting-edge insights"
+          }
+          backgroundImage={data.banner?.background?.asset?.src}
           thumbnailImage={data.banner?.thumbnail}
           variant="default"
           textColor="dark"
@@ -147,8 +149,11 @@ export default function Grow3dgeIdeaLabPage() {
 
       <div className="mt-11  pb-16">
         <EnhancedContentListing
-          title="Latest Partner Innovations"
-          description="Discover cutting-edge research and collaborative opportunities exclusive to our partner network"
+          title={data.sessionTitle}
+          description={
+            data.sessionDescription ||
+            "Discover cutting-edge research and collaborative opportunities exclusive to our partner network"
+          }
           items={filteredItems}
           categories={ideaLabs.categories}
           activeCategory={ideaLabs.activeTab}
