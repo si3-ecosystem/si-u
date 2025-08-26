@@ -1,18 +1,24 @@
 import { Globe, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import apiClient from "@/utils/interceptor";
+import { apiClient, ApiErrorClass } from "@/services/api";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/store";
-// import { updateDomain } from "@/redux/slice/authSlice";
+import { setDomain } from "@/redux/slice/contentSlice";
 import Link from "next/link";
 
 const Domain = () => {
   const dispatch = useDispatch();
   const existingDomain =
-    useSelector((state: RootState) => state.user?.domain) ?? "";
+    useSelector((state: RootState) => state.content?.domain) ?? "";
   const [subDomain, setSubDomain] = useState<string>("");
   const [domainLoading, setDomainLoading] = useState<boolean>(false);
+
+  const getDisplayDomain = (value: string): string => {
+    if (!value) return "";
+    // If it's just a subdomain (no dot), append full suffix
+    return value.includes(".") ? value : `${value}.siher.eth.link`;
+  };
 
   useEffect(() => {
     if (existingDomain) {
@@ -35,21 +41,26 @@ const Domain = () => {
     }
     try {
       setDomainLoading(true);
-      const response = await apiClient.post(`/domain/publish`, {
+      const response: any = await apiClient.post(`/domain/publish`, {
         domain: subDomain,
       });
-      if (response.status === 200) {
+      // Support both shapes:
+      // 1) { domain: string }
+      // 2) { status: 'success', data: { domain: string } }
+      const newDomain = (response && (response.domain || response?.data?.domain)) || "";
+      if (newDomain) {
+        dispatch(setDomain(newDomain));
         toast.success("Domain successfully published!");
-        console.log(response?.data?.domain);
-        // dispatch(updateDomain(response?.data?.domain));
       } else {
-        toast.error(response.data?.message ?? "Failed to register domain.");
+        const message = response?.error?.message || "Failed to register domain.";
+        toast.error(message);
       }
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message ??
-          "Something went wrong. Please try again."
-      );
+      if (error instanceof ApiErrorClass) {
+        toast.error(error.message || "Failed to register domain.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setDomainLoading(false);
     }
@@ -62,11 +73,11 @@ const Domain = () => {
           <div className="flex items-center p-2">
             <p>Web page URL: </p>
             <Link
-              href={`https://${existingDomain}`}
+              href={`https://${getDisplayDomain(existingDomain)}`}
               target="_blank"
               className="ml-2 font-serif text-blue-600 hover:underline underline-offset-2"
             >
-              {`https://${existingDomain}`}
+              {`https://${getDisplayDomain(existingDomain)}`}
             </Link>
           </div>
         ) : (
