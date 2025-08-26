@@ -23,6 +23,7 @@ export const config = createConfig({
   ],
   transports: {
     [mainnet.id]: http(),
+    [polygon.id]: http(),
     [sepolia.id]: http(),
   },
 });
