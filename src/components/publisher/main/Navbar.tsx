@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import { setIsNewWebpage } from "@/redux/slice/contentSlice";
-import apiClient from "@/utils/interceptor";
+import { apiClient, ApiErrorClass } from "@/services/api";
 import { type RootState } from "@/redux/store";
 
 const Navbar = () => {
@@ -34,10 +34,11 @@ const Navbar = () => {
         timeline: contentData.timeline,
         available: contentData.available,
         socialChannels: contentData.socialChannels,
+        domain: (contentData as any).domain ?? "",
       };
       const url = isNewWebpage ? "/webcontent/publish" : "/webcontent/update";
-      const response = await apiClient.post(url, publishData);
-      if (response.status === 200 || response.status === 201) {
+      const response: any = await apiClient.post(url, publishData);
+      if (response.status === "success") {
         toast.success("Content published successfully!");
         dispatch(setIsNewWebpage(false));
       } else {
@@ -46,14 +47,22 @@ const Navbar = () => {
     } catch (error: any) {
       console.error("Publish error:", error);
       let errorMessage = "";
-      if (error.response?.status === 400) {
-        errorMessage =
-          error.response.data?.message ?? error.response.data ?? "Bad request";
-      } else if (error.response?.status === 401) {
-        router.replace("/login");
-        return;
-      } else if (error.code === "ECONNABORTED") {
+      if (error instanceof ApiErrorClass) {
+        if (error.statusCode === 401) {
+          router.replace("/login");
+          return;
+        }
+        if (error.statusCode === 408) {   
+          errorMessage = "Request timeout. Please try again.";
+        } else {
+          errorMessage = error.message || "Something went wrong";
+        }
+      } else if (error?.code === "ECONNABORTED") {
         errorMessage = "Request timeout. Please try again.";
+      } else if (typeof error?.message === "string") {
+        errorMessage = error.message;
+      } else {
+        errorMessage = "Failed to publish content";
       }
       toast.error(errorMessage);
     } finally {

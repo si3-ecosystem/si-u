@@ -47,16 +47,32 @@ const Marquee = ({ items = [] }: { items?: string[] }) => {
   );
 };
 
-const InfoRow = ({ title, value }: { title: string; value: React.ReactNode }) => (
+const InfoRow = ({
+  title,
+  value,
+}: {
+  title: string;
+  value: React.ReactNode;
+}) => (
   <div className="flex gap-2 font-medium">
     <div className="text-blue-primary tracking-tight sm:tracking-wide font-medium w-1/3 whitespace-nowrap min-w-44">
       {title}
     </div>
-    <div className="cursor-default w-2/3 whitespace-nowrap overflow-hidden">{value}</div>
+    <div className="cursor-default w-2/3 whitespace-nowrap overflow-hidden">
+      {value}
+    </div>
   </div>
 );
 
-const ProfileCard = ({ image, fullName, pronoun }: { image: string; fullName: string; pronoun: string }) => {
+const ProfileCard = ({
+  image,
+  fullName,
+  pronoun,
+}: {
+  image: string;
+  fullName: string;
+  pronoun: string;
+}) => {
   return (
     <section className="relative aspect-[3/4] w-full max-w-xs rounded-2xl flex-shrink-0">
       {image && (
@@ -69,9 +85,13 @@ const ProfileCard = ({ image, fullName, pronoun }: { image: string; fullName: st
           priority
         />
       )}
-      <div className="rounded-2xl absolute -right-4 md:right-0 lg:-right-2 -bottom-4 xl:-right-4 border border-light-purple p-4 flex flex-col justify-center items-center gap-1 md:gap-2 bg-purple-primary shadow-md font-dmsans">
-        <span className="font-medium text-base md:text-lg whitespace-nowrap">{fullName ?? ""}</span>
-        <span className="tracking-wider text-xs md:text-sm">{pronoun ? `(${pronoun.toLowerCase()})` : ""}</span>
+      <div className="rounded-2xl absolute right-1/2 translate-x-1/2 lg:translate-x-0 -bottom-4 xl:-right-4 border border-light-purple p-4 flex flex-col justify-center items-center gap-1 md:gap-2 bg-purple-primary shadow-md font-dmsans">
+        <span className="font-medium text-base md:text-lg whitespace-nowrap">
+          {fullName ?? ""}
+        </span>
+        <span className="tracking-wider text-xs md:text-sm">
+          {pronoun ? `(${pronoun.toLowerCase()})` : ""}
+        </span>
       </div>
     </section>
   );
@@ -88,7 +108,7 @@ const Landing = () => {
     image = "",
     pronoun = "",
     title = "",
-    fullName = ""
+    fullName = "",
   } = useMemo(() => landingData || {}, [landingData]);
 
   // Ensure hashTags is always an array
@@ -148,7 +168,13 @@ const Landing = () => {
             />
             <InfoRow
               title="Superpowers:"
-              value={superPowers.length < 3 ? superPowers.join(", ") : <Marquee items={superPowers} />}
+              value={
+                superPowers.length < 3 ? (
+                  superPowers.join(", ")
+                ) : (
+                  <Marquee items={superPowers} />
+                )
+              }
             />
           </section>
         </div>

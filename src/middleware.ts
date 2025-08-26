@@ -208,9 +208,9 @@ export async function middleware(request: NextRequest) {
 async function verifyJwtToken(
   request: NextRequest
 ): Promise<UserJWTPayload | null> {
+  const jwtCookie = request.cookies.get("si3-jwt");
+  
   try {
-    const jwtCookie = request.cookies.get("si3-jwt");
-
     if (!jwtCookie?.value) {
       console.log("[Middleware] No JWT cookie found");
       return null;
@@ -247,8 +247,6 @@ async function verifyJwtToken(
       console.error("[Middleware] JWT verification failed:", {
         name: err.name,
         message: err.message,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         cookieLength: jwtCookie?.value?.length || 0,
       });
     } else {

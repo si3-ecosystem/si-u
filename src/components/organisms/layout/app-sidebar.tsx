@@ -76,8 +76,8 @@ const subMenuGroups: SubMenuGroup[] = [
     items: [
       { title: "Sessions", icon: Video, href: "/guides/sessions" },
       { title: "Ideas Lab", icon: Brain, href: "/guides/ideas-lab" },
+      { title: "SI Her Publisher", icon: Globe, href: "/publisher" },
       { title: "Go Live (Coming Soon) ", icon: Share2, href: "/#" },
-      { title: "Publisher", icon: Globe, href: "/publisher" },
     ],
   },
   {
@@ -156,7 +156,11 @@ export function AppSidebar() {
       <Sidebar className={cn("border-r !bg-white border", !open && "!w-0")}>
         <SidebarHeader className="!py-8 !px-6 bg-white">
           <div className="flex items-center justify-between w-full">
-            <Link href="/" className={cn(!open ? " " : "")} onClick={handleLinkClick}>
+            <Link
+              href="/"
+              className={cn(!open ? " " : "")}
+              onClick={handleLinkClick}
+            >
               <div className="px-4">
                 <Image
                   src={"/logo.svg"}
@@ -174,7 +178,11 @@ export function AppSidebar() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
               {mainMenuItems.map((item) => (
-                <Link key={item.href} href={item.href} onClick={handleLinkClick}>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={handleLinkClick}
+                >
                   <Button
                     variant="ghost"
                     className={cn(
@@ -195,7 +203,11 @@ export function AppSidebar() {
                   {group.title}
                 </h3>
                 {group.items.map((item) => (
-                  <Link key={item.href} href={item.href} onClick={handleLinkClick}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={handleLinkClick}
+                  >
                     <Button
                       variant="ghost"
                       className={cn(

@@ -7,6 +7,20 @@ import type { RootState } from "@/redux/store";
 import type { LiveTypes } from "@/utils/types";
 const Cards = lazy(() => import("./LiveCards"));
 
+const getYouTubeVideoId = (url: string): string | null => {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /youtube\.com\/v\/([^&\n?#]+)/,
+    /youtube\.com\/watch\?.*&v=([^&\n?#]+)/,
+  ];
+  for (const pattern of patterns) {
+    const match = pattern.exec(url);
+    if (match) return match[1];
+  }
+  return null;
+};
+
 interface AudioVisualizerProps {
   isPlaying: boolean;
 }
@@ -62,18 +76,40 @@ interface MediaComponentProps {
 const MediaComponent = ({ url, mediaType }: MediaComponentProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
   if (!url) return null;
+
+  // Check if it's a YouTube URL
+  const youtubeVideoId = getYouTubeVideoId(url);
+
   if (mediaType === "video") {
-    return (
-      <video
-        src={url}
-        className="w-full h-full object-cover rounded-2xl"
-        playsInline
-        muted
-        loop
-        autoPlay
-      />
-    );
+    if (youtubeVideoId) {
+      // YouTube video
+      return (
+        <div className="w-full h-full rounded-2xl overflow-hidden">
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${youtubeVideoId}&controls=1&rel=0`}
+            title="YouTube video player"
+            className="w-full h-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      );
+    } else {
+      // Regular video file
+      return (
+        <video
+          src={url}
+          className="w-full h-full object-cover rounded-2xl"
+          playsInline
+          muted
+          loop
+          autoPlay
+        />
+      );
+    }
   }
   if (mediaType === "audio") {
     const handlePlay = () => {
@@ -230,13 +266,18 @@ const Live = () => {
         {/* Live Cards */}
         {validDetails.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <Suspense fallback={
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="w-full h-48 bg-gray-200 animate-pulse rounded-lg"></div>
-                ))}
-              </div>
-            }>
+            <Suspense
+              fallback={
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="w-full h-48 bg-gray-200 animate-pulse rounded-lg"
+                    ></div>
+                  ))}
+                </div>
+              }
+            >
               {validDetails.map((item, index) => (
                 <div key={`${item.title}-${index}`} className="w-full">
                   <Cards {...item} />
