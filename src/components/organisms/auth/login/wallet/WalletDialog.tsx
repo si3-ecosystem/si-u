@@ -298,9 +298,17 @@ export function WalletDialog({
 
   const handleConnect = useCallback(
     (selectedConnector: any) => {
+      // Check if this connector is already connected
+      if (isConnected && connector?.id === selectedConnector.id) {
+        console.log('Connector already connected');
+        onWalletConnected(address!, selectedConnector.name);
+        onOpenChange(false);
+        return;
+      }
+  
       setConnectionError("");
       setIsConnecting(true);
-
+  
       connect(
         { connector: selectedConnector },
         {
@@ -324,9 +332,9 @@ export function WalletDialog({
         }
       );
     },
-    [connect, onWalletConnected, onOpenChange]
+    [connect, onWalletConnected, onOpenChange, isConnected, connector, address]
   );
-
+  
   const { injected, nonInjected, installedRequiredWallets } = useMemo(() => {
     const injected = connectors.filter((c) => c.type === "injected");
     const nonInjected = connectors.filter(
