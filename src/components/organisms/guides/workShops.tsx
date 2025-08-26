@@ -3,8 +3,7 @@
 import { Tabs } from "@/components/molecules/tabs/guideTabs";
 import React, { useState } from "react";
 
-import { useSiherGuidesSessions } from "@/hooks/useSiherGuidesSessions";
-import { SiherGuidesSession } from "@/types/siherguides/session";
+import { GuidesSession, SiherGuidesSession } from "@/types/siherguides/session";
 import { PreviousGuidesSessionCard } from "@/components/molecules/cards/PreviousGuidesSession";
 import { SessionCard } from "@/components/molecules/cards/sessionCard";
 import { RSVPErrorBoundary } from "@/components/molecules/errors/RSVPErrorBoundary";
@@ -12,14 +11,18 @@ import { RSVPErrorBoundary } from "@/components/molecules/errors/RSVPErrorBounda
 interface WorkShopsProps {
   data: SiherGuidesSession;
   globalFilter?: string;
+  upcomingSessions: GuidesSession[];
+  previousSessions: GuidesSession[];
 }
 
-export default function WorkShops({ data, globalFilter = "" }: WorkShopsProps) {
+export default function WorkShops({ 
+  data, 
+  globalFilter = "", 
+  upcomingSessions, 
+  previousSessions 
+}: WorkShopsProps) {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-
-  const { upcomingSessions, previousSessions } = useSiherGuidesSessions(data.guides, globalFilter);
-
 
   const toggleDropdown = (id: string) => {
     setOpenDropdownId(openDropdownId === id ? null : id);

@@ -57,6 +57,7 @@ export interface GuidesSession {
   guideName: string;
   guideImage?: SanityImage | undefined;
   language?: string;
+  category?: GuideSessionCategory;
   // Updated to support multiple partners
   partners?: Array<{
     _id: string;
@@ -111,11 +112,25 @@ export interface GuidesSession {
   };
 }
 
+// Guide Session Category Interface
+export interface GuideSessionCategory {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+    _type?: string;
+  };
+  icon?: SanityImage;
+}
+
 export interface SiherGuidesSession {
   _id: string;
   title: string;
   description: string;
+  topicTitle?: string;
+  topicDesc?: string;
   banner?: GuidesSessionBanner;
+  topics?: GuideSessionCategory[];
   guides: GuidesSession[];
 }
 
