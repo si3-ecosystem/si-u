@@ -56,21 +56,7 @@ function InjectedWallet({ onWalletConnected }: InjectedWalletProps) {
     setIsDialogOpen(open);
   }, []);
 
-  // Auto-handle already connected wallet
-  useEffect(() => {
-    if (isDialogOpen && isConnected && address && connector?.name) {
-      handleWalletConnected(address, connector.name);
-      setIsDialogOpen(false);
-    }
-  }, [
-    isDialogOpen,
-    isConnected,
-    address,
-    connector?.name,
-    handleWalletConnected,
-  ]);
-
-  const buttonText = isConnected ? "Sign with Wallet" : "Connect Your Wallet";
+  const buttonText = "Connect Your Wallet";
 
   return (
     <>
