@@ -1,9 +1,9 @@
 import { http, createConfig } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
+import { mainnet, polygon, sepolia } from "wagmi/chains";
 import { safe, injected, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [mainnet, sepolia],
+  chains: [mainnet, polygon, sepolia],
   ssr: false,
   connectors: [
     walletConnect({
