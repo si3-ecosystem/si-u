@@ -1,20 +1,29 @@
 "use client";
 
 import WorkShops from "@/components/organisms/guides/workShops";
+import { GuidesPopularTopics } from "@/components/organisms/guides/PopularTopics";
 import { useQuery } from "@tanstack/react-query";
 import { getSiherGuidesSessionData } from "@/lib/sanity/client";
 import type { SiherGuidesSession } from "@/types/siherguides/session";
 import Loading from "@/app/loading";
 import { ContentBanner } from "@/components/molecules/content/ContentBanner";
-import { useState } from "react";
+import { useGuidesSessionsWithFiltering } from "@/hooks/useGuidesSessionsWithFiltering";
 
 export default function SessionsPage() {
-  const [globalFilter, setGlobalFilter] = useState("");
-  
   const { data, isLoading, error } = useQuery<SiherGuidesSession>({
     queryKey: ["siher-guides-session"],
     queryFn: getSiherGuidesSessionData,
   });
+
+  const {
+    globalFilter,
+    setGlobalFilter,
+    selectedCategory,
+    setSelectedCategory,
+    categoryCounts,
+    upcomingSessions,
+    previousSessions,
+  } = useGuidesSessionsWithFiltering(data?.guides || [], "");
 
   if (isLoading) return <Loading />;
 
@@ -45,7 +54,25 @@ export default function SessionsPage() {
         />
 
         <div className="px-4 mt-11 lg:px-6 pb-16">
-          <WorkShops data={data} globalFilter={globalFilter} />
+          <GuidesPopularTopics
+            data={{
+              topicTitle: data?.topicTitle || "Popular Topics",
+              topicDesc:
+                data?.topicDesc ||
+                "Explore sessions by category and find content that interests you",
+              topics: data?.topics || [], // Array of topics
+            }}
+            categoryCounts={categoryCounts}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+          />
+
+          <WorkShops 
+            data={data} 
+            globalFilter={globalFilter} 
+            upcomingSessions={upcomingSessions}
+            previousSessions={previousSessions}
+          />
         </div>
       </div>
     </div>

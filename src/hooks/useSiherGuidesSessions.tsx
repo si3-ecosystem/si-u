@@ -9,7 +9,8 @@ interface UseSiherGuidesSessionsResult {
 
 export function useSiherGuidesSessions(
   guides: GuidesSession[] | null | undefined,
-  globalFilter: string = ""
+  globalFilter: string = "",
+  selectedCategory: string = ""
 ): UseSiherGuidesSessionsResult {
 
   const { upcomingSessions, previousSessions } = useMemo(() => {
@@ -17,11 +18,18 @@ export function useSiherGuidesSessions(
       return { upcomingSessions: [], previousSessions: [] };
     }
 
-    // First filter by search term if provided
+    // First filter by category if provided
     let filteredGuides = guides;
+    if (selectedCategory && selectedCategory !== "all" && selectedCategory.trim()) {
+      filteredGuides = guides.filter((guide) => {
+        return guide.category?.slug?.current?.toLowerCase() === selectedCategory.toLowerCase();
+      });
+    }
+
+    // Then filter by search term if provided
     if (globalFilter && globalFilter.trim()) {
       const searchTerm = globalFilter.toLowerCase().trim();
-      filteredGuides = guides.filter((guide) => {
+      filteredGuides = filteredGuides.filter((guide) => {
         const title = guide.title?.toLowerCase() || "";
         const description = guide.description?.toLowerCase() || "";
         const guideName = guide.guideName?.toLowerCase() || "";
@@ -73,7 +81,7 @@ export function useSiherGuidesSessions(
     });
 
     return { upcomingSessions: upcoming, previousSessions: previous };
-  }, [guides, globalFilter]);
+  }, [guides, globalFilter, selectedCategory]);
 
   return {
     upcomingSessions,

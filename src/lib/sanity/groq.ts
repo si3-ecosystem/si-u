@@ -218,6 +218,8 @@ export const siherGuidesSessionQuery = groq`
     _id,
     title,
     description,
+    topicTitle,
+    topicDesc,
     banner->{
       title,
       description,
@@ -232,6 +234,17 @@ export const siherGuidesSessionQuery = groq`
         "ImageColor": asset->metadata.palette.dominant.background
       }
     },
+    // Add topics array for popular topics section
+    topics[]-> {
+      _id,
+      title,
+      slug,
+      icon {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    },
     "guides": guides[]->{
       _id,
       title,
@@ -239,6 +252,17 @@ export const siherGuidesSessionQuery = groq`
       date,
       time,
       guideName,
+      // Add category field for filtering
+      category->{
+        _id,
+        title,
+        slug,
+        icon {
+          ...,
+          "blurDataURL": asset->metadata.lqip,
+          "ImageColor": asset->metadata.palette.dominant.background
+        }
+      },
       guideImage {
         ...,
         "blurDataURL": asset->metadata.lqip,
