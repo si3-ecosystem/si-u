@@ -61,4 +61,5 @@ export interface ContentState {
   isNewWebpage: boolean;
   socialChannels: SocialChannelTypes[];
   slider: string[];
+  domain?: string;
 }
