@@ -31,12 +31,14 @@ interface PopularTopicsProps {
   };
   categoryCounts?: CategoryCount[];
   setSelectedCategory: (value: string) => void;
+  selectedCategory?: string;
 }
 
 export function PopularTopics({
   data,
   categoryCounts = [],
   setSelectedCategory,
+  selectedCategory,
 }: PopularTopicsProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -84,12 +86,24 @@ export function PopularTopics({
 
   return (
     <div className="relative">
-      <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
-        {data?.topicTitle || data?.title || "Popular Topics"}
-      </h2>
-      <p className="text-brandGray text-base leading-[140%] font-normal mb-4">
-        {data?.topicDesc || data?.description || "Explore sessions by category"}
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-black text-xl lg:text-2xl font-medium mb-2">
+            {data?.topicTitle || data?.title || "Popular Topics"}
+          </h2>
+          <p className="text-brandGray text-base leading-[140%] font-normal">
+            {data?.topicDesc || data?.description || "Explore sessions by category"}
+          </p>
+        </div>
+        {selectedCategory && selectedCategory !== "all" && selectedCategory !== "" && (
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            Clear Filter
+          </button>
+        )}
+      </div>
 
       <div className="relative">
         <div className="overflow-hidden" ref={emblaRef}>
@@ -102,7 +116,11 @@ export function PopularTopics({
               return (
                 <div
                   key={index}
-                  className="flex-shrink-0 flex flex-col max-w-[228px] w-full rounded-lg bg-white overflow-hidden border-2 border-gray-200 hover:border-blue-300 transition-colors cursor-pointer"
+                  className={`flex-shrink-0 flex flex-col max-w-[228px] w-full rounded-lg bg-white overflow-hidden border-2 transition-colors cursor-pointer ${
+                    selectedCategory === categorySlug 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
                   onClick={() => setSelectedCategory(categorySlug)}
                 >
                   {imageUrl && (

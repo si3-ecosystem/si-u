@@ -409,9 +409,19 @@ export class UnifiedAuthService {
    */
   static async updateProfile(updates: Partial<UserData>): Promise<UserData> {
     try {
+      console.log('🔄 [AuthService] updateProfile called with:', updates);
       const response = await apiClient.patch<UserData>('/auth/profile', updates);
       
+      console.log('📝 [AuthService] updateProfile response:', {
+        status: response.status,
+        hasData: !!response.data,
+        dataKeys: response.data ? Object.keys(response.data) : 'no data',
+        username: response.data?.username,
+        email: response.data?.email
+      });
+      
       if (response.status === 'success' && response.data) {
+        console.log('✅ [AuthService] Dispatching updateUserProfile with:', response.data);
         
         // Use updateUserProfile to preserve critical fields
         store.dispatch(updateUserProfile(response.data));
@@ -426,7 +436,7 @@ export class UnifiedAuthService {
 
       throw new Error('Profile update failed');
     } catch (error) {
-      console.error('[AuthService] Profile update error:', error);
+      console.error('❌ [AuthService] Profile update error:', error);
       throw error;
     }
   }

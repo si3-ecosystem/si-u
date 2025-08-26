@@ -53,6 +53,7 @@ export interface GuidesSession {
   date?: string;
   endDate?: string;
   time?: string;
+  backgroundImage?:SanityImage | undefined;
   guideName: string;
   guideImage?: SanityImage | undefined;
   language?: string;
@@ -83,6 +84,10 @@ export interface GuidesSession {
   googleCalendarUrl?: string;
   fixImage?: SanityImage;
   allowCancel?: boolean;
+  
+  // External RSVP URLs (string fields for redirecting to external registration)
+  guidesRsvp?: string; // External RSVP URL for guides sessions
+  fixRsvp?: string;   // External RSVP URL for fix sessions
   pdfFile?: {
     asset: {
       url: string;
@@ -131,6 +136,8 @@ export interface Grow3dgeSession {
   title: string;
   description: string;
   topicTitle: string;
+  sessionTitle:string;
+  sessionDescription:string;
   topicDesc: string;
   banner?: GuidesSessionBanner;
   topics?: Grow3dgeCategory[]; // Changed to array
@@ -155,6 +162,10 @@ export interface FixCard {
   rsvpChannelLink?: string;
   googleCalendarUrl?: string;
   allowCancel?: boolean;
+  
+  // External RSVP URLs (string fields for redirecting to external registration)
+  guidesRsvp?: string; // External RSVP URL for guides sessions
+  fixRsvp?: string;   // External RSVP URL for fix sessions
   // Updated to support multiple partners
   partners?: Array<{
     _id: string;
