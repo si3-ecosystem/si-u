@@ -2,7 +2,6 @@
 
 import { LogOut } from "lucide-react";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import ConfirmLogoutDialog from "./ConfirmLogoutDialog";
@@ -12,7 +11,6 @@ import { setLogoutModalOpen } from "@/redux/slice/modalSlice";
 import { UnifiedAuthService } from "@/services/authService";
 
 const LogoutButton = () => {
-  const router = useRouter();
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -27,32 +25,51 @@ const LogoutButton = () => {
 
       console.log('[LogoutButton] Starting logout process...');
 
-      // Use UnifiedAuthService for proper logout
-      await UnifiedAuthService.logout();
-
+      // Close modal first
       dispatch(setLogoutModalOpen(false));
 
-      console.log('[LogoutButton] Logout complete, forcing redirect...');
+      // Use UnifiedAuthService for comprehensive logout with redirect
+      // The service now handles all cleanup and redirect internally
+      await UnifiedAuthService.logout({ redirect: true });
 
-      // Force immediate redirect with page reload to ensure clean state
-      if (typeof window !== 'undefined') {
-        // Clear any remaining cookies manually as backup
-        document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
-        // Force redirect with replace to prevent back navigation
-        window.location.replace('/login');
-      }
+      console.log('[LogoutButton] Logout process initiated successfully');
 
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('[LogoutButton] Logout error:', error);
       dispatch(setLogoutModalOpen(false));
 
-      // Force redirect even on error
+      // Enhanced error handling - try emergency cleanup
+      try {
+        console.log('[LogoutButton] Attempting emergency cleanup...');
+        
+        // Force clear all storage
+        if (typeof window !== 'undefined') {
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          // Clear all cookies
+          document.cookie.split(';').forEach((cookie) => {
+            const eqPos = cookie.indexOf('=');
+            const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+            if (name) {
+              document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+            }
+          });
+        }
+        
+        console.log('[LogoutButton] Emergency cleanup completed');
+      } catch (cleanupError) {
+        console.error('[LogoutButton] Emergency cleanup failed:', cleanupError);
+      }
+
+      // Force redirect even on error as ultimate fallback
       if (typeof window !== 'undefined') {
-        console.log('[LogoutButton] Redirecting to login page (error case)');
-        // Clear cookies manually
-        document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.replace('/login');
+        console.log('[LogoutButton] Force redirecting due to error...');
+        
+        // The auth service should have handled cleanup, but ensure redirect happens
+        setTimeout(() => {
+          window.location.replace('/login');
+        }, 500);
       }
     } finally {
       setIsLoading(false);

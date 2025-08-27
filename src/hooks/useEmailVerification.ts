@@ -19,7 +19,7 @@ export function useEmailVerification({ profile }: UseEmailVerificationProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
+          "Authorization": `Bearer ${localStorage.getItem('si3-jwt') || ''}`
         },
         body: JSON.stringify({ email }),
         credentials: "include",
@@ -77,7 +77,7 @@ export function useEmailVerification({ profile }: UseEmailVerificationProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
+          "Authorization": `Bearer ${localStorage.getItem('si3-jwt') || ''}`
         },
         credentials: "include",
       });

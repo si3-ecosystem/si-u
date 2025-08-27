@@ -4,7 +4,7 @@
  */
 
 import { store } from '@/redux/store';
-import { initializeUser, setUser, updateUserProfile, resetUser, forceUpdateUser, UserData } from '@/redux/slice/userSlice';
+import { initializeUser, updateUserProfile, resetUser, forceUpdateUser, UserData } from '@/redux/slice/userSlice';
 import { apiClient } from './api';
 import { AuthCacheManager } from '@/utils/authCacheManager';
 
@@ -446,7 +446,6 @@ export class UnifiedAuthService {
    */
   static async sendEmailOTP(email: string): Promise<ApiResponse> {
     try {
-      console.log('[AuthService] Sending email OTP to:', email);
 
       const response = await apiClient.post('/auth/email/send-otp', {
         email: email.trim()
@@ -465,7 +464,6 @@ export class UnifiedAuthService {
    */
   static async sendEmailVerification(): Promise<ApiResponse> {
     try {
-      console.log('[AuthService] Sending verification to current user email');
 
       const response = await apiClient.post('/auth/send-verification');
 
@@ -482,7 +480,6 @@ export class UnifiedAuthService {
    */
   static async sendEmailVerificationToNewEmail(email: string): Promise<ApiResponse> {
     try {
-      console.log('[AuthService] Sending verification to new email:', email);
 
       const response = await apiClient.post('/auth/send-verification-new-email', {
         email: email.trim()
@@ -501,7 +498,6 @@ export class UnifiedAuthService {
    */
   static async verifyEmail(otp: string): Promise<ApiResponse> {
     try {
-      console.log('[AuthService] Verifying email with OTP');
 
       const response = await apiClient.post('/auth/verify-email', {
         otp: otp.trim()
@@ -525,7 +521,6 @@ export class UnifiedAuthService {
    */
   static async verifyEmailOTP(email: string, otp: string): Promise<ApiResponse> {
     try {
-      console.log('[AuthService] Verifying email OTP for login:', email);
 
       const response = await apiClient.post('/auth/email/verify-otp', {
         email: email.trim(),
@@ -549,8 +544,14 @@ export class UnifiedAuthService {
 
         // Apply auth update using the unified method
         this.applyAuthUpdate({ user: normalizedUser, token: response.data.token });
+        
+        // Force re-initialization to ensure auth state is properly set
+        setTimeout(() => {
+          this.initialize().then((success) => {
+            console.log('[AuthService] Re-initialization after OTP result:', success);
+          });
+        }, 100);
 
-        console.log('[AuthService] Email OTP verification successful');
       }
 
       return response;
@@ -561,67 +562,222 @@ export class UnifiedAuthService {
   }
 
   /**
-   * Logout user
+   * Logout user with comprehensive cleanup
    */
-  static async logout(options: { redirect?: boolean } = { redirect: false }): Promise<void> {
+  static async logout(options: { redirect?: boolean } = { redirect: true }): Promise<void> {
+    
     try {
-      // Call logout endpoint
+      // Try to call logout endpoint, but don't fail if it doesn't work
       await apiClient.post('/auth/logout');
     } catch (error) {
-      console.error('[AuthService] Logout API error:', error);
-    } finally {
-      // Clear all authentication data
+      console.warn('[AuthService] Logout API error (continuing with cleanup):', error);
+      // Continue with cleanup even if API call fails
+    }
+    
+    try {
+      // Always clear all authentication data regardless of API response
       this.clearAllAuthData();
+    } catch (error) {
+      console.error('[AuthService] Error during data cleanup:', error);
+      // Force manual cleanup as fallback
+      this.forceManualCleanup();
+    }
 
-      // Optionally redirect to login page
-      if (options.redirect && typeof window !== 'undefined') {
-        console.log('[AuthService] Redirecting to login page after logout');
-        window.location.href = '/login';
+    // Additional cleanup using TokenCleanup utility for maximum reliability
+    try {
+      const { TokenCleanup } = await import('@/utils/tokenCleanup');
+      TokenCleanup.clearEverything();
+    } catch (importError) {
+      console.warn('[AuthService] Could not import TokenCleanup, using fallback cleanup:', importError);
+      // Fallback to manual cleanup if import fails
+      this.forceManualCleanup();
+    }
+
+    // Verify cleanup was successful
+    if (typeof window !== 'undefined') {
+      const remainingTokens = this.checkForRemainingTokens();
+      if (remainingTokens.length > 0) {
+        console.warn('[AuthService] Found remaining tokens after cleanup:', remainingTokens);
+        // Force clear any remaining tokens
+        this.forceManualCleanup();
+      } else {
+        console.log('[AuthService] Cleanup verification successful - no tokens remaining');
       }
+    }
+
+    // Handle redirect (default to true as per memory requirement)
+    if (options.redirect && typeof window !== 'undefined') {
+      
+      // Add a small delay to ensure all cleanup is complete
+      setTimeout(() => {
+        // Use window.location.replace() to prevent back navigation as per memory
+        window.location.replace('/login');
+      }, 100);
+    }
+    
+  }
+
+  /**
+   * Force manual cleanup as ultimate fallback
+   */
+  private static forceManualCleanup(): void {
+    
+    if (typeof window !== 'undefined') {
+      try {
+        // Force clear localStorage
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key) {
+            localStorage.removeItem(key);
+          }
+        }
+        
+        // Force clear sessionStorage
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const key = sessionStorage.key(i);
+          if (key) {
+            sessionStorage.removeItem(key);
+          }
+        }
+        
+        // Force clear all cookies
+        document.cookie.split(';').forEach((cookie) => {
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
+          }
+        });
+        
+      } catch (error) {
+        console.error('[AuthService] Error in force manual cleanup:', error);
+      }
+    }
+    
+    // Force reset Redux state
+    try {
+      store.dispatch(resetUser());
+    } catch (error) {
+      console.error('[AuthService] Error resetting Redux state:', error);
     }
   }
 
   /**
-   * Clear all authentication data and state
+   * Check for remaining tokens in storage (verification method)
    */
+  private static checkForRemainingTokens(): string[] {
+    if (typeof window === 'undefined') return [];
+    
+    const remainingTokens: string[] = [];
+    
+    // Check localStorage
+    const possibleTokenKeys = [
+      'si3-jwt', 'si3-token', 'token', 'auth-token', 
+      'refresh-token', 'session-token', 'access-token', 
+      'user-token', 'authentication', 'authorization'
+    ];
+    
+    possibleTokenKeys.forEach(key => {
+      if (localStorage.getItem(key)) {
+        remainingTokens.push(`localStorage:${key}`);
+      }
+    });
+    
+    // Check sessionStorage
+    possibleTokenKeys.forEach(key => {
+      if (sessionStorage.getItem(key)) {
+        remainingTokens.push(`sessionStorage:${key}`);
+      }
+    });
+    
+    // Check cookies
+    possibleTokenKeys.forEach(key => {
+      if (document.cookie.includes(`${key}=`)) {
+        remainingTokens.push(`cookie:${key}`);
+      }
+    });
+    
+    return remainingTokens;
+  }
   static clearAllAuthData(): void {
-    // Clear token
+    // Clear token using the existing method
     this.clearToken();
 
     // Reset Redux state
     store.dispatch(resetUser());
 
-    // Clear all localStorage auth-related data
     if (typeof window !== 'undefined') {
-      // Clear any other auth-related localStorage items
-      const keysToRemove = ['si3-jwt', 'si3-token', 'user-preferences', 'auth-state'];
-      keysToRemove.forEach(key => {
-        localStorage.removeItem(key);
-      });
-
-      // Clear sessionStorage
-      sessionStorage.clear();
-
-      // Clear auth-related cookies with all possible path combinations
-      const cookiesToClear = ['si3-jwt', 'auth-token', 'token'];
-      const paths = ['/', '/login', '/dashboard', '/admin', '/profile', '/settings'];
-      const domains = [window.location.hostname, `.${window.location.hostname}`, 'localhost'];
-
-      cookiesToClear.forEach(cookieName => {
-        paths.forEach(path => {
-          domains.forEach(domain => {
-            // Clear with domain
-            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain}; SameSite=Lax;`;
-            // Clear without domain
-            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; SameSite=Lax;`;
-          });
+      // Use TokenCleanup utility for comprehensive cleanup
+      try {
+        // Import TokenCleanup synchronously
+        import('@/utils/tokenCleanup').then(({ TokenCleanup }) => {
+          // Clear all tokens and storage
+          TokenCleanup.clearAllTokensFromLocalStorage();
+          TokenCleanup.clearAllAuthDataFromLocalStorage();
+          TokenCleanup.clearAllSessionStorage();
+          TokenCleanup.clearAllAuthCookies();
+          
+        }).catch((importError) => {
+          console.warn('[AuthService] Could not import TokenCleanup:', importError);
         });
+        
+        // Force clear entire localStorage as backup (immediate)
+        localStorage.clear();
+        
+      } catch (error) {
+        console.warn('[AuthService] TokenCleanup utility not available, using fallback cleanup:', error);
+        
+        // Fallback to manual cleanup if TokenCleanup fails
+        try {
+          // First, get all localStorage keys to log what we're clearing
+          const localStorageKeys = Object.keys(localStorage);
+          console.log('[AuthService] Clearing localStorage keys:', localStorageKeys);
+          
+          // Clear all localStorage completely
+          localStorage.clear();
+          
+        } catch (localStorageError) {
+          console.error('[AuthService] Error clearing localStorage:', localStorageError);
+          // Fallback: clear known auth-related keys
+          const keysToRemove = [
+            'si3-jwt', 
+            'si3-token', 
+            'token', 
+            'user-preferences', 
+            'auth-state',
+            'diversityTrackerChartShown',
+            'user-data',
+            'auth-token',
+            'refresh-token',
+            'session-data'
+          ];
+          keysToRemove.forEach(key => {
+            try {
+              localStorage.removeItem(key);
+            } catch (keyError) {
+              console.warn(`[AuthService] Could not remove localStorage key: ${key}`, keyError);
+            }
+          });
+        }
 
-        // Also clear with no path specified
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax;`;
-      });
+        // Clear ALL sessionStorage (comprehensive approach)
+        try {
+          const sessionStorageKeys = Object.keys(sessionStorage);
+          console.log('[AuthService] Clearing sessionStorage keys:', sessionStorageKeys);
+          
+          sessionStorage.clear();
+          
+          console.log('[AuthService] All sessionStorage cleared');
+        } catch (sessionStorageError) {
+          console.error('[AuthService] Error clearing sessionStorage:', sessionStorageError);
+        }
 
-      console.log('[AuthService] All cookies and storage cleared');
+        // Clear auth-related cookies with comprehensive approach
+        this.clearAllAuthCookies();
+      }
+
     }
 
     // Clear React Query cache if available
@@ -692,9 +848,24 @@ export class UnifiedAuthService {
       // Also store in cookie for middleware consistency
       const expires = new Date();
       expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
-      document.cookie = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+      const cookieValue = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+      document.cookie = cookieValue;
+      
+      console.log('[AuthService] Token stored in cookie:', {
+        cookieSet: cookieValue.substring(0, 50) + '...',
+        expires: expires.toUTCString()
+      });
+      
+      // Verify cookie was set
+      setTimeout(() => {
+        const cookieCheck = this.getTokenFromCookie();
+        console.log('[AuthService] Cookie verification:', {
+          cookieRetrieved: !!cookieCheck,
+          cookiesMatch: cookieCheck === token,
+          allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0])
+        });
+      }, 100);
 
-      console.log('[AuthService] Token stored in both localStorage and cookie');
     }
   }
 
@@ -709,7 +880,6 @@ export class UnifiedAuthService {
       // If not in localStorage, check cookies as fallback
       const cookieToken = this.getTokenFromCookie();
       if (cookieToken) {
-        console.log('[AuthService] Found token in cookie, syncing to localStorage');
         // Sync cookie token to localStorage for consistency
         localStorage.setItem(this.TOKEN_KEY, cookieToken);
         return cookieToken;
@@ -793,6 +963,72 @@ export class UnifiedAuthService {
     }
   }
 
+  /**
+   * Comprehensive cookie clearing method
+   */
+  private static clearAllAuthCookies(): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      // List of all possible cookie names that might contain auth data
+      const cookiesToClear = [
+        'si3-jwt', 
+        'auth-token', 
+        'token',
+        'si3-token',
+        'refresh-token',
+        'session-token',
+        'access-token',
+        'user-token',
+        'authentication',
+        'authorization'
+      ];
+      
+      // List of all possible paths where cookies might be stored
+      const paths = [
+        '/', 
+        '/login', 
+        '/dashboard', 
+        '/admin', 
+        '/profile', 
+        '/settings',
+        '/guides',
+        '/scholars',
+        '/grow3dge',
+        '/communities'
+      ];
+      
+      // List of possible domains
+      const domains = [
+        window.location.hostname, 
+        `.${window.location.hostname}`, 
+        'localhost',
+        '.localhost'
+      ];
+
+      // Clear cookies with all possible combinations
+      cookiesToClear.forEach(cookieName => {
+        // Clear with all path/domain combinations
+        paths.forEach(path => {
+          domains.forEach(domain => {
+            // Clear with domain
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain}; SameSite=Lax;`;
+            // Clear without domain
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; SameSite=Lax;`;
+          });
+        });
+
+        // Also clear with no path/domain specified (catch-all)
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax;`;
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax;`;
+      });
+
+      console.log('[AuthService] All auth cookies cleared with comprehensive approach');
+    } catch (error) {
+      console.error('[AuthService] Error clearing cookies:', error);
+    }
+  }
+
   private static isValidTokenFormat(token: string): boolean {
     return token.split('.').length === 3;
   }
@@ -829,14 +1065,48 @@ export class UnifiedAuthService {
   /**
    * Clear React Query cache
    */
+  /**
+   * Clear React Query cache comprehensively
+   */
   private static clearQueryCache(): void {
     try {
-      // Try to get the global query client and clear user-specific cache
+      // Try multiple approaches to clear React Query cache
+      
+      // Method 1: Use global query client if available
       if (typeof window !== 'undefined' && (window as any).__REACT_QUERY_CLIENT__) {
         const queryClient = (window as any).__REACT_QUERY_CLIENT__;
+        
+        // Clear all queries
+        queryClient.clear();
+        
+        // Clear user-specific cache
         AuthCacheManager.clearUserSpecificCache(queryClient);
-        console.log('[AuthService] User-specific React Query cache cleared');
+        
+        console.log('[AuthService] React Query cache cleared via global client');
       }
+      
+      // Method 2: Use AuthCacheManager directly
+      if (typeof window !== 'undefined') {
+        try {
+          // Try to clear cache using any available query client
+          const possibleClients = [
+            (window as any).queryClient,
+            (window as any).__TANSTACK_QUERY_CLIENT__,
+            (window as any).__REACT_QUERY_CLIENT__
+          ];
+          
+          possibleClients.forEach((client, index) => {
+            if (client && typeof client.clear === 'function') {
+              client.clear();
+              console.log(`[AuthService] Cleared query cache via method ${index + 1}`);
+            }
+          });
+        } catch (error) {
+          console.warn('[AuthService] Could not clear additional query caches:', error);
+        }
+      }
+      
+      console.log('[AuthService] Query cache clearing completed');
     } catch (error) {
       console.warn('[AuthService] Could not clear React Query cache:', error);
     }
@@ -877,18 +1147,41 @@ export class UnifiedAuthService {
    */
   static applyAuthUpdate(authData: { user: UserData; token: string }): void {
     try {
-      console.log('[AuthService] Applying unified auth update:', authData.user);
+      console.log('[AuthService] Applying unified auth update:', {
+        userEmail: authData.user.email,
+        userId: authData.user._id,
+        hasToken: !!authData.token,
+        tokenLength: authData.token.length
+      });
 
       // 1. Update token storage
       this.setToken(authData.token);
+      
+      // Verify token was stored
+      const storedToken = this.getStoredToken();
+      console.log('[AuthService] Token storage verification:', {
+        tokenStored: !!storedToken,
+        tokensMatch: storedToken === authData.token
+      });
 
       // 2. Update Redux state
       console.log('[AuthService] Dispatching forceUpdateUser with:', {
         hasId: !!authData.user._id,
         userId: authData.user._id,
-        userEmail: authData.user.email
+        userEmail: authData.user.email,
+        isVerified: authData.user.isVerified || authData.user.isEmailVerified
       });
+      
       store.dispatch(forceUpdateUser(authData.user));
+      
+      // Verify Redux state was updated
+      const newState = store.getState();
+      console.log('[AuthService] Redux state after update:', {
+        isLoggedIn: newState.user.isLoggedIn,
+        hasUser: !!newState.user.user,
+        userEmail: newState.user.user?.email,
+        userId: newState.user.user?._id
+      });
 
       // 3. Invalidate user-specific cache for new user data
       this.invalidateUserCache();
