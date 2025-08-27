@@ -152,28 +152,15 @@ export function useWalletManagement() {
           console.warn("Failed to disconnect from wagmi:", wagmiError);
         }
 
-        // Refresh JWT token to reflect the wallet disconnect
-        // But preserve the local state we just set
-        try {
-          const currentLocalUser = { ...updatedUser }; // Save our local state
-          await UnifiedAuthService.refreshToken();
-          console.log("JWT token refreshed after wallet disconnect");
-
-          // Re-apply our preserved state after token refresh
-          setTimeout(() => {
-            dispatch(forceUpdateUser(currentLocalUser));
-            console.log("Re-applied preserved user state after token refresh");
-          }, 100);
-        } catch (refreshError) {
-          console.warn("Failed to refresh JWT token after wallet disconnect:", refreshError);
-          // Don't try fallback refresh as it might overwrite our preserved state
-        }
-
-        // Force a re-render by updating the loading state
-        setIsLoading(true);
-        setTimeout(() => setIsLoading(false), 100);
-
         toast.success("Wallet disconnected successfully. You can reconnect a wallet anytime.");
+
+        // Hard reload to ensure clean UI state after wallet disconnect
+        // This prevents UI confusion and loading state issues
+        console.log("Performing hard reload after wallet disconnect...");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000); // Small delay to show success message
+
         return { success: true };
       } else {
         throw new Error("Failed to disconnect wallet");
@@ -254,6 +241,13 @@ export function useWalletManagement() {
     }, 100);
 
     toast.success("Wallet connected successfully!");
+
+    // Hard reload to ensure clean UI state after wallet connection
+    console.log("Performing hard reload after wallet connection...");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); // Small delay to show success message
+
     return { success: true };
   };
 
