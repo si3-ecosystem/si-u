@@ -152,14 +152,27 @@ export function useWalletManagement() {
           console.warn("Failed to disconnect from wagmi:", wagmiError);
         }
 
-        toast.success("Wallet disconnected successfully. You can reconnect a wallet anytime.");
+        toast.success("Wallet disconnected successfully. Logging out for security...");
 
-        // Hard reload to ensure clean UI state after wallet disconnect
-        // This prevents UI confusion and loading state issues
-        console.log("Performing hard reload after wallet disconnect...");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000); // Small delay to show success message
+        // Check if user has a verified email address
+        const hasVerifiedEmail = updatedUser.isVerified && updatedUser.email && !updatedUser.email.includes('@wallet.temp');
+
+        if (hasVerifiedEmail) {
+          console.log("User has verified email, performing logout after wallet disconnect...");
+          // Import and use the auth service to properly log out
+          const { UnifiedAuthService } = await import('@/services/authService');
+
+          // Add delay to show success message, then logout
+          setTimeout(async () => {
+            await UnifiedAuthService.logout({ redirect: true });
+          }, 1500);
+        } else {
+          console.log("User has no verified email, performing hard reload...");
+          // For users without verified email, just reload (they can't log back in anyway)
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
 
         return { success: true };
       } else {
@@ -206,11 +219,31 @@ export function useWalletManagement() {
       }
 
       if (error?.statusCode === 401) {
-        toast.warning(
-          "Wallet disconnected locally. Please verify your email to sync with server."
-        );
+        toast.warning("Authentication error. Logging out for security...");
+
+        // If 401 error, logout completely
+        setTimeout(async () => {
+          const { UnifiedAuthService } = await import('@/services/authService');
+          await UnifiedAuthService.logout({ redirect: true });
+        }, 1500);
       } else {
         toast.warning("Wallet disconnected locally. Server sync failed.");
+
+        // For other errors, check if we should logout or reload
+        const hasVerifiedEmail = updatedUser.isVerified && updatedUser.email && !updatedUser.email.includes('@wallet.temp');
+
+        if (hasVerifiedEmail) {
+          console.log("Error case: User has verified email, performing logout...");
+          setTimeout(async () => {
+            const { UnifiedAuthService } = await import('@/services/authService');
+            await UnifiedAuthService.logout({ redirect: true });
+          }, 1500);
+        } else {
+          console.log("Error case: User has no verified email, performing reload...");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
       }
 
       return { success: false, error: error.message };

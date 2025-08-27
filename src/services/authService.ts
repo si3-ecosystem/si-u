@@ -65,6 +65,10 @@ export class UnifiedAuthService {
   private static async performInitialization(): Promise<boolean> {
     try {
       console.log('[AuthService] Starting initialization process...');
+
+      // Small delay to ensure cookies are available (especially on page refresh)
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const token = this.getStoredToken();
       if (!token) {
         console.log('[AuthService] No stored token found during initialization');
@@ -76,6 +80,35 @@ export class UnifiedAuthService {
           cookie: !!cookieToken,
           allCookies: typeof window !== 'undefined' ? document.cookie.split(';').map(c => c.trim().split('=')[0]) : []
         });
+
+        // Fallback: Try to get user data from server using cookies
+        console.log('[AuthService] No client-side token found, checking server-side auth...');
+        try {
+          const response = await apiClient.get('/auth/me');
+          if (response.data?.status === 'success' && response.data?.data) {
+            const userData = response.data.data;
+            console.log('[AuthService] Server-side auth successful, user found:', userData.email);
+
+            // If server returns a token, store it locally for future use
+            if (response.data.data.token) {
+              console.log('[AuthService] Server provided token, storing locally');
+              this.setToken(response.data.data.token);
+            }
+
+            // User is authenticated via cookie, initialize with user data
+            store.dispatch(initializeUser({
+              data: userData,
+              preservedFields: {
+                authMethod: 'cookie-based',
+                serverAuthenticated: true
+              }
+            }));
+            return true;
+          }
+        } catch (error) {
+          console.log('[AuthService] Server-side auth failed:', error);
+        }
+
         // Mark as initialized even if no token
         store.dispatch(initializeUser({}));
         return false;
@@ -937,13 +970,39 @@ export class UnifiedAuthService {
       // Also store in cookie for middleware consistency
       const expires = new Date();
       expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
-      const cookieValue = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+
+      // Set cookie without Secure flag for localhost development
+      const isSecure = window.location.protocol === 'https:';
+      const secureFlag = isSecure ? '; Secure' : '';
+      const cookieValue = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${secureFlag}`;
+
+      console.log('[AuthService] Setting cookie with value:', {
+        isSecure,
+        cookieValue: cookieValue.substring(0, 100) + '...'
+      });
+
       document.cookie = cookieValue;
 
       console.log('[AuthService] Token stored in cookie:', {
         cookieSet: cookieValue.substring(0, 50) + '...',
         expires: expires.toUTCString(),
         timestamp: new Date().toISOString()
+      });
+
+      // Immediate verification that cookie was set
+      const immediateCheck = document.cookie;
+      console.log('[AuthService] Immediate cookie check after setting:', {
+        rawCookies: immediateCheck,
+        containsOurCookie: immediateCheck.includes(this.TOKEN_KEY),
+        allCookieNames: immediateCheck.split(';').map(c => c.trim().split('=')[0])
+      });
+
+      // Try to read the cookie back using our parsing method
+      const cookieReadBack = this.getTokenFromCookie();
+      console.log('[AuthService] Cookie read-back test:', {
+        success: !!cookieReadBack,
+        matches: cookieReadBack === token,
+        cookieLength: cookieReadBack?.length
       });
 
       // Verify cookie was set with more detailed logging
@@ -1037,15 +1096,34 @@ export class UnifiedAuthService {
     if (typeof window === 'undefined') return null;
 
     try {
-      const cookies = document.cookie.split(';');
+      const rawCookies = document.cookie;
+      console.log('[AuthService] Raw cookie string:', rawCookies);
+
+      const cookies = rawCookies.split(';');
       console.log('[AuthService] Parsing cookies, looking for:', this.TOKEN_KEY);
       console.log('[AuthService] Found cookies:', cookies.map(c => c.trim().split('=')[0]));
 
       for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        console.log('[AuthService] Checking cookie:', name, 'matches:', name === this.TOKEN_KEY);
+        const trimmedCookie = cookie.trim();
+        const equalIndex = trimmedCookie.indexOf('=');
+
+        if (equalIndex === -1) continue;
+
+        const name = trimmedCookie.substring(0, equalIndex);
+        const value = trimmedCookie.substring(equalIndex + 1);
+
+        console.log('[AuthService] Checking cookie:', {
+          name,
+          expectedName: this.TOKEN_KEY,
+          matches: name === this.TOKEN_KEY,
+          nameLength: name.length,
+          expectedLength: this.TOKEN_KEY.length,
+          hasValue: !!value,
+          valueLength: value?.length || 0
+        });
+
         if (name === this.TOKEN_KEY && value) {
-          console.log('[AuthService] Found matching cookie with value');
+          console.log('[AuthService] Found matching cookie with value length:', value.length);
           return decodeURIComponent(value);
         }
       }
@@ -1173,11 +1251,21 @@ export class UnifiedAuthService {
 
   /**
    * Get auth headers for API requests
+   * Note: Backend now supports both Authorization header and cookies
    */
   static getAuthHeaders(): Record<string, string> {
     const token = this.getStoredToken();
-  
-    return token ? { Authorization: `Bearer ${token}` } : {};
+
+    if (token) {
+      console.log('[AuthService] Using Authorization header with token:', {
+        tokenLength: token.length,
+        tokenStart: token.substring(0, 20) + '...'
+      });
+      return { Authorization: `Bearer ${token}` };
+    } else {
+      console.log('[AuthService] No client-side token, backend will use cookies');
+      return {};
+    }
   }
 
   /**
@@ -1447,6 +1535,67 @@ export class UnifiedAuthService {
     } catch (error) {
       console.error('[AuthService] Error refreshing auth state:', error);
       return false;
+    }
+  }
+
+  /**
+   * Verify authentication consistency - check if user actually exists and is properly authenticated
+   */
+  static async verifyAuthConsistency(): Promise<{ isValid: boolean; shouldLogout: boolean; reason?: string }> {
+    try {
+      console.log('[AuthService] Verifying authentication consistency...');
+
+      const token = this.getStoredToken();
+      if (!token) {
+        console.log('[AuthService] No token found - user should not be authenticated');
+        return { isValid: false, shouldLogout: true, reason: 'No token found' };
+      }
+
+      // Decode token to check basic validity
+      const payload = this.decodeToken(token);
+      if (!payload) {
+        console.log('[AuthService] Invalid token format');
+        return { isValid: false, shouldLogout: true, reason: 'Invalid token format' };
+      }
+
+      // Check if token is expired
+      if (this.isTokenExpired(payload)) {
+        console.log('[AuthService] Token is expired');
+        return { isValid: false, shouldLogout: true, reason: 'Token expired' };
+      }
+
+      // Verify with server that user still exists and is valid
+      try {
+        const response = await apiClient.get('/auth/me');
+        if (response.data?.status === 'success' && response.data?.data) {
+          const userData = response.data.data;
+
+          // Check if user has required fields
+          if (!userData._id || !userData.email) {
+            console.log('[AuthService] User data incomplete');
+            return { isValid: false, shouldLogout: true, reason: 'Incomplete user data' };
+          }
+
+          console.log('[AuthService] Authentication consistency verified - user is valid');
+          return { isValid: true, shouldLogout: false };
+        } else {
+          console.log('[AuthService] Server returned invalid user data');
+          return { isValid: false, shouldLogout: true, reason: 'Invalid server response' };
+        }
+      } catch (apiError: any) {
+        console.error('[AuthService] API error during consistency check:', apiError);
+
+        // If 401/403, definitely logout
+        if (apiError.status === 401 || apiError.status === 403) {
+          return { isValid: false, shouldLogout: true, reason: 'Authentication failed on server' };
+        }
+
+        // For other errors, don't logout immediately (might be network issue)
+        return { isValid: false, shouldLogout: false, reason: 'Network error during verification' };
+      }
+    } catch (error) {
+      console.error('[AuthService] Error during consistency verification:', error);
+      return { isValid: false, shouldLogout: false, reason: 'Verification error' };
     }
   }
 }

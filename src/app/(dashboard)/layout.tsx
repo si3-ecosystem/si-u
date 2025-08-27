@@ -33,14 +33,18 @@ export default function DashboardLayout({
       return;
     }
 
+    // Simplified auth check - only redirect if user is initialized and clearly not authenticated
     if (currentUser.isInitialized) {
       const isAuthenticated = !!currentUser.user?._id;
 
       if (!isAuthenticated) {
+        console.log('[DashboardLayout] User not authenticated, redirecting to login');
         setHasRedirected(true);
         router.replace('/login');
         return;
       }
+
+      console.log('[DashboardLayout] User authenticated:', currentUser.user?.email);
     }
   }, [isClient, currentUser.isInitialized, currentUser.user?._id, router, hasRedirected]);
 
@@ -52,17 +56,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (currentUser.isInitialized && !currentUser.user?._id) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting to login...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Show loading only if not initialized yet
   if (!currentUser.isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -72,6 +66,14 @@ export default function DashboardLayout({
         </div>
       </div>
     );
+  }
+
+  // If initialized but no user, the useEffect will handle redirect
+  // In the meantime, show the dashboard (middleware already verified the cookie)
+  if (currentUser.isInitialized && !currentUser.user?._id) {
+    // Don't show loading screen, let the dashboard render
+    // The middleware has already verified the user has a valid cookie
+    console.log('[DashboardLayout] User initialized but no _id, letting dashboard render (middleware verified cookie)');
   }
 
   return (
