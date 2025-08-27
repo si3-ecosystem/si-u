@@ -66,32 +66,65 @@ export class AuthDebugger {
 
   /**
    * Check if there's a redirect loop happening
+   * Only detect actual loops, not legitimate redirects after successful auth
    */
   static checkRedirectLoop() {
     if (typeof window === 'undefined') return false;
-    
+
     const currentPath = window.location.pathname;
     const referrer = document.referrer;
-    
-    // Check if we're bouncing between login and dashboard
-    const isRedirectLoop = (
-      (currentPath === '/login' && referrer.includes('/dashboard')) ||
-      (currentPath === '/dashboard' && referrer.includes('/login'))
-    );
-    
-    if (isRedirectLoop) {
-      console.error('[AuthDebugger] REDIRECT LOOP DETECTED!', {
+
+    // Track redirect history to detect actual loops
+    const redirectHistory = sessionStorage.getItem('redirect-history');
+    const history = redirectHistory ? JSON.parse(redirectHistory) : [];
+
+    // Add current navigation to history
+    const currentNavigation = {
+      path: currentPath,
+      referrer,
+      timestamp: Date.now()
+    };
+
+    history.push(currentNavigation);
+
+    // Keep only last 5 navigations and remove old ones (older than 30 seconds)
+    const recentHistory = history
+      .filter((nav: any) => Date.now() - nav.timestamp < 30000)
+      .slice(-5);
+
+    sessionStorage.setItem('redirect-history', JSON.stringify(recentHistory));
+
+    // Check for actual redirect loop: same path visited 3+ times in 30 seconds
+    const pathCounts = recentHistory.reduce((counts: any, nav: any) => {
+      counts[nav.path] = (counts[nav.path] || 0) + 1;
+      return counts;
+    }, {});
+
+    const isActualLoop = Object.values(pathCounts).some((count: any) => count >= 3);
+
+    if (isActualLoop) {
+      console.error('[AuthDebugger] ACTUAL REDIRECT LOOP DETECTED!', {
         currentPath,
         referrer,
+        pathCounts,
+        recentHistory,
         timestamp: new Date().toISOString()
       });
-      
+
       // Log current auth state
       this.logAllCookies();
-      
+
       return true;
     }
-    
+
+    // Log legitimate navigation for debugging
+    console.log('[AuthDebugger] Navigation tracked:', {
+      currentPath,
+      referrer,
+      pathCounts,
+      isLegitimate: true
+    });
+
     return false;
   }
 

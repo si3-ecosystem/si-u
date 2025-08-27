@@ -89,8 +89,8 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
       // Verify token persistence before redirecting
       const verifyTokenPersistence = async () => {
         let attempts = 0;
-        const maxAttempts = 10;
-        const checkInterval = 200;
+        const maxAttempts = 15;
+        const checkInterval = 300;
 
         while (attempts < maxAttempts) {
           const storedToken = localStorage.getItem('si3-jwt');
@@ -104,11 +104,25 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
             hasLocalStorage: !!storedToken,
             hasCookie: !!cookieToken,
             localStorageMatches: storedToken === verifyResponse.data.token,
-            cookieMatches: decodeURIComponent(cookieToken || '') === verifyResponse.data.token
+            cookieMatches: decodeURIComponent(cookieToken || '') === verifyResponse.data.token,
+            expectedToken: verifyResponse.data.token.substring(0, 20) + '...'
           });
 
-          if (storedToken && cookieToken) {
-            console.log('[WalletSignature] Token persistence verified, redirecting to dashboard...');
+          // Check if both storage methods have the correct token
+          const localStorageValid = storedToken === verifyResponse.data.token;
+          const cookieValid = cookieToken && decodeURIComponent(cookieToken) === verifyResponse.data.token;
+
+          if (localStorageValid && cookieValid) {
+            console.log('[WalletSignature] Token persistence verified successfully!');
+
+            // Add a small delay to ensure auth state is fully updated
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Clear any redirect loop flags before navigating
+            sessionStorage.removeItem('redirect-history');
+            sessionStorage.removeItem('force-login');
+
+            console.log('[WalletSignature] Redirecting to dashboard...');
             router.replace("/dashboard");
             return;
           }
@@ -118,7 +132,12 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
         }
 
         console.warn('[WalletSignature] Token persistence verification failed after', maxAttempts, 'attempts');
-        // Redirect anyway, but with warning
+        console.warn('[WalletSignature] Final state:', {
+          localStorage: !!localStorage.getItem('si3-jwt'),
+          cookie: !!document.cookie.includes('si3-jwt=')
+        });
+
+        // Still redirect, but log the issue
         router.replace("/dashboard");
       };
 
