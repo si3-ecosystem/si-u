@@ -64,17 +64,32 @@ export class UnifiedAuthService {
    */
   private static async performInitialization(): Promise<boolean> {
     try {
+      console.log('[AuthService] Starting initialization process...');
       const token = this.getStoredToken();
       if (!token) {
-        console.log('[AuthService] No stored token found');
+        console.log('[AuthService] No stored token found during initialization');
+        // Check both localStorage and cookies separately for debugging
+        const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem(this.TOKEN_KEY) : null;
+        const cookieToken = this.getTokenFromCookie();
+        console.log('[AuthService] Token check details:', {
+          localStorage: !!localStorageToken,
+          cookie: !!cookieToken,
+          allCookies: typeof window !== 'undefined' ? document.cookie.split(';').map(c => c.trim().split('=')[0]) : []
+        });
         // Mark as initialized even if no token
         store.dispatch(initializeUser({}));
         return false;
       }
 
+      console.log('[AuthService] Found stored token, validating format...');
       // Validate token format
       if (!this.isValidTokenFormat(token)) {
-        console.log('[AuthService] Invalid token format, clearing');
+        console.log('[AuthService] Invalid token format, clearing. Token details:', {
+          tokenLength: token.length,
+          tokenStart: token.substring(0, 20) + '...',
+          isString: typeof token === 'string',
+          hasJWTStructure: token.split('.').length === 3
+        });
         this.clearToken();
         store.dispatch(initializeUser({}));
         return false;
@@ -84,12 +99,18 @@ export class UnifiedAuthService {
       console.log('[AuthService] Decoding token:', {
         tokenLength: token.length,
         tokenStart: token.substring(0, 50) + '...',
-        tokenEnd: '...' + token.substring(token.length - 50)
+        tokenEnd: '...' + token.substring(token.length - 50),
+        timestamp: new Date().toISOString()
       });
 
       const payload = this.decodeToken(token);
       if (!payload) {
-        console.log('[AuthService] Failed to decode token, clearing');
+        console.error('[AuthService] Failed to decode token, clearing. Token analysis:', {
+          tokenLength: token.length,
+          tokenParts: token.split('.').length,
+          tokenStart: token.substring(0, 20) + '...',
+          isValidJWT: /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)
+        });
         this.clearToken();
         store.dispatch(initializeUser({}));
         return false;
@@ -101,12 +122,18 @@ export class UnifiedAuthService {
         isVerified: payload.isVerified,
         wallet_address: payload.wallet_address,
         exp: payload.exp,
-        iat: payload.iat
+        iat: payload.iat,
+        currentTime: Math.floor(Date.now() / 1000),
+        timeUntilExpiry: payload.exp ? payload.exp - Math.floor(Date.now() / 1000) : 'unknown'
       });
 
       // Check if token is expired
       if (this.isTokenExpired(payload)) {
-        console.log('[AuthService] Token expired, clearing');
+        console.log('[AuthService] Token expired, clearing. Expiry details:', {
+          tokenExp: payload.exp,
+          currentTime: Math.floor(Date.now() / 1000),
+          expiredBy: Math.floor(Date.now() / 1000) - (payload.exp || 0)
+        });
         this.clearToken();
         store.dispatch(initializeUser({}));
         return false;
@@ -250,11 +277,31 @@ export class UnifiedAuthService {
         });
 
         // Apply auth update using the unified method
+        console.log('[AuthService] About to apply auth update with token:', {
+          tokenLength: response.data.token.length,
+          tokenStart: response.data.token.substring(0, 20) + '...',
+          userEmail: normalizedUser.email,
+          userId: normalizedUser._id
+        });
+
         this.applyAuthUpdate({ user: normalizedUser, token: response.data.token });
 
         console.log('[AuthService] Auth update applied, checking stored token...');
         const storedToken = this.getStoredToken();
-        console.log('[AuthService] Stored token after update:', !!storedToken);
+        console.log('[AuthService] Stored token after update:', {
+          tokenStored: !!storedToken,
+          tokenMatches: storedToken === response.data.token,
+          tokenLength: storedToken?.length || 0
+        });
+
+        // Additional verification with delay to ensure async operations complete
+        setTimeout(() => {
+          const delayedCheck = this.getStoredToken();
+          console.log('[AuthService] Delayed token check (500ms):', {
+            tokenStored: !!delayedCheck,
+            tokenMatches: delayedCheck === response.data.token
+          });
+        }, 500);
 
         return { data: response.data };
       }
@@ -869,26 +916,48 @@ export class UnifiedAuthService {
    */
   private static setToken(token: string): void {
     if (typeof window !== 'undefined') {
+      console.log('[AuthService] Setting token:', {
+        tokenLength: token.length,
+        tokenStart: token.substring(0, 20) + '...',
+        tokenEnd: '...' + token.substring(token.length - 20),
+        timestamp: new Date().toISOString()
+      });
+
       // Store in localStorage
       localStorage.setItem(this.TOKEN_KEY, token);
+      console.log('[AuthService] Token stored in localStorage');
+
+      // Verify localStorage storage immediately
+      const localStorageCheck = localStorage.getItem(this.TOKEN_KEY);
+      console.log('[AuthService] localStorage verification:', {
+        stored: !!localStorageCheck,
+        matches: localStorageCheck === token
+      });
 
       // Also store in cookie for middleware consistency
       const expires = new Date();
       expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
       const cookieValue = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
       document.cookie = cookieValue;
-      
+
       console.log('[AuthService] Token stored in cookie:', {
         cookieSet: cookieValue.substring(0, 50) + '...',
-        expires: expires.toUTCString()
+        expires: expires.toUTCString(),
+        timestamp: new Date().toISOString()
       });
-      
-      // Verify cookie was set
+
+      // Verify cookie was set with more detailed logging
       setTimeout(() => {
         const cookieCheck = this.getTokenFromCookie();
-      
+        console.log('[AuthService] Cookie verification after 100ms:', {
+          found: !!cookieCheck,
+          matches: cookieCheck === token,
+          allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0])
+        });
       }, 100);
 
+    } else {
+      console.warn('[AuthService] Cannot set token - window is undefined (SSR)');
     }
   }
 
@@ -990,12 +1059,30 @@ export class UnifiedAuthService {
 
   private static clearToken(): void {
     if (typeof window !== 'undefined') {
+      console.log('[AuthService] Clearing token:', {
+        timestamp: new Date().toISOString(),
+        hadLocalStorage: !!localStorage.getItem(this.TOKEN_KEY),
+        hadCookie: !!this.getTokenFromCookie(),
+        stackTrace: new Error().stack?.split('\n').slice(1, 4).join('\n')
+      });
+
       // Clear from localStorage
       localStorage.removeItem(this.TOKEN_KEY);
 
       // Clear from cookie
       document.cookie = `${this.TOKEN_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
 
+      // Verify clearing worked
+      setTimeout(() => {
+        const localStorageCheck = localStorage.getItem(this.TOKEN_KEY);
+        const cookieCheck = this.getTokenFromCookie();
+        console.log('[AuthService] Token clearing verification:', {
+          localStorageCleared: !localStorageCheck,
+          cookieCleared: !cookieCheck
+        });
+      }, 100);
+    } else {
+      console.log('[AuthService] Cannot clear token - window is undefined (SSR)');
     }
   }
 
@@ -1187,13 +1274,31 @@ export class UnifiedAuthService {
 
       // 1. Update token storage
       this.setToken(authData.token);
-      
-      // Verify token was stored
+
+      // Verify token was stored with multiple checks
       const storedToken = this.getStoredToken();
+      const localStorageToken = localStorage.getItem(this.TOKEN_KEY);
+      const cookieToken = this.getTokenFromCookie();
+
       console.log('[AuthService] Token storage verification:', {
         tokenStored: !!storedToken,
-        tokensMatch: storedToken === authData.token
+        tokensMatch: storedToken === authData.token,
+        localStorageStored: !!localStorageToken,
+        localStorageMatches: localStorageToken === authData.token,
+        cookieStored: !!cookieToken,
+        cookieMatches: cookieToken === authData.token,
+        allCookies: typeof window !== 'undefined' ? document.cookie.split(';').map(c => c.trim().split('=')[0]) : []
       });
+
+      // If token storage failed, log detailed error
+      if (!storedToken || storedToken !== authData.token) {
+        console.error('[AuthService] Token storage failed!', {
+          originalToken: authData.token.substring(0, 20) + '...',
+          storedToken: storedToken ? storedToken.substring(0, 20) + '...' : null,
+          localStorage: !!localStorageToken,
+          cookie: !!cookieToken
+        });
+      }
 
       // 2. Update Redux state
       console.log('[AuthService] Dispatching forceUpdateUser with:', {

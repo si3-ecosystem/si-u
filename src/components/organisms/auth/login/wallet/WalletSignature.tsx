@@ -86,11 +86,44 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
 
       setIsRedirecting(true);
 
-      // Wait a bit longer for auth state to update, then redirect to dashboard
-      setTimeout(() => {
-        console.log('[WalletSignature] Redirecting to dashboard...');
+      // Verify token persistence before redirecting
+      const verifyTokenPersistence = async () => {
+        let attempts = 0;
+        const maxAttempts = 10;
+        const checkInterval = 200;
+
+        while (attempts < maxAttempts) {
+          const storedToken = localStorage.getItem('si3-jwt');
+          const cookieToken = document.cookie
+            .split(';')
+            .find(cookie => cookie.trim().startsWith('si3-jwt='))
+            ?.split('=')[1];
+
+          console.log('[WalletSignature] Token persistence check:', {
+            attempt: attempts + 1,
+            hasLocalStorage: !!storedToken,
+            hasCookie: !!cookieToken,
+            localStorageMatches: storedToken === verifyResponse.data.token,
+            cookieMatches: decodeURIComponent(cookieToken || '') === verifyResponse.data.token
+          });
+
+          if (storedToken && cookieToken) {
+            console.log('[WalletSignature] Token persistence verified, redirecting to dashboard...');
+            router.replace("/dashboard");
+            return;
+          }
+
+          attempts++;
+          await new Promise(resolve => setTimeout(resolve, checkInterval));
+        }
+
+        console.warn('[WalletSignature] Token persistence verification failed after', maxAttempts, 'attempts');
+        // Redirect anyway, but with warning
         router.replace("/dashboard");
-      }, 1500);
+      };
+
+      // Start token persistence verification
+      verifyTokenPersistence();
     } catch (error: any) {
       setError(
         error.message || "Failed to authenticate wallet. Please try again."
