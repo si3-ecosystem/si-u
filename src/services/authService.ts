@@ -534,7 +534,26 @@ export class UnifiedAuthService {
           userEmail: response.data.user?.email,
           userId: response.data.user?.id,
           user_Id: response.data.user?._id,
+          userIsVerified: response.data.user?.isVerified,
+          userIsEmailVerified: response.data.user?.isEmailVerified,
         });
+
+        // Debug: Check what's in the JWT token
+        if (response.data.token) {
+          try {
+            const tokenParts = response.data.token.split('.');
+            if (tokenParts.length === 3) {
+              const payload = JSON.parse(atob(tokenParts[1]));
+              console.log('[AuthService] JWT payload verification status:', {
+                isVerified: payload.isVerified,
+                email: payload.email,
+                userId: payload._id
+              });
+            }
+          } catch (e) {
+            console.log('[AuthService] Could not decode JWT for debugging:', e);
+          }
+        }
 
         // Normalize user data - ensure _id field exists
         const normalizedUser = {
