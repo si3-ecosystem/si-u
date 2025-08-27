@@ -118,7 +118,7 @@ export function NotificationSection() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg lg:text-xl font-bold">
-            Notification
+            Notifications
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
@@ -135,7 +135,7 @@ export function NotificationSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="w-5 h-5" />
-            Notification
+           Notifications
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
@@ -150,7 +150,7 @@ export function NotificationSection() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg lg:text-xl font-bold">
-          Notification
+             Notifications
         </CardTitle>
       </CardHeader>
       <CardContent>

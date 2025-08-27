@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, Download } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 import { AttendEventDropdown } from "../dropdowns/attendEventDropdown";
 import { FixCard } from "@/types/siherguides/session";
@@ -136,43 +136,43 @@ export function Grow3dgeSessionCard({
     }
   };
 
-  const handleDownloadMaterials = () => {
-    // Handle course materials download
-    if (session.pdfGuide?.enabled) {
-      if (
-        session.pdfGuide.type === "download" &&
-        session.pdfGuide.downloadFile?.asset?.url
-      ) {
-        // Download PDF file
-        const link = document.createElement("a");
-        link.href = session.pdfGuide.downloadFile.asset.url;
-        link.target = "_blank";
-        link.download = session.pdfGuide.title || "course-materials.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else if (
-        session.pdfGuide.type === "url" &&
-        session.pdfGuide.shareableUrl
-      ) {
-        // Open shareable URL
-        window.open(session.pdfGuide.shareableUrl, "_blank");
-      } else {
-        ErrorHandler.showInfo("Course materials configuration incomplete");
-      }
-    } else if (session.pdfFile?.asset?.url) {
-      // Fallback to legacy pdfFile
-      const link = document.createElement("a");
-      link.href = session.pdfFile.asset.url;
-      link.target = "_blank";
-      link.download = "course-materials.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      ErrorHandler.showInfo("Course materials not available");
-    }
-  };
+  // const handleDownloadMaterials = () => {
+  //   // Handle course materials download
+  //   if (session.pdfGuide?.enabled) {
+  //     if (
+  //       session.pdfGuide.type === "download" &&
+  //       session.pdfGuide.downloadFile?.asset?.url
+  //     ) {
+  //       // Download PDF file
+  //       const link = document.createElement("a");
+  //       link.href = session.pdfGuide.downloadFile.asset.url;
+  //       link.target = "_blank";
+  //       link.download = session.pdfGuide.title || "course-materials.pdf";
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
+  //     } else if (
+  //       session.pdfGuide.type === "url" &&
+  //       session.pdfGuide.shareableUrl
+  //     ) {
+  //       // Open shareable URL
+  //       window.open(session.pdfGuide.shareableUrl, "_blank");
+  //     } else {
+  //       ErrorHandler.showInfo("Course materials configuration incomplete");
+  //     }
+  //   } else if (session.pdfFile?.asset?.url) {
+  //     // Fallback to legacy pdfFile
+  //     const link = document.createElement("a");
+  //     link.href = session.pdfFile.asset.url;
+  //     link.target = "_blank";
+  //     link.download = "course-materials.pdf";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } else {
+  //     ErrorHandler.showInfo("Course materials not available");
+  //   }
+  // };
 
   const getButtonText = () => {
     // If external RSVP URL is provided, show simple "Register Now" text
@@ -226,8 +226,8 @@ export function Grow3dgeSessionCard({
     }
   };
 
-  const hasCourseMatials =
-    session.pdfGuide?.enabled || session.pdfFile?.asset?.url;
+  // const hasCourseMatials =
+  //   session.pdfGuide?.enabled || session.pdfFile?.asset?.url;
 
   return (
     <Card className="p-4 w-full">
@@ -312,7 +312,7 @@ export function Grow3dgeSessionCard({
             </div>
 
             <div className="flex flex-col md:flex-row gap-2">
-              {hasCourseMatials && (
+              {/* {hasCourseMatials && (
                 <button
                   onClick={handleDownloadMaterials}
                   className="border border-blue-600 text-blue-600 font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 hover:bg-blue-50 transition-colors"
@@ -320,7 +320,7 @@ export function Grow3dgeSessionCard({
                   <Download className="w-4 h-4" />
                   {session.pdfGuide?.title || "Course Materials"}
                 </button>
-              )}
+              )} */}
 
               <div className="relative">
                 <button
@@ -349,6 +349,7 @@ export function Grow3dgeSessionCard({
 
                 {!hasExternalRSVP && openDropdownId === session._id && (
                   <AttendEventDropdown
+                    rsvpLink={session?.fixRsvp}
                     onClose={() => setOpenDropdownId(null)}
                     eventId={session._id}
                     currentStatus={rsvpStatus}
