@@ -59,10 +59,13 @@ export function useIdeaLabs(cards: IdeaLabCard[]) {
 
   const allCards = table.getCoreRowModel().rows.map((row) => row.original);
   const categories = useMemo(() => {
+    // Extract and clean category titles
     const cats = allCards
-      .map((card) => card.category?.title)
-      .filter(Boolean) as string[];
-    return ["All", ...Array.from(new Set(cats))];
+      .map((card) => card.category?.title?.trim())
+      .filter((title): title is string => Boolean(title) && typeof title === 'string' && title.length > 0);
+    
+    const uniqueCats = Array.from(new Set(cats));
+    return ["All", ...uniqueCats];
   }, [allCards]);
 
   const filteredCards = useMemo(() => {

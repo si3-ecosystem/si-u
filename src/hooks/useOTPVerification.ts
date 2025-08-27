@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UnifiedAuthService } from "@/services/authService";
 
 export function useOTPVerification() {
   const [otpCode, setOtpCode] = useState("");
@@ -12,11 +13,10 @@ export function useOTPVerification() {
     setIsVerifyingOTP(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const response = await fetch(`${apiUrl}/api/auth/verify-email`, {
+      const response = await fetch(`${apiUrl}/api/auth/email/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
         },
         body: JSON.stringify({ otp, email }),
         credentials: "include",
@@ -27,8 +27,32 @@ export function useOTPVerification() {
       if (response.ok && responseData.status === "success") {
         setOtpCode("");
 
+        // Store token and update auth state
         if (responseData.data?.token) {
-          localStorage.setItem('token', responseData.data.token);
+          console.log('[useOTPVerification] Storing token and updating auth state');
+          localStorage.setItem('si3-jwt', responseData.data.token);
+          
+          // Also set cookie for middleware
+          const expires = new Date();
+          expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+          document.cookie = `si3-jwt=${encodeURIComponent(responseData.data.token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+          
+          // Normalize user data
+          const normalizedUser = {
+            ...responseData.data.user,
+            _id: responseData.data.user._id || responseData.data.user.id
+          };
+          
+          // Apply auth update using the unified method
+          UnifiedAuthService.applyAuthUpdate({
+            user: normalizedUser,
+            token: responseData.data.token
+          });
+
+          console.log('[useOTPVerification] Auth state updated successfully');
+
+          // Small delay to ensure state propagation
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         return { success: true, data: responseData };
@@ -36,7 +60,7 @@ export function useOTPVerification() {
         return { success: false, error: responseData.message || "Invalid OTP" };
       }
     } catch (error) {
-      console.error("❌ Error verifying OTP:", error);
+      console.error("❌ [useOTPVerification] Error verifying OTP:", error);
       return { success: false, error: "Network error" };
     } finally {
       setIsVerifyingOTP(false);

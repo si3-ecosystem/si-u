@@ -98,6 +98,8 @@ export async function middleware(request: NextRequest) {
     isVerified,
     hasUser: !!user,
     userEmail: user?.email,
+    userIsVerified: user?.isVerified,
+    userId: user?._id,
     cookies: request.cookies.getAll().map(c => ({ name: c.name, hasValue: !!c.value }))
   });
 
@@ -116,9 +118,13 @@ export async function middleware(request: NextRequest) {
 
   // Prevent access to login pages if already logged in and verified
   // Add extra validation to prevent redirect loops
-  if (PUBLIC_AUTH_ROUTES.includes(pathname) && isAuthenticated && isVerified && user?._id) {
-    console.log(`[Middleware] Redirecting authenticated user from ${pathname} to dashboard`);
-    return NextResponse.redirect(new URL(getDefaultDashboard(), request.url));
+  // For email login, allow redirect even if JWT shows unverified (verification happens during login)
+  if (PUBLIC_AUTH_ROUTES.includes(pathname) && isAuthenticated && user?._id) {
+    // Allow redirect if verified OR if this is likely an email login completion
+    if (isVerified || (pathname === "/login" && user?.email)) {
+      console.log(`[Middleware] Redirecting authenticated user from ${pathname} to dashboard (verified: ${isVerified})`);
+      return NextResponse.redirect(new URL(getDefaultDashboard(), request.url));
+    }
   }
 
   // Handle verification flow - allow access if authenticated but not verified

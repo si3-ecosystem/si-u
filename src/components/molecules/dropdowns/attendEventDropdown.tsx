@@ -18,17 +18,18 @@ interface AttendEventDropdownProps {
   onJoinChannel?: () => void;
   onCancelAttendance?: () => void;
   onOpenRSVPForm?: () => void;
+  rsvpLink?: string;
 }
 
 export function AttendEventDropdown({
   onClose,
+  rsvpLink,
   hasRSVP = false,
   hasValidEmail = true,
   isDeleting = false,
   onCalendarAdd,
   // onJoinChannel,
   onCancelAttendance,
-  onOpenRSVPForm
 }: AttendEventDropdownProps) {
 
   const handleCalendarClick = (type: 'google' | 'apple' | 'ics') => {
@@ -47,15 +48,10 @@ export function AttendEventDropdown({
   };
 
   const handleRSVPClick = () => {
-    if (!hasValidEmail) {
-      // Redirect to profile page to update email
-      if (typeof window !== 'undefined') {
-        window.location.href = '/profile';
-      }
-      onClose();
+    if (rsvpLink) {
+      window.open(rsvpLink, "_blank");
       return;
     }
-    onOpenRSVPForm?.();
     onClose();
   };
 

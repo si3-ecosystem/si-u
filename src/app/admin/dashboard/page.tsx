@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { StatCard } from "@/components/atoms/admin/StatCard";
 import { CronJobStatus } from "@/components/molecules/admin/CronJobStatus";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
@@ -11,6 +12,8 @@ import {
   Mail,
   RefreshCw,
   Filter,
+  Settings,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -123,6 +126,34 @@ export default function AdminDashboard() {
 
       {/* Cron Jobs Status */}
       <CronJobStatus cronJobs={cronJobs || []} />
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Link href="/admin/users">
+              <Button className="w-full justify-start" variant="outline">
+                <UserCheck className="h-4 w-4 mr-2" />
+                Manage Users
+              </Button>
+            </Link>
+            <Button className="w-full justify-start" variant="outline" disabled>
+              <Mail className="h-4 w-4 mr-2" />
+              Send Announcements
+            </Button>
+            <Button className="w-full justify-start" variant="outline" disabled>
+              <Activity className="h-4 w-4 mr-2" />
+              System Analytics
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* RSVP Management */}
       <Card>

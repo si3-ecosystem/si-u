@@ -36,7 +36,6 @@ export class AuthCacheManager {
    */
   static clearUserSpecificCache(queryClient: QueryClient): void {
     try {
-      console.log('[AuthCacheManager] Clearing user-specific cache...');
       
       // Remove queries that start with user-specific keys
       this.USER_SPECIFIC_KEYS.forEach(key => {
@@ -49,7 +48,6 @@ export class AuthCacheManager {
       // Also remove any queries that contain user ID patterns
       this.clearUserIdBasedQueries(queryClient);
       
-      console.log('[AuthCacheManager] User-specific cache cleared');
     } catch (error) {
       console.error('[AuthCacheManager] Error clearing user-specific cache:', error);
     }
@@ -107,7 +105,6 @@ export class AuthCacheManager {
    */
   static invalidateUserSpecificCache(queryClient: QueryClient): void {
     try {
-      console.log('[AuthCacheManager] Invalidating user-specific cache for new user...');
       
       this.USER_SPECIFIC_KEYS.forEach(key => {
         queryClient.invalidateQueries({ 
@@ -116,7 +113,6 @@ export class AuthCacheManager {
         });
       });
       
-      console.log('[AuthCacheManager] User-specific cache invalidated');
     } catch (error) {
       console.error('[AuthCacheManager] Error invalidating user-specific cache:', error);
     }
@@ -127,9 +123,7 @@ export class AuthCacheManager {
    */
   static clearAllCache(queryClient: QueryClient): void {
     try {
-      console.log('[AuthCacheManager] Clearing all cache data...');
       queryClient.clear();
-      console.log('[AuthCacheManager] All cache data cleared');
     } catch (error) {
       console.error('[AuthCacheManager] Error clearing all cache:', error);
     }
@@ -169,7 +163,6 @@ export class AuthCacheManager {
    */
   static cleanupStaleCache(queryClient: QueryClient, maxAgeMs: number = 30 * 60 * 1000): void {
     try {
-      console.log('[AuthCacheManager] Cleaning up stale cache data...');
       
       const now = Date.now();
       const allQueries = queryClient.getQueryCache().getAll();
@@ -183,7 +176,6 @@ export class AuthCacheManager {
         }
       });
       
-      console.log('[AuthCacheManager] Stale cache data cleaned up');
     } catch (error) {
       console.error('[AuthCacheManager] Error cleaning up stale cache:', error);
     }

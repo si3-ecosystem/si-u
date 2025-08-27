@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { urlForImage } from "@/lib/sanity/image";
 import { GuidesSession } from "@/types/siherguides/session";
@@ -36,21 +37,27 @@ export function PreviousGuidesSessionCard({
     <>
       <Card className="bg-white p-3 rounded-lg  w-full h-full">
         <div className="relative mb-4 rounded-lg overflow-hidden ">
-            <Image
-              src={
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                urlForImage(session?.backgroundImage)?.src || "/card_placeholder.png"
-              }
-              alt={session.title}
-              width={320}
-              loading="lazy"
-              decoding="async"
-              title={session.title}
-              height={180}
-              className="w-full h-44 object-cover object-center rounded-lg"
-              
-            />
+          <Image
+            src={
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              urlForImage(session?.backgroundImage)?.src ||
+              "/card_placeholder.png"
+            }
+            alt={session.title}
+            width={320}
+            loading="lazy"
+            decoding="async"
+            title={session.title}
+            height={180}
+            className="w-full h-44 object-cover object-center rounded-lg"
+          />
+
+          {session.category && (
+            <Badge className="absolute top-2 left-2 text-xs text-black font-normal capitalize ">
+              {session.category.title}
+            </Badge>
+          )}
         </div>
         <div className="px-3 pb-3 flex flex-col justify-between">
           <div className="flex flex-col">

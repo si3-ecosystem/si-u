@@ -4,7 +4,7 @@ import { FixCard } from "@/types/siherguides/session";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import { Download, Play } from "lucide-react";
+import { Download, ExternalLink, Play } from "lucide-react";
 import { ErrorHandler } from "@/utils/errorHandler";
 import { Badge } from "@/components/ui/badge";
 
@@ -75,6 +75,7 @@ export function PreviousGrow3dgeSessionCard({ session }: { session: FixCard }) {
   const hasCourseMatials =
     session.pdfGuide?.enabled || session.pdfFile?.asset?.url;
   const hasVideo = session.videoUrl;
+  const hasUlr = session?.pdfGuide?.shareableUrl;
 
   return (
     <>
@@ -155,7 +156,11 @@ export function PreviousGrow3dgeSessionCard({ session }: { session: FixCard }) {
                 onClick={handleDownloadMaterials}
                 className="w-full py-2 text-center border border-gray-300 rounded-md text-sm font-medium hover:bg-black hover:text-white transition-colors flex items-center justify-center gap-2"
               >
-                <Download className="w-4 h-4" />
+                {hasUlr ? (
+                  <ExternalLink className="w-4 h-4" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
                 {session.pdfGuide?.title || "Download Materials"}
               </button>
             )}

@@ -220,6 +220,7 @@ export const siherGuidesSessionQuery = groq`
     description,
     topicTitle,
     topicDesc,
+    guidesRsvp,
     banner->{
       title,
       description,
@@ -456,6 +457,7 @@ export const fixSessionsQuery = groq`
     topicTitle,
     topicDesc,
     sessionTitle,
+    fixRsvp,
     sessionDescription,
      banner->{
       title,

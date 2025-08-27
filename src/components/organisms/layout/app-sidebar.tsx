@@ -14,6 +14,8 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { useAppSelector } from "@/redux/store";
+import { useMemo } from "react";
 
 import {
   Sidebar,
@@ -101,7 +103,7 @@ const subMenuGroups: SubMenuGroup[] = [
         href: "/grow3dge/grow3dge-sessions",
       },
       {
-        title: "Ideas Labs",
+        title: "Ideas Lab",
         icon: Brain,
         href: "/grow3dge/ideas-lab",
       },
@@ -123,6 +125,45 @@ const subMenuGroups: SubMenuGroup[] = [
 export function AppSidebar() {
   const pathname = usePathname();
   const { open, isMobile, setOpenMobile } = useSidebar();
+  const currentUser = useAppSelector((state) => state.user);
+
+  // Get user roles for filtering menu items
+  const userRoles = currentUser?.user?.roles || [];
+  const isAdmin = userRoles.includes("admin");
+  const isGuide = userRoles.includes("guide");
+  const isScholar = userRoles.includes("scholar");
+  const isPartner = userRoles.includes("partner");
+
+  // Filter menu items based on roles
+  const filteredMainMenuItems = useMemo(() => {
+    if (isAdmin) {
+      // Admin sees all main menu items
+      return mainMenuItems;
+    }
+    
+    // For non-admin users, filter out admin dashboard
+    return mainMenuItems.filter(item => item.href !== "/admin/dashboard");
+  }, [isAdmin]);
+
+  const filteredSubMenuGroups = useMemo(() => {
+    if (isAdmin) {
+      // Admin sees all submenu groups
+      return subMenuGroups;
+    }
+
+    return subMenuGroups.filter(group => {
+      if (group.title === "SI HER GUIDES" && (isGuide || isAdmin)) {
+        return true;
+      }
+      if (group.title === "SI U SCHOLARS" && (isScholar || isAdmin)) {
+        return true;
+      }
+      if (group.title === "GROW3DGE PROGRAM" && (isPartner || isAdmin)) {
+        return true;
+      }
+      return false;
+    });
+  }, [isAdmin, isGuide, isScholar, isPartner]);
 
   if (!open) return null;
 
@@ -134,8 +175,8 @@ export function AppSidebar() {
   };
 
   const allMenuItems: MenuItem[] = [
-    ...mainMenuItems,
-    ...subMenuGroups.flatMap((group) => group.items),
+    ...filteredMainMenuItems,
+    ...filteredSubMenuGroups.flatMap((group) => group.items),
   ];
 
   const longestMatchingHref = allMenuItems
@@ -177,12 +218,8 @@ export function AppSidebar() {
         <SidebarContent className={cn("!px-6 !bg-white", !open && "w-0")}>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
-              {mainMenuItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={handleLinkClick}
-                >
+              {filteredMainMenuItems.map((item) => (
+                <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                   <Button
                     variant="ghost"
                     className={cn(
@@ -197,7 +234,7 @@ export function AppSidebar() {
               ))}
             </div>
 
-            {subMenuGroups.map((group) => (
+            {filteredSubMenuGroups.map((group) => (
               <div key={group.title} className="">
                 <h3 className="font-medium text-xs text-[#6D6D6D] pr-4 !mb-2">
                   {group.title}

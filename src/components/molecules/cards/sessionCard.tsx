@@ -10,6 +10,7 @@ import { useRSVP } from "@/hooks/useRSVP";
 import { useCalendarIntegration } from "@/hooks/useCalendarIntegration";
 import { RSVPStatus } from "@/types/rsvp";
 import { ErrorHandler } from "@/utils/errorHandler";
+import { Badge } from "@/components/ui/badge";
 
 interface SessionCardProps {
   session: GuidesSession;
@@ -189,6 +190,11 @@ export function SessionCard({
     <Card className="p-4 w-full">
       <div className="flex flex-col md:flex-row gap-4 h-full">
         <div className="relative w-full md:w-[227.995px] flex-shrink-0">
+          {session.category && (
+            <Badge className="absolute top-2 left-2 text-xs text-black font-normal capitalize ">
+              {session.category.title}
+            </Badge>
+          )}
           <div className="absolute bottom-2 bg-white text-xs px-2 py-1 rounded-full z-10 right-2">
             {session.language}
           </div>
@@ -213,7 +219,10 @@ export function SessionCard({
             </div>
             <div className="flex items-center gap-1 text-xs leading-5">
               <Clock className="w-5 h-5" />
-              <span>{moment(session.date).utc().format("HH:mm")} UTC</span>
+              <span>
+                {moment(session.date).utc().format("HH:mm")} -{" "}
+                {moment(session.endDate).utc().format("HH:mm")} UTC
+              </span>
             </div>
           </div>
           <p className="text-sm line-clamp-2">{session?.description}</p>
@@ -285,6 +294,7 @@ export function SessionCard({
 
               {!hasExternalRSVP && openDropdownId === session._id && (
                 <AttendEventDropdown
+                  rsvpLink= {session?.guidesRsvp}
                   onClose={() => setOpenDropdownId(null)}
                   eventId={session._id}
                   currentStatus={rsvpStatus}
