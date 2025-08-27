@@ -19,7 +19,6 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
   Filter, 
@@ -43,7 +42,6 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   ColumnDef
 } from '@tanstack/react-table';
 import { toast } from 'sonner';
@@ -68,7 +66,6 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
     columnFilters,
     setColumnFilters,
     paginationState,
-    setPaginationState,
     filters,
     updateFilter,
     clearFilters,
@@ -80,6 +77,8 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
     refetchStats,
     exportUsers,
   } = useAdminUsers(40);
+
+
 
   // Helper function to copy wallet address
   const copyToClipboard = async (text: string) => {
@@ -337,72 +336,71 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
         </Card>
       ) : stats ? (
         <>
-          {/* Overview Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Card>
-              <CardContent className="flex items-center p-6">
-                <Users className="h-8 w-8 text-blue-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold">{stats.overview.totalUsers}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="flex items-center p-6">
-                <Check className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Verified Users</p>
-                  <p className="text-2xl font-bold">{stats.overview.verifiedUsers}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="flex items-center p-6">
-                <Users className="h-8 w-8 text-purple-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Wallet Verified</p>
-                  <p className="text-2xl font-bold">{stats.overview.walletVerifiedUsers}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="flex items-center p-6">
-                <Users className="h-8 w-8 text-orange-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">With Wallets</p>
-                  <p className="text-2xl font-bold">{stats.overview.usersWithWallets}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="flex items-center p-6">
-                <Users className="h-8 w-8 text-indigo-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Newsletter</p>
-                  <p className="text-2xl font-bold">{stats.overview.subscribedToNewsletter}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Role Statistics */}
+          {/* Simple Statistics Overview */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">User Roles Distribution</CardTitle>
+              <CardTitle className="text-lg">User Statistics Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(stats.roleDistribution).map(([role, count]) => (
-                  <Badge key={role} variant="outline" className="px-3 py-1">
-                    {role}: {String(count)}
-                  </Badge>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{stats.overview.totalUsers}</div>
+                  <div className="text-sm text-gray-600">Total Users</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{stats.overview.verifiedUsers}</div>
+                  <div className="text-sm text-gray-600">Verified</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{stats.overview.walletVerifiedUsers}</div>
+                  <div className="text-sm text-gray-600">Wallet Verified</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{stats.overview.usersWithWallets}</div>
+                  <div className="text-sm text-gray-600">With Wallets</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-indigo-600">{stats.overview.subscribedToNewsletter}</div>
+                  <div className="text-sm text-gray-600">Newsletter</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-teal-600">{stats.activity.activeUsers}</div>
+                  <div className="text-sm text-gray-600">Active Users</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Role Distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Role Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {stats.roleSummary.roleBreakdown.map(({ role, count, percentage }) => (
+                  <div key={role} className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-xl font-bold">{count}</div>
+                    <div className="text-sm text-gray-600 capitalize">{role}</div>
+                    <div className="text-xs text-gray-500">{percentage}%</div>
+                  </div>
                 ))}
               </div>
             </CardContent>
           </Card>
         </>
-      ) : null}
+      ) : (
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <p className="text-gray-600 mb-2">No statistics available</p>
+              <p className="text-xs text-gray-500">Stats: {stats ? 'Available' : 'Not available'}</p>
+              <p className="text-xs text-gray-500">Loading: {statsLoading ? 'Yes' : 'No'}</p>
+              <p className="text-xs text-gray-500">Error: {statsError ? 'Yes' : 'No'}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters and Controls */}
       <Card>

@@ -959,7 +959,6 @@ export class UnifiedAuthService {
       // Clear from cookie
       document.cookie = `${this.TOKEN_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
 
-      console.log('[AuthService] Token cleared from both localStorage and cookie');
     }
   }
 
@@ -1023,7 +1022,6 @@ export class UnifiedAuthService {
         document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax;`;
       });
 
-      console.log('[AuthService] All auth cookies cleared with comprehensive approach');
     } catch (error) {
       console.error('[AuthService] Error clearing cookies:', error);
     }
@@ -1054,11 +1052,7 @@ export class UnifiedAuthService {
    */
   static getAuthHeaders(): Record<string, string> {
     const token = this.getStoredToken();
-    console.log('[AuthService] Getting auth headers:', {
-      hasToken: !!token,
-      tokenLength: token?.length,
-      environment: process.env.NODE_ENV
-    });
+  
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 

@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   SortingState,
   ColumnFiltersState,
@@ -122,6 +123,32 @@ const defaultSorting: AdminUsersSorting = {
 
 export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn {
   const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL search parameters
+  const initializeFromURL = useCallback(() => {
+    const urlFilters: AdminUsersFilters = {
+      search: searchParams.get('search') || '',
+      role: searchParams.get('role') || '',
+      isVerified: searchParams.get('verified') ? searchParams.get('verified') === 'true' : null,
+      hasWallet: searchParams.get('hasWallet') ? searchParams.get('hasWallet') === 'true' : null,
+      newsletter: searchParams.get('newsletter') ? searchParams.get('newsletter') === 'true' : null,
+    };
+
+    const urlSorting: AdminUsersSorting = {
+      sortBy: (searchParams.get('sortBy') as any) || 'createdAt',
+      sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
+    };
+
+    const urlPagination: PaginationState = {
+      pageIndex: Math.max(0, (parseInt(searchParams.get('page') || '1') - 1)),
+      pageSize: parseInt(searchParams.get('limit') || String(initialPageSize)),
+    };
+
+    return { urlFilters, urlSorting, urlPagination };
+  }, [searchParams, initialPageSize]);
+
   // State management
   const [filters, setFilters] = useState<AdminUsersFilters>(defaultFilters);
   const [sorting, setSorting] = useState<AdminUsersSorting>(defaultSorting);
@@ -130,10 +157,39 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
     pageSize: initialPageSize,
   });
 
-  // Ensure client-side mounting
+  // Ensure client-side mounting and initialize from URL
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    if (typeof window !== 'undefined') {
+      const { urlFilters, urlSorting, urlPagination } = initializeFromURL();
+      setFilters(urlFilters);
+      setSorting(urlSorting);
+      setPagination(urlPagination);
+    }
+  }, [initializeFromURL]);
+
+  // Update URL when filters, sorting, or pagination changes
+  const updateURL = useCallback((newFilters: AdminUsersFilters, newSorting: AdminUsersSorting, newPagination: PaginationState) => {
+    const params = new URLSearchParams();
+
+    // Add filters to URL
+    if (newFilters.search) params.set('search', newFilters.search);
+    if (newFilters.role) params.set('role', newFilters.role);
+    if (newFilters.isVerified !== null) params.set('verified', String(newFilters.isVerified));
+    if (newFilters.hasWallet !== null) params.set('hasWallet', String(newFilters.hasWallet));
+    if (newFilters.newsletter !== null) params.set('newsletter', String(newFilters.newsletter));
+
+    // Add sorting to URL
+    if (newSorting.sortBy !== 'createdAt') params.set('sortBy', newSorting.sortBy);
+    if (newSorting.sortOrder !== 'desc') params.set('sortOrder', newSorting.sortOrder);
+
+    // Add pagination to URL
+    if (newPagination.pageIndex > 0) params.set('page', String(newPagination.pageIndex + 1));
+    if (newPagination.pageSize !== initialPageSize) params.set('limit', String(newPagination.pageSize));
+
+    const newURL = params.toString() ? `?${params.toString()}` : '';
+    router.replace(`/admin/users${newURL}`, { scroll: false });
+  }, [router, initialPageSize]);
 
   // Convert filters and sorting to query params
   const queryParams = useMemo((): AdminUsersQueryParams => {
@@ -153,7 +209,6 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
     if (filters.hasWallet !== null) params.hasWallet = String(filters.hasWallet);
     if (filters.newsletter !== null) params.newsletter = String(filters.newsletter);
 
-    console.log('[useAdminUsers] Query params generated:', params);
     return params;
   }, [filters, sorting, pagination]);
 
@@ -196,7 +251,7 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
       if (!result.data) {
         throw new Error('No statistics data received from API');
       }
-      return result.data;
+      return result;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
@@ -250,59 +305,122 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
 
   // Return data for component to create table
 
-  // Helper functions
+  // Helper functions with URL updates
   const updateFilter = useCallback((key: keyof AdminUsersFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination(prev => ({ ...prev, pageIndex: 0 })); // Reset to first page
-  }, []);
+    const newFilters = { ...filters, [key]: value };
+    const newPagination = { ...pagination, pageIndex: 0 }; // Reset to first page
+    setFilters(newFilters);
+    setPagination(newPagination);
+    updateURL(newFilters, sorting, newPagination);
+  }, [filters, pagination, sorting, updateURL]);
 
   const clearFilters = useCallback(() => {
+    const newPagination = { ...pagination, pageIndex: 0 };
     setFilters(defaultFilters);
-    setPagination(prev => ({ ...prev, pageIndex: 0 }));
-  }, []);
+    setPagination(newPagination);
+    updateURL(defaultFilters, sorting, newPagination);
+  }, [pagination, sorting, updateURL]);
 
   const gotoPage = useCallback((page: number) => {
     console.log('[useAdminUsers] gotoPage called with:', page);
-    setPagination(prev => ({ ...prev, pageIndex: page - 1 }));
-  }, []);
+    const newPagination = { ...pagination, pageIndex: page - 1 };
+    setPagination(newPagination);
+    updateURL(filters, sorting, newPagination);
+  }, [pagination, filters, sorting, updateURL]);
 
   const nextPage = useCallback(() => {
     console.log('[useAdminUsers] nextPage called, hasNext:', paginationInfo.hasNext);
     if (paginationInfo.hasNext) {
-      setPagination(prev => ({ ...prev, pageIndex: prev.pageIndex + 1 }));
+      const newPagination = { ...pagination, pageIndex: pagination.pageIndex + 1 };
+      setPagination(newPagination);
+      updateURL(filters, sorting, newPagination);
     }
-  }, [paginationInfo.hasNext]);
+  }, [paginationInfo.hasNext, pagination, filters, sorting, updateURL]);
 
   const previousPage = useCallback(() => {
     console.log('[useAdminUsers] previousPage called, hasPrev:', paginationInfo.hasPrev);
     if (paginationInfo.hasPrev) {
-      setPagination(prev => ({ ...prev, pageIndex: prev.pageIndex - 1 }));
+      const newPagination = { ...pagination, pageIndex: pagination.pageIndex - 1 };
+      setPagination(newPagination);
+      updateURL(filters, sorting, newPagination);
     }
-  }, [paginationInfo.hasPrev]);
+  }, [paginationInfo.hasPrev, pagination, filters, sorting, updateURL]);
 
   const setPageSize = useCallback((size: number) => {
     console.log('[useAdminUsers] setPageSize called with:', size);
-    setPagination(prev => {
-      const newPagination = { ...prev, pageSize: size, pageIndex: 0 };
-      console.log('[useAdminUsers] New pagination state:', newPagination);
-      return newPagination;
-    });
-  }, []);
+    const newPagination = { pageSize: size, pageIndex: 0 };
+    setPagination(newPagination);
+    updateURL(filters, sorting, newPagination);
+  }, [filters, sorting, updateURL]);
 
-  const exportUsers = useCallback(() => {
-    // Export functionality - could be implemented to download CSV
-    const csv = users.map(user => ({
-      Email: user.email,
-      Name: user.name || user.username || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'N/A',
-      Role: user.roles?.[0] || 'scholar',
-      Verified: user.isVerified ? 'Yes' : 'No',
-      Company: user.companyName || user.company || 'N/A',
-      Created: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown',
-    }));
-    
-    console.log('Exporting users:', csv);
-    toast.success('Export functionality would download CSV here');
-  }, [users]);
+  const exportUsers = useCallback(async () => {
+    try {
+      toast.info('Preparing export...');
+
+      // Fetch all users with current filters (no pagination limit)
+      const exportParams = {
+        ...queryParams,
+        limit: 10000, // Large limit to get all users
+        page: 1,
+      };
+
+      const result = await apiClient.get<any>('/admin/users', exportParams);
+      const allUsers = result?.data?.users || [];
+
+      if (allUsers.length === 0) {
+        toast.warning('No users found to export');
+        return;
+      }
+
+      // Convert to CSV format
+      const csvData = allUsers.map((user: any) => ({
+        Email: user.email || 'N/A',
+        Username: user.username || 'N/A',
+        Name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'N/A',
+        Roles: Array.isArray(user.roles) ? user.roles.join(', ') : (user.roles || 'scholar'),
+        'Email Verified': user.isVerified ? 'Yes' : 'No',
+        'Wallet Verified': user.isWalletVerified ? 'Yes' : 'No',
+        'Wallet Address': user.wallet_address || user.walletInfo?.address || 'N/A',
+        'Connected Wallet': user.walletInfo?.connectedWallet || 'N/A',
+        Company: user.companyName || user.companyAffiliation || 'N/A',
+        Newsletter: user.newsletter ? 'Yes' : 'No',
+        Interests: Array.isArray(user.interests) ? user.interests.join(', ') : (user.interests || 'N/A'),
+        'Personal Values': Array.isArray(user.personalValues) ? user.personalValues.join(', ') : (user.personalValues || 'N/A'),
+        'Last Login': user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never',
+        'Created At': user.createdAt ? new Date(user.createdAt).toLocaleString() : 'Unknown',
+        'Updated At': user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'Unknown',
+      }));
+
+      // Convert to CSV string
+      const headers = Object.keys(csvData[0]);
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row =>
+          headers.map(header => {
+            const value = row[header as keyof typeof row];
+            // Escape commas and quotes in CSV
+            return `"${String(value).replace(/"/g, '""')}"`;
+          }).join(',')
+        )
+      ].join('\n');
+
+      // Download CSV file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `users-export-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success(`Successfully exported ${allUsers.length} users`);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export users');
+    }
+  }, [queryParams]);
 
   return {
     // Data
