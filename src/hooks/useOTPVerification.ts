@@ -44,12 +44,15 @@ export function useOTPVerification() {
           };
           
           // Apply auth update using the unified method
-          UnifiedAuthService.applyAuthUpdate({ 
-            user: normalizedUser, 
-            token: responseData.data.token 
+          UnifiedAuthService.applyAuthUpdate({
+            user: normalizedUser,
+            token: responseData.data.token
           });
-          
+
           console.log('[useOTPVerification] Auth state updated successfully');
+
+          // Small delay to ensure state propagation
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         return { success: true, data: responseData };

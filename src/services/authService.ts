@@ -544,13 +544,21 @@ export class UnifiedAuthService {
 
         // Apply auth update using the unified method
         this.applyAuthUpdate({ user: normalizedUser, token: response.data.token });
-        
-        // Force re-initialization to ensure auth state is properly set
-        setTimeout(() => {
-          this.initialize().then((success) => {
-            console.log('[AuthService] Re-initialization after OTP result:', success);
-          });
-        }, 100);
+
+        // Wait for Redux state to be updated before proceeding
+        await new Promise(resolve => {
+          const checkState = () => {
+            const currentState = store.getState();
+            if (currentState.user.isLoggedIn && currentState.user.user?._id) {
+              console.log('[AuthService] Redux state confirmed updated after OTP verification');
+              resolve(true);
+            } else {
+              console.log('[AuthService] Waiting for Redux state update...');
+              setTimeout(checkState, 50);
+            }
+          };
+          checkState();
+        });
 
       }
 

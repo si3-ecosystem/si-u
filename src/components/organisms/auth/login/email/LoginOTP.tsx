@@ -63,7 +63,13 @@ const LoginOTP: React.FC<LoginOTPProps> = ({ email, onBack, onSuccess }) => {
         onSuccess?.(response.data);
 
         setIsRedirecting(true);
-        setTimeout(() => router.push("/"), 1000);
+
+        // Wait a bit longer to ensure Redux state is fully updated
+        // before redirecting to prevent middleware/client state mismatch
+        setTimeout(() => {
+          console.log('[LoginOTP] Redirecting to dashboard after successful OTP verification');
+          router.push("/dashboard");
+        }, 1500);
       } catch (error: any) {
         setError(
           error.message || "Invalid verification code. Please try again."
