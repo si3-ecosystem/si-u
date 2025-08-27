@@ -82,18 +82,18 @@ const subMenuGroups: SubMenuGroup[] = [
       { title: "Go Live (Coming Soon) ", icon: Share2, href: "/#" },
     ],
   },
-  {
-    title: "SI U SCHOLARS",
-    items: [
-      { title: "Sessions", icon: Video, href: "/scholars/sessions" },
-      // {
-      //   title: "Web3 Natives",
-      //   icon: UserSquare2,
-      //   href: "/web3-natives",
-      // },
-      { title: "Ideas Lab", icon: Brain, href: "/scholars/ideas-lab" },
-    ],
-  },
+  // {
+  //   title: "SI U SCHOLARS",
+  //   items: [
+  //     { title: "Sessions", icon: Video, href: "/scholars/sessions" },
+  //     // {
+  //     //   title: "Web3 Natives",
+  //     //   icon: UserSquare2,
+  //     //   href: "/web3-natives",
+  //     // },
+  //     { title: "Ideas Lab", icon: Brain, href: "/scholars/ideas-lab" },
+  //   ],
+  // },
   {
     title: "GROW3DGE PROGRAM",
     items: [
@@ -131,7 +131,7 @@ export function AppSidebar() {
   const userRoles = currentUser?.user?.roles || [];
   const isAdmin = userRoles.includes("admin");
   const isGuide = userRoles.includes("guide");
-  const isScholar = userRoles.includes("scholar");
+  // const isScholar = userRoles.includes("scholar");
   const isPartner = userRoles.includes("partner");
 
   // Filter menu items based on roles
@@ -155,15 +155,15 @@ export function AppSidebar() {
       if (group.title === "SI HER GUIDES" && (isGuide || isAdmin)) {
         return true;
       }
-      if (group.title === "SI U SCHOLARS" && (isScholar || isAdmin)) {
-        return true;
-      }
+      // if (group.title === "SI U SCHOLARS" && (isScholar || isAdmin)) {
+      //   return true;
+      // }
       if (group.title === "GROW3DGE PROGRAM" && (isPartner || isAdmin)) {
         return true;
       }
       return false;
     });
-  }, [isAdmin, isGuide, isScholar, isPartner]);
+  }, [isAdmin, isGuide, isPartner]);
 
   if (!open) return null;
 
