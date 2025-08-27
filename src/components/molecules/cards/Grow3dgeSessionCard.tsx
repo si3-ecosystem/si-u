@@ -68,23 +68,25 @@ export function Grow3dgeSessionCard({
     isUpdating,
     isDeleting,
     config,
-  } = hasExternalRSVP ? {
-    rsvp: null,
-    rsvpStatus: null,
-    hasRSVP: false,
-    createRSVP: () => {},
-    updateRSVP: () => {},
-    deleteRSVP: () => {},
-    isCreating: false,
-    isUpdating: false,
-    isDeleting: false,
-    config: {
-      isRSVPEnabled: false,
-      isDeadlinePassed: false,
-      hasValidEmail: true,
-      requiresApproval: false,
-    },
-  } : rsvpHookResult;
+  } = hasExternalRSVP
+    ? {
+        rsvp: null,
+        rsvpStatus: null,
+        hasRSVP: false,
+        createRSVP: () => {},
+        updateRSVP: () => {},
+        deleteRSVP: () => {},
+        isCreating: false,
+        isUpdating: false,
+        isDeleting: false,
+        config: {
+          isRSVPEnabled: false,
+          isDeadlinePassed: false,
+          hasValidEmail: true,
+          requiresApproval: false,
+        },
+      }
+    : rsvpHookResult;
 
   // Calendar integration
   const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } =
@@ -264,10 +266,13 @@ export function Grow3dgeSessionCard({
               <Calendar className="w-5 h-5" />
               <span>{moment(session.date).format("YYYY-MM-DD")}</span>
             </div>
-            {session.time && (
+            {session.endDate && (
               <div className="flex items-center gap-1 text-xs leading-5">
                 <Clock className="w-5 h-5" />
-                <span>{session.time}</span>
+                <span>
+                  {moment(session.date).utc().format("HH:mm")} -{" "}
+                  {moment(session.endDate).utc().format("HH:mm")} UTC
+                </span>
               </div>
             )}
           </div>
@@ -322,19 +327,20 @@ export function Grow3dgeSessionCard({
                   onClick={() => {
                     // If external RSVP URL is provided, redirect to it
                     if (hasExternalRSVP) {
-                      window.open(session.fixRsvp, '_blank');
+                      window.open(session.fixRsvp, "_blank");
                       return;
                     }
                     // Otherwise, use the dropdown functionality
                     toggleDropdown(session._id);
                   }}
                   disabled={
-                    hasExternalRSVP ? false :
-                    !config.isRSVPEnabled ||
-                    config.isDeadlinePassed ||
-                    isCreating ||
-                    isUpdating ||
-                    isDeleting
+                    hasExternalRSVP
+                      ? false
+                      : !config.isRSVPEnabled ||
+                        config.isDeadlinePassed ||
+                        isCreating ||
+                        isUpdating ||
+                        isDeleting
                   }
                   className={getButtonStyle()}
                 >

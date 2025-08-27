@@ -95,9 +95,10 @@ export const PartnerProgramForm = memo<PartnerProgramFormProps>(
     });
 
     const interestOptions = [
-      "Well-Being in the Web3 Workplace Training ",
-      "Cybersecurity for Web3 Teams Training",
-      "Education & Community Growth Partnerships ",
+      "Educational content development",
+      "In-person event partnership ",
+      "Virtual event partnership ",
+      "Marketing or co-marketing campaign",
     ];
 
     const mutation = useMutation({
@@ -177,8 +178,8 @@ export const PartnerProgramForm = memo<PartnerProgramFormProps>(
                     </span>
                   </DialogTitle>
                   <DialogDescription className="mx-auto w-full max-w-[517.453px] text-base leading-5 text-[#3D3D3D] sm:text-left">
-                    Please share your interest(s) in ways to partner with{" "}
-                    {"SI<3>"}, and a member of our team will reach out soon.
+                    Please share your interest(s) in our community network for
+                    educational and marketing partnerships.
                   </DialogDescription>
                 </div>
               </div>
@@ -238,9 +239,10 @@ export const PartnerProgramForm = memo<PartnerProgramFormProps>(
                     control={form.control}
                     name="interests"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col gap-8">
+                      <FormItem className="flex flex-col gap-0.5">
                         <FormLabel htmlFor="" className="text-base font-medium">
-                          What are you interested in exploring?{" "}
+                          What type of partnership(s) are you interested in
+                          exploring?*
                           <span className="text-red-500">*</span>
                         </FormLabel>
                         <ul className="flex flex-col gap-2.5">
@@ -354,7 +356,6 @@ export const PartnerProgramForm = memo<PartnerProgramFormProps>(
             </div>
           </DialogContent>
         </Dialog>
-       
       </div>
     );
   }

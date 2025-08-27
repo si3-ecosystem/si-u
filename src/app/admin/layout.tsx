@@ -32,6 +32,12 @@ export default function AdminLayout({
                 Dashboard
               </a>
               <a 
+                href="/admin/users" 
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Users
+              </a>
+              <a 
                 href="/guides/sessions" 
                 className="text-gray-600 hover:text-gray-900 transition-colors"
               >

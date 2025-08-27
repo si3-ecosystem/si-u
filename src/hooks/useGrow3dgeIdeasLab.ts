@@ -14,8 +14,14 @@ export function useGrow3dgeIdeasLab(cards: any[]) {
   const pageSize = 6;
 
   const categories = useMemo(() => {
-    const cats = cards.map((card) => card.category?.title).filter(Boolean);
-    return Array.from(new Set(cats));
+    // Extract and clean category titles
+    const cats = cards
+      .map((card) => card.category?.title?.trim())
+      .filter((title): title is string => Boolean(title) && title.length > 0);
+    
+    const uniqueCats = Array.from(new Set(cats));
+    
+    return uniqueCats;
   }, [cards]);
 
   const columns = useMemo<ColumnDef<any>[]>(

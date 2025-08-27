@@ -42,17 +42,6 @@ export function ProfileEditForm() {
     const hasUsername = profile?.username && profile.username.length >= 2;
     const hasRealEmail = profile?.email && !profile.email.includes("@wallet.temp") && !profile.email.endsWith(".temp");
 
-    console.log('🔍 Profile completion check:', {
-      profile: !!profile,
-      isClient,
-      isEmailVerified,
-      hasUsername,
-      hasRealEmail,
-      username: profile?.username,
-      email: profile?.email,
-      isComplete: isEmailVerified && hasUsername && hasRealEmail
-    });
-
     return isEmailVerified && hasUsername && hasRealEmail;
   }, [profile, isClient]);
 
@@ -92,7 +81,6 @@ export function ProfileEditForm() {
     if (result.success) {
       stepManager.goToNextStep();
     } else {
-      console.log("❌ Email verification failed:", result.error);
       // Show user-friendly error message in toast
       if (result.error?.includes("already in use") || result.error?.includes("already exists")) {
         toast.error("This email address is already in use by another account");

@@ -74,3 +74,80 @@ export interface CronJobStatus {
   nextRun?: string;
   message?: string;
 }
+
+// Admin Users Table Types
+export interface AdminUserTableData {
+  _id: string;
+  email: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  roles: string[];
+  isVerified: boolean;
+  newsletter: boolean;
+  interests: string[];
+  companyName?: string;
+  companyAffiliation?: string;
+  wallet_address?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastLogin?: string;
+  personalValues: string[];
+  digitalLinks: Array<{
+    platform: string;
+    url: string;
+  }>;
+  walletInfo?: {
+    address?: string;
+    connectedWallet?: 'Zerion' | 'MetaMask' | 'WalletConnect' | 'Other';
+    network?: 'Mainnet' | 'Polygon' | 'Arbitrum' | 'Base' | 'Optimism';
+    connectedAt?: string;
+    lastUsed?: string;
+  };
+}
+
+export interface AdminUsersFilters {
+  search: string;
+  role: string;
+  isVerified?: boolean | null;
+  hasWallet?: boolean | null;
+  newsletter?: boolean | null;
+}
+
+export interface AdminUsersSorting {
+  sortBy: 'email' | 'name' | 'role' | 'isVerified' | 'lastLogin' | 'createdAt';
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface AdminUsersResponse {
+  success: boolean;
+  data: AdminUserTableData[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  stats: {
+    totalUsers: number;
+    verifiedUsers: number;
+    usersWithWallet: number;
+    newsletterSubscribers: number;
+    roleStats: Record<string, number>;
+  };
+}
+
+export interface AdminUsersQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string; // verified, unverified, wallet_verified, all
+  hasWallet?: string;
+  newsletter?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
