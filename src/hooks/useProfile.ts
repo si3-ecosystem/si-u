@@ -59,10 +59,8 @@ export function useProfile() {
 
       // If the response doesn't contain updated user data, force refresh from server
       if (!data || !data.username) {
-        console.log('⚠️ API response missing updated user data, forcing refresh...');
         try {
           await UnifiedAuthService.forceRefreshUserData();
-          console.log('✅ User data refreshed successfully');
         } catch (error) {
           console.error('❌ Failed to refresh user data:', error);
         }
@@ -83,27 +81,21 @@ export function useProfile() {
     },
 
     onSuccess: async (data) => {
-      console.log('📧 Email update success - Response data:', data);
       ErrorHandler.showSuccess('Email updated successfully!');
 
-      // If the response doesn't contain updated user data, force refresh from server
       if (!data || !data.email) {
-        console.log('⚠️ API response missing updated user data, forcing refresh...');
         try {
           await UnifiedAuthService.forceRefreshUserData();
-          console.log('✅ User data refreshed successfully');
         } catch (error) {
           console.error('❌ Failed to refresh user data:', error);
         }
       }
 
-      // Invalidate RSVP queries since email validation affects RSVP
       queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
       queryClient.invalidateQueries({ queryKey: ['rsvp'] });
     },
   });
 
-  // Mutation for updating name specifically
   const updateNameMutation = useMutation({
     mutationFn: (name: string) => UnifiedAuthService.updateProfile({ name }),
 
@@ -115,7 +107,6 @@ export function useProfile() {
       console.log('👤 Name update success - Response data:', data);
       ErrorHandler.showSuccess('Name updated successfully!');
 
-      // If the response doesn't contain updated user data, force refresh from server
       if (!data || !data.name) {
         console.log('⚠️ API response missing updated user data, forcing refresh...');
         try {
@@ -126,24 +117,20 @@ export function useProfile() {
         }
       }
 
-      // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });
     },
   });
 
-  // Check if user has temporary email
   const isTemporaryEmail = (email?: string) => {
     if (!email) return true;
     return email.endsWith('.temp') || email.includes('wallet') || email.includes('@wallet.temp');
   };
 
-  // Check if profile is complete
   const isProfileComplete = () => {
     if (!profile) return false;
     return !isTemporaryEmail(profile.email) && !!profile.name;
   };
 
-  // Get profile completion percentage
   const getProfileCompletion = () => {
     if (!profile) return 0;
 
