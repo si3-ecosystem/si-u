@@ -213,7 +213,7 @@ export function SessionCard({
             </div>
             <div className="flex items-center gap-1 text-xs leading-5">
               <Clock className="w-5 h-5" />
-              <span>{moment(session.date).utc().format("HH:mm")} UTC</span>
+              <span>{moment(session.date).utc().format("HH:mm")} - {moment(session.endDate).utc().format("HH:mm")} UTC</span>
             </div>
           </div>
           <p className="text-sm line-clamp-2">{session?.description}</p>

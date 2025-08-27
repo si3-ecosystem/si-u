@@ -168,6 +168,7 @@ export interface FixCard {
   language?: string;
   date?: string;
   time?: string;
+  endDate?: string;
   fixImage?: SanityImage;
   guideName?: string;
   guideImage?: SanityImage;
