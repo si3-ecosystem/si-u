@@ -19,28 +19,24 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  RefreshCw, 
-  ChevronLeft, 
-  ChevronRight, 
-  ChevronsLeft, 
+import {
+  Search,
+  Filter,
+  Download,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
   ChevronsRight,
   Users,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
   Copy,
   Check
 } from 'lucide-react';
 import { useAdminUsers } from '@/hooks/useAdminUsers';
-import { 
+import {
   flexRender,
   useReactTable,
   getCoreRowModel,
-  getSortedRowModel,
   getFilteredRowModel,
   ColumnDef
 } from '@tanstack/react-table';
@@ -61,8 +57,6 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
     stats,
     statsLoading,
     statsError,
-    tableSorting,
-    setTableSorting,
     columnFilters,
     setColumnFilters,
     paginationState,
@@ -263,15 +257,7 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
     data: users,
     columns,
     state: {
-      sorting: tableSorting,
       columnFilters,
-    },
-    onSortingChange: (updater) => {
-      if (typeof updater === 'function') {
-        setTableSorting(updater(tableSorting));
-      } else {
-        setTableSorting(updater);
-      }
     },
     onColumnFiltersChange: (updater) => {
       if (typeof updater === 'function') {
@@ -281,10 +267,8 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
       }
     },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
-    manualSorting: true,
     manualFiltering: true,
     pageCount: pagination.totalPages, // Use backend-provided totalPages directly
   });
@@ -539,24 +523,8 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
                     {headerGroup.headers.map((header: any) => (
                       <TableHead key={header.id} className="whitespace-nowrap">
                         {header.isPlaceholder ? null : (
-                          <div
-                            className={`flex items-center gap-1 ${
-                              header.column.getCanSort() ? 'cursor-pointer select-none' : ''
-                            }`}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
+                          <div className="flex items-center">
                             {flexRender(header.column.columnDef.header, header.getContext())}
-                            {header.column.getCanSort() && (
-                              <span className="ml-1">
-                                {header.column.getIsSorted() === 'desc' ? (
-                                  <ArrowDown className="h-4 w-4" />
-                                ) : header.column.getIsSorted() === 'asc' ? (
-                                  <ArrowUp className="h-4 w-4" />
-                                ) : (
-                                  <ArrowUpDown className="h-4 w-4 opacity-50" />
-                                )}
-                              </span>
-                            )}
                           </div>
                         )}
                       </TableHead>

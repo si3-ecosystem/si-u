@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  SortingState,
   ColumnFiltersState,
   PaginationState,
 } from '@tanstack/react-table';
@@ -79,12 +78,9 @@ interface UseAdminUsersReturn {
   statsError: Error | null;
 
   // Table state
-  tableSorting: SortingState;
-  setTableSorting: (sorting: SortingState) => void;
   columnFilters: ColumnFiltersState;
   setColumnFilters: (filters: ColumnFiltersState) => void;
   paginationState: PaginationState;
-  setPaginationState: (pagination: PaginationState) => void;
 
   // Filters
   filters: AdminUsersFilters;
@@ -300,7 +296,6 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
   // for better access to copy functionality
 
   // Table configuration - moved to component
-  const [tableSorting, setTableSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   // Return data for component to create table
@@ -357,15 +352,38 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
     try {
       toast.info('Preparing export...');
 
-      // Fetch all users with current filters (no pagination limit)
-      const exportParams = {
-        ...queryParams,
-        limit: 10000, // Large limit to get all users
-        page: 1,
-      };
+      // Fetch all users by paginating through all pages
+      let allUsers: any[] = [];
+      let currentPage = 1;
+      let hasMorePages = true;
+      const limit = 100; // Maximum allowed by API
 
-      const result = await apiClient.get<any>('/admin/users', exportParams);
-      const allUsers = result?.data?.users || [];
+      while (hasMorePages) {
+        const exportParams = {
+          ...queryParams,
+          limit,
+          page: currentPage,
+        };
+
+        const result = await apiClient.get<any>('/admin/users', exportParams);
+        const pageUsers = result?.data?.users || [];
+
+        if (pageUsers.length === 0) {
+          hasMorePages = false;
+        } else {
+          allUsers = [...allUsers, ...pageUsers];
+
+          // Show progress for large exports
+          if (currentPage > 1) {
+            toast.info(`Fetching users... (${allUsers.length} collected)`);
+          }
+
+          // Check if we have more pages based on the response
+          const pagination = result?.data?.pagination;
+          hasMorePages = pagination?.hasNextPage || pageUsers.length === limit;
+          currentPage++;
+        }
+      }
 
       if (allUsers.length === 0) {
         toast.warning('No users found to export');
@@ -438,12 +456,9 @@ export function useAdminUsers(initialPageSize: number = 40): UseAdminUsersReturn
     statsError: statsError as Error | null,
 
     // Table state
-    tableSorting,
-    setTableSorting,
     columnFilters,
     setColumnFilters,
     paginationState: pagination,
-    setPaginationState: setPagination,
 
     // Filters
     filters,
