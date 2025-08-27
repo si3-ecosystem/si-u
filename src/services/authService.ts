@@ -896,17 +896,25 @@ export class UnifiedAuthService {
     if (typeof window !== 'undefined') {
       // First check localStorage
       const localStorageToken = localStorage.getItem(this.TOKEN_KEY);
+      console.log('[AuthService] Token check - localStorage:', !!localStorageToken);
+
       if (localStorageToken) {
         return localStorageToken;
       }
 
       // If not in localStorage, check cookies as fallback
       const cookieToken = this.getTokenFromCookie();
+      console.log('[AuthService] Token check - cookie:', !!cookieToken);
+
       if (cookieToken) {
         // Sync cookie token to localStorage for consistency
         localStorage.setItem(this.TOKEN_KEY, cookieToken);
+        console.log('[AuthService] Synced cookie token to localStorage');
         return cookieToken;
       }
+
+      // Debug: Show all cookies
+      console.log('[AuthService] All cookies:', document.cookie);
     }
     return null;
   }
@@ -961,9 +969,14 @@ export class UnifiedAuthService {
 
     try {
       const cookies = document.cookie.split(';');
+      console.log('[AuthService] Parsing cookies, looking for:', this.TOKEN_KEY);
+      console.log('[AuthService] Found cookies:', cookies.map(c => c.trim().split('=')[0]));
+
       for (const cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
+        console.log('[AuthService] Checking cookie:', name, 'matches:', name === this.TOKEN_KEY);
         if (name === this.TOKEN_KEY && value) {
+          console.log('[AuthService] Found matching cookie with value');
           return decodeURIComponent(value);
         }
       }
@@ -971,6 +984,7 @@ export class UnifiedAuthService {
       console.error('[AuthService] Error reading token from cookie:', error);
     }
 
+    console.log('[AuthService] No matching cookie found');
     return null;
   }
 
