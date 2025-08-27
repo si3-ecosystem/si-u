@@ -110,7 +110,7 @@ const AuthContainer = () => {
     >
       <div className="space-y-3 md:space-y-4">
         <InjectedWallet onWalletConnected={handleWalletConnected} />
-        <EtherMail />
+        {/* <EtherMail /> */}
       </div>
 
       <div className="my-5 flex items-center md:my-5">

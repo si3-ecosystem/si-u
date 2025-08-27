@@ -1,11 +1,9 @@
 "use client";
-
 import { LogOut } from "lucide-react";
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import ConfirmLogoutDialog from "./ConfirmLogoutDialog";
-
 import { useDispatch } from "react-redux";
 import { setLogoutModalOpen } from "@/redux/slice/modalSlice";
 import { UnifiedAuthService } from "@/services/authService";
@@ -23,7 +21,7 @@ const LogoutButton = () => {
     try {
       setIsLoading(true);
 
-      console.log('[LogoutButton] Starting logout process...');
+      console.log("[LogoutButton] Starting logout process...");
 
       // Close modal first
       dispatch(setLogoutModalOpen(false));
@@ -41,12 +39,12 @@ const LogoutButton = () => {
       // Enhanced error handling - try emergency cleanup
       try {
         console.log('[LogoutButton] Attempting emergency cleanup...');
-        
+
         // Force clear all storage
         if (typeof window !== 'undefined') {
           localStorage.clear();
           sessionStorage.clear();
-          
+
           // Clear all cookies
           document.cookie.split(';').forEach((cookie) => {
             const eqPos = cookie.indexOf('=');
@@ -56,7 +54,7 @@ const LogoutButton = () => {
             }
           });
         }
-        
+
         console.log('[LogoutButton] Emergency cleanup completed');
       } catch (cleanupError) {
         console.error('[LogoutButton] Emergency cleanup failed:', cleanupError);
@@ -65,7 +63,7 @@ const LogoutButton = () => {
       // Force redirect even on error as ultimate fallback
       if (typeof window !== 'undefined') {
         console.log('[LogoutButton] Force redirecting due to error...');
-        
+
         // The auth service should have handled cleanup, but ensure redirect happens
         setTimeout(() => {
           window.location.replace('/login');

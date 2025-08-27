@@ -296,26 +296,19 @@ export function WalletDialog({
 
   useEffect(() => setIsMounted(true), []);
 
-  // Handle already connected wallet
-  useEffect(() => {
-    if (open && isConnected && address && connector?.name) {
-      onWalletConnected(address, connector.name);
-      onOpenChange(false);
-    }
-  }, [
-    open,
-    isConnected,
-    address,
-    connector?.name,
-    onWalletConnected,
-    onOpenChange,
-  ]);
-
   const handleConnect = useCallback(
     (selectedConnector: any) => {
+      // Check if this connector is already connected
+      if (isConnected && connector?.id === selectedConnector.id) {
+        console.log('Connector already connected');
+        onWalletConnected(address!, selectedConnector.name);
+        onOpenChange(false);
+        return;
+      }
+  
       setConnectionError("");
       setIsConnecting(true);
-
+  
       connect(
         { connector: selectedConnector },
         {
@@ -339,9 +332,9 @@ export function WalletDialog({
         }
       );
     },
-    [connect, onWalletConnected, onOpenChange]
+    [connect, onWalletConnected, onOpenChange, isConnected, connector, address]
   );
-
+  
   const { injected, nonInjected, installedRequiredWallets } = useMemo(() => {
     const injected = connectors.filter((c) => c.type === "injected");
     const nonInjected = connectors.filter(
@@ -388,7 +381,7 @@ export function WalletDialog({
     [installedRequiredWallets]
   );
 
-  if (!isMounted || (isConnected && address && connector)) return null;
+  if (!isMounted) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

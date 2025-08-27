@@ -107,7 +107,8 @@ const initialState: ContentState = {
       url: "https://twitter.com"
     }
   ],
-  isNewWebpage: true
+  isNewWebpage: true,
+  domain: ""
 };
 
 const contentSlice = createSlice({
@@ -121,6 +122,10 @@ const contentSlice = createSlice({
       const { section, data } = action.payload;
       if (section === "isNewWebpage" && typeof data === "boolean") {
         state.isNewWebpage = data;
+        return;
+      }
+      if (section === "domain") {
+        (state as any).domain = typeof data === "string" ? data : "";
         return;
       }
       if (!state[section]) {
@@ -208,6 +213,9 @@ const contentSlice = createSlice({
       field.splice(index, 1);
     },
     clearContent: () => initialState,
+    setDomain: (state, action: PayloadAction<string | undefined>) => {
+      (state as any).domain = action.payload ?? "";
+    },
     setIsNewWebpage: (state, action: PayloadAction<boolean>) => {
       state.isNewWebpage = action.payload;
     }
@@ -221,6 +229,7 @@ export const {
   addArrayItem,
   removeArrayItem,
   clearContent,
+  setDomain,
   setIsNewWebpage
 } = contentSlice.actions;
 
