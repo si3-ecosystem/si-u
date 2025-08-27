@@ -1,7 +1,3 @@
-/**
- * ProfileImageUpload Component
- * Reusable component for uploading and managing profile images
- */
 
 "use client";
 
@@ -42,23 +38,11 @@ export function ProfileImageUpload({
 }: ProfileImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentUser = useAppSelector(state => {
-    console.log('🔄 useAppSelector called - Redux state:', {
-      profileImage: state.user.user.profileImage,
-      avatar: state.user.user.avatar,
-      lastUpdated: state.user.lastUpdated
-    });
+  
     return state.user.user;
   });
 
-  // Debug: Log current user state
-  React.useEffect(() => {
-    console.log('🖼️ ProfileImageUpload - Current user state:', {
-      profileImage: currentUser?.profileImage,
-      avatar: currentUser?.avatar,
-      _id: currentUser?._id,
-      email: currentUser?.email
-    });
-  }, [currentUser?.profileImage, currentUser?.avatar]);
+
 
   const {
     isUploading,
@@ -73,57 +57,37 @@ export function ProfileImageUpload({
     formatFileSize,
   } = useProfileImageUpload({
     onSuccess: (imageUrl, userData) => {
-      console.log('🎉 ProfileImageUpload - Upload success callback:', { imageUrl, userData });
       onSuccess?.(imageUrl, userData);
     },
     onError: (error) => {
-      console.error('❌ ProfileImageUpload - Upload error callback:', error);
       onError?.(error);
     },
   });
 
-  // Get current profile image URL using utility function
   const currentImageUrl = getProfileImageUrl(currentUser);
 
-  // Get display image URL (preview takes priority)
   const displayImageUrl = previewUrl || currentImageUrl;
 
-  // Get user initials using utility function
   const userInitials = getUserInitials(currentUser);
 
-  // Debug: Log image URLs
-  React.useEffect(() => {
-    console.log('🖼️ ProfileImageUpload - Image URLs:', {
-      currentImageUrl,
-      displayImageUrl,
-      previewUrl,
-      userInitials
-    });
-  }, [currentImageUrl, displayImageUrl, previewUrl, userInitials]);
-
-  // Handle file input change
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       selectFile(file);
     }
-    // Reset input value to allow selecting the same file again
     event.target.value = '';
   };
 
-  // Handle click on avatar to open file picker
   const handleAvatarClick = () => {
     if (!isUploading) {
       fileInputRef.current?.click();
     }
   };
 
-  // Handle upload button click
   const handleUpload = () => {
     uploadImage();
   };
 
-  // Handle cancel/clear selection
   const handleCancel = () => {
     clearSelection();
     clearError();

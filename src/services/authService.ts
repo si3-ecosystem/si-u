@@ -867,11 +867,7 @@ export class UnifiedAuthService {
       // Verify cookie was set
       setTimeout(() => {
         const cookieCheck = this.getTokenFromCookie();
-        console.log('[AuthService] Cookie verification:', {
-          cookieRetrieved: !!cookieCheck,
-          cookiesMatch: cookieCheck === token,
-          allCookies: document.cookie.split(';').map(c => c.trim().split('=')[0])
-        });
+      
       }, 100);
 
     }
