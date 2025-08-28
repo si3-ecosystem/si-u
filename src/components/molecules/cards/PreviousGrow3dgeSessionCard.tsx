@@ -73,9 +73,10 @@ export function PreviousGrow3dgeSessionCard({ session }: { session: FixCard }) {
   };
 
   const hasCourseMatials =
-    session.pdfGuide?.enabled || session.pdfFile?.asset?.url;
+    session.pdfGuide?.enabled === true;
   const hasVideo = session.videoUrl;
   const hasUlr = session?.pdfGuide?.shareableUrl;
+
 
   return (
     <>
