@@ -86,11 +86,6 @@ const subMenuGroups: SubMenuGroup[] = [
     title: "SI U SCHOLARS",
     items: [
       { title: "Sessions", icon: Video, href: "/scholars/sessions" },
-      // {
-      //   title: "Web3 Natives",
-      //   icon: UserSquare2,
-      //   href: "/web3-natives",
-      // },
       { title: "Ideas Lab", icon: Brain, href: "/scholars/ideas-lab" },
     ],
   },
@@ -130,10 +125,32 @@ export function AppSidebar() {
   // Get user roles for filtering menu items
   const userRoles = currentUser?.user?.roles || [];
   // const isAdmin = userRoles.includes("admin");
-  const isAdmin = true; // Temporarily disable admin check for testing
+  // const isAdmin = true; // Temporarily disable admin check for testing
+  const userEmail = currentUser?.user?.email || "";
+  const isAdmin = userRoles.includes("admin");
   const isGuide = userRoles.includes("guide");
-  const isScholar = userRoles.includes("scholar");
   const isPartner = userRoles.includes("partner");
+  
+  // List of allowed scholar emails
+  const allowedScholarEmails = [
+    "shoagasraful4231@gmail.com",
+    "asraful.islam@tutors.es",
+    "brenda.c.altamirano@gmail.com",
+    "Donna@boostalyze.com",
+    "estherjoy947@gmail.com",
+    "imhaseeb8@gmail.com",
+    "jaris.careers@gmail.com",
+    "318solaris@gmail.com",
+    "immanuelkristie@gmail.com",
+    "kara@si3.space",
+    "masha.vaverova@gmail.com",
+    "raheelahmed5650@gmail.com",
+    "muhammadsalmansarwar32@gmail.com",
+    "Zainalis.914@gmail.com"
+  ];
+  
+  // Check if user is an allowed scholar
+  const isAllowedScholar = allowedScholarEmails.includes(userEmail.toLowerCase());
 
   // Filter menu items based on roles
   const filteredMainMenuItems = useMemo(() => {
@@ -156,7 +173,7 @@ export function AppSidebar() {
       if (group.title === "SI HER GUIDES" && (isGuide || isAdmin)) {
         return true;
       }
-      if (group.title === "SI U SCHOLARS" && (isScholar || isAdmin)) {
+      if (group.title === "SI U SCHOLARS" && (isAllowedScholar || isAdmin)) {
         return true;
       }
       if (group.title === "GROW3DGE PROGRAM" && (isPartner || isAdmin)) {
@@ -164,7 +181,7 @@ export function AppSidebar() {
       }
       return false;
     });
-  }, [isAdmin, isGuide, isScholar, isPartner]);
+  }, [isAdmin, isGuide, isPartner, isAllowedScholar]);
 
   if (!open) return null;
 

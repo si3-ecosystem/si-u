@@ -16,7 +16,7 @@ import { ProfileUpdateStep } from "./steps/ProfileUpdateStep";
 import { ProfileCompleteView } from "./steps/ProfileCompleteView";
 
 import { useEmailVerification } from "@/hooks/useEmailVerification";
-import { useOTPVerification } from "@/hooks/useOTPVerification";
+import { useProfileEmailVerification } from "@/hooks/useProfileEmailVerification";
 import { useProfileFormSteps } from "@/hooks/useProfileFormSteps";
 
 const profileSchema = z.object({
@@ -32,7 +32,7 @@ export function ProfileEditForm() {
 
   const stepManager = useProfileFormSteps({ profile, isClient });
   const emailVerification = useEmailVerification({ profile });
-  const otpVerification = useOTPVerification();
+  const profileEmailVerification = useProfileEmailVerification();
 
   // Check if profile is complete
   const isProfileComplete = React.useMemo(() => {
@@ -122,16 +122,18 @@ export function ProfileEditForm() {
 
   // OTP and verification handlers
   const handleVerifyOTP = async () => {
-    const result = await otpVerification.verifyOTP(
+    // Use profile email verification for existing users (not login flow)
+    const result = await profileEmailVerification.verifyProfileEmail(
       emailVerification.pendingEmail,
-      otpVerification.otpCode
+      profileEmailVerification.otpCode
     );
 
     if (result.success) {
       stepManager.goToNextStep();
+      toast.success("Email verified successfully!");
     } else {
-      console.log("❌ OTP verification failed:", result.error);
-      toast.error(result.error || "Failed to verify OTP code");
+      console.log("❌ Profile email verification failed:", result.error);
+      toast.error(result.error || "Failed to verify email");
     }
   };
 
@@ -214,9 +216,9 @@ export function ProfileEditForm() {
                 {stepManager.currentStep === "verify" && (
                   <OTPVerificationStep
                     pendingEmail={emailVerification.pendingEmail}
-                    otpCode={otpVerification.otpCode}
-                    setOtpCode={otpVerification.setOtpCode}
-                    isVerifyingOTP={otpVerification.isVerifyingOTP}
+                    otpCode={profileEmailVerification.otpCode}
+                    setOtpCode={profileEmailVerification.setOtpCode}
+                    isVerifyingOTP={profileEmailVerification.isVerifyingOTP}
                     isSendingOTP={emailVerification.isSendingOTP}
                     onVerifyOTP={handleVerifyOTP}
                     onResendOTP={handleResendOTP}

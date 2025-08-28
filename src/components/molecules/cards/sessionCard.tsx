@@ -47,10 +47,7 @@ export function SessionCard({
 
   const partnerLogos = getPartnerLogos();
 
-  // Check if external RSVP URL is provided
-  const hasExternalRSVP = session.guidesRsvp && session.guidesRsvp.trim();
-
-  // RSVP functionality (only used when no external RSVP URL)
+  // RSVP functionality - always use the hook to get proper config
   const rsvpHookResult = useRSVP(session._id, session);
   const {
     rsvp,
@@ -63,25 +60,7 @@ export function SessionCard({
     isUpdating,
     isDeleting,
     config,
-  } = hasExternalRSVP
-    ? {
-        rsvp: null,
-        rsvpStatus: null,
-        hasRSVP: false,
-        createRSVP: () => {},
-        updateRSVP: () => {},
-        deleteRSVP: () => {},
-        isCreating: false,
-        isUpdating: false,
-        isDeleting: false,
-        config: {
-          isRSVPEnabled: false,
-          isDeadlinePassed: false,
-          hasValidEmail: true,
-          requiresApproval: false,
-        },
-      }
-    : rsvpHookResult;
+  } = rsvpHookResult;
 
   // Calendar integration
   const { addToGoogleCalendar, addToAppleCalendar, downloadICSFile } =
@@ -135,11 +114,7 @@ export function SessionCard({
   };
 
   const getButtonText = () => {
-    // If external RSVP URL is provided, show simple "Register Now" text
-    if (hasExternalRSVP) {
-      return "Register Now";
-    }
-
+    // Always show appropriate text regardless of external RSVP
     if (!config.isRSVPEnabled) return "RSVP Disabled";
     if (config.isDeadlinePassed) return "RSVP Closed";
     if (!config.hasValidEmail) return "Update Email to RSVP";
@@ -162,11 +137,6 @@ export function SessionCard({
   const getButtonStyle = () => {
     const baseStyle =
       "text-white border font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 max-lg:w-full max-lg:text-center";
-
-    // If external RSVP URL is provided, use default black style
-    if (hasExternalRSVP) {
-      return `${baseStyle} border-black bg-black hover:bg-gray-800`;
-    }
 
     if (!config.isRSVPEnabled || config.isDeadlinePassed) {
       return `${baseStyle} border-gray-400 bg-gray-400 cursor-not-allowed`;
@@ -269,32 +239,22 @@ export function SessionCard({
             <div className="mt-4 md:mt-0 relative max-lg:w-full">
               <button
                 onClick={() => {
-                  // If external RSVP URL is provided, redirect to it
-                  if (hasExternalRSVP) {
-                    window.open(session.guidesRsvp, "_blank");
-                    return;
-                  }
-                  // Otherwise, use the dropdown functionality
+                  // Always use dropdown functionality regardless of external RSVP
                   toggleDropdown(session._id);
                 }}
                 className={getButtonStyle()}
                 disabled={
-                  hasExternalRSVP
-                    ? false
-                    : isCreating ||
-                      isUpdating ||
-                      isDeleting ||
-                      !config.isRSVPEnabled ||
-                      config.isDeadlinePassed ||
-                      !config.hasValidEmail
+                  !config.isRSVPEnabled ||
+                  config.isDeadlinePassed ||
+                  !config.hasValidEmail
                 }
               >
                 {getButtonText()}
               </button>
 
-              {!hasExternalRSVP && openDropdownId === session._id && (
+              {openDropdownId === session._id && (
                 <AttendEventDropdown
-                  rsvpLink= {session?.guidesRsvp}
+                  rsvpLink={session?.guidesRsvp}
                   onClose={() => setOpenDropdownId(null)}
                   eventId={session._id}
                   currentStatus={rsvpStatus}

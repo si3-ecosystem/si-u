@@ -2,32 +2,75 @@
 
 import { useEffect } from 'react';
 import { useAppSelector } from '@/redux/store';
-import { UnifiedAuthService } from '@/services/authService';
+import { apiClient } from '@/services/api';
+import { initializeUser } from '@/redux/slice/userSlice';
+import { store } from '@/redux/store';
 
 /**
- * Hook to initialize authentication state from stored JWT token
- * This should be called once at the app level to restore user session
+ * Simplified hook to initialize authentication state from server
+ * Relies on server-side authentication via cookies
  */
 export function useAuthInitializer() {
   const currentUser = useAppSelector(state => state.user);
 
   useEffect(() => {
-    // Only initialize if user is not already initialized
-    if (currentUser.isInitialized) {
-      return;
-    }
+    console.log('[useAuthInitializer] Effect triggered:', {
+      isInitialized: currentUser.isInitialized,
+      hasUser: !!currentUser.user,
+      userId: currentUser.user?._id,
+      userEmail: currentUser.user?.email
+    });
 
-    // Use the unified auth service to initialize (it handles race conditions internally)
+    // Always fetch fresh data from server to ensure we have the latest user information
+    // This solves refresh issues and ensures data is always up-to-date
+    console.log('[useAuthInitializer] Fetching fresh user data from server...');
+
+    // Simple server-side auth check
     const initializeAuth = async () => {
       try {
-        await UnifiedAuthService.initialize();
+        console.log('[useAuthInitializer] Fetching user data from server...');
+
+        // Try to get user data from server using cookies
+        const response = await apiClient.get('/auth/me');
+
+        console.log('[useAuthInitializer] Full response object:', response);
+        console.log('[useAuthInitializer] Response.data:', response.data);
+        console.log('[useAuthInitializer] Response keys:', Object.keys(response));
+        console.log('[useAuthInitializer] Response.data keys:', response.data ? Object.keys(response.data) : 'no data');
+
+        // Check different possible response structures
+        const userData = response.data?.user || response.data?.data?.user || response.data;
+        console.log('[useAuthInitializer] Extracted user data:', userData);
+
+        if (userData && userData.id) {
+          console.log('[useAuthInitializer] Found user data with id:', userData.id);
+
+          // Normalize user data - ensure _id field exists (server returns 'id')
+          const normalizedUserData = {
+            ...userData,
+            _id: userData._id || userData.id // Map 'id' to '_id' if needed
+          };
+
+          console.log('[useAuthInitializer] Normalized user data:', normalizedUserData);
+          console.log('[useAuthInitializer] Server auth successful, user found:', normalizedUserData.email);
+
+          // Initialize user in Redux store
+          store.dispatch(initializeUser(normalizedUserData));
+        } else {
+          console.log('[useAuthInitializer] No valid user data from server');
+          console.log('[useAuthInitializer] Response structure did not match expected format');
+          // Initialize as not logged in
+          store.dispatch(initializeUser({}));
+        }
       } catch (error) {
-        console.error('[useAuthInitializer] Failed to initialize auth:', error);
+        console.log('[useAuthInitializer] Server auth failed, user not authenticated:', error.message);
+        // Initialize as not logged in
+        store.dispatch(initializeUser({}));
       }
     };
 
     initializeAuth();
-  }, [currentUser.isInitialized]);
+  }, []); // Run once on mount to always fetch fresh data
 
   return {
     isInitialized: currentUser.isInitialized

@@ -152,28 +152,28 @@ export function useWalletManagement() {
           console.warn("Failed to disconnect from wagmi:", wagmiError);
         }
 
-        // Refresh JWT token to reflect the wallet disconnect
-        // But preserve the local state we just set
-        try {
-          const currentLocalUser = { ...updatedUser }; // Save our local state
-          await UnifiedAuthService.refreshToken();
-          console.log("JWT token refreshed after wallet disconnect");
+        toast.success("Wallet disconnected successfully. Logging out for security...");
 
-          // Re-apply our preserved state after token refresh
+        // Check if user has a verified email address
+        const hasVerifiedEmail = updatedUser.isVerified && updatedUser.email && !updatedUser.email.includes('@wallet.temp');
+
+        if (hasVerifiedEmail) {
+          console.log("User has verified email, performing logout after wallet disconnect...");
+          // Import and use the auth service to properly log out
+          const { UnifiedAuthService } = await import('@/services/authService');
+
+          // Add delay to show success message, then logout
+          setTimeout(async () => {
+            await UnifiedAuthService.logout({ redirect: true });
+          }, 1500);
+        } else {
+          console.log("User has no verified email, performing hard reload...");
+          // For users without verified email, just reload (they can't log back in anyway)
           setTimeout(() => {
-            dispatch(forceUpdateUser(currentLocalUser));
-            console.log("Re-applied preserved user state after token refresh");
-          }, 100);
-        } catch (refreshError) {
-          console.warn("Failed to refresh JWT token after wallet disconnect:", refreshError);
-          // Don't try fallback refresh as it might overwrite our preserved state
+            window.location.reload();
+          }, 1000);
         }
 
-        // Force a re-render by updating the loading state
-        setIsLoading(true);
-        setTimeout(() => setIsLoading(false), 100);
-
-        toast.success("Wallet disconnected successfully. You can reconnect a wallet anytime.");
         return { success: true };
       } else {
         throw new Error("Failed to disconnect wallet");
@@ -219,11 +219,31 @@ export function useWalletManagement() {
       }
 
       if (error?.statusCode === 401) {
-        toast.warning(
-          "Wallet disconnected locally. Please verify your email to sync with server."
-        );
+        toast.warning("Authentication error. Logging out for security...");
+
+        // If 401 error, logout completely
+        setTimeout(async () => {
+          const { UnifiedAuthService } = await import('@/services/authService');
+          await UnifiedAuthService.logout({ redirect: true });
+        }, 1500);
       } else {
         toast.warning("Wallet disconnected locally. Server sync failed.");
+
+        // For other errors, check if we should logout or reload
+        const hasVerifiedEmail = updatedUser.isVerified && updatedUser.email && !updatedUser.email.includes('@wallet.temp');
+
+        if (hasVerifiedEmail) {
+          console.log("Error case: User has verified email, performing logout...");
+          setTimeout(async () => {
+            const { UnifiedAuthService } = await import('@/services/authService');
+            await UnifiedAuthService.logout({ redirect: true });
+          }, 1500);
+        } else {
+          console.log("Error case: User has no verified email, performing reload...");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
       }
 
       return { success: false, error: error.message };
@@ -254,6 +274,13 @@ export function useWalletManagement() {
     }, 100);
 
     toast.success("Wallet connected successfully!");
+
+    // Hard reload to ensure clean UI state after wallet connection
+    console.log("Performing hard reload after wallet connection...");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); // Small delay to show success message
+
     return { success: true };
   };
 

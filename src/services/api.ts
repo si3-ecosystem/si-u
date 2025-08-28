@@ -26,7 +26,8 @@ export class ApiClient {
     const config: RequestInit = {
       headers: {
         ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        ...UnifiedAuthService.getAuthHeaders(),
+        // Removed Authorization header - relying on cookies for authentication
+        // The si3-jwt cookie will be sent automatically with credentials: 'include'
         ...options.headers,
       },
       credentials: 'include', // Include cookies for authentication

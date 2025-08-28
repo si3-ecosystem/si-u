@@ -33,14 +33,18 @@ export default function DashboardLayout({
       return;
     }
 
+    // Simplified auth check - only redirect if user is initialized and clearly not authenticated
     if (currentUser.isInitialized) {
       const isAuthenticated = !!currentUser.user?._id;
 
       if (!isAuthenticated) {
+        console.log('[DashboardLayout] User not authenticated, redirecting to login');
         setHasRedirected(true);
         router.replace('/login');
         return;
       }
+
+      console.log('[DashboardLayout] User authenticated:', currentUser.user?.email);
     }
   }, [isClient, currentUser.isInitialized, currentUser.user?._id, router, hasRedirected]);
 
@@ -52,7 +56,6 @@ export default function DashboardLayout({
     );
   }
 
-  console.log(currentUser);
   if (currentUser.isInitialized && !currentUser.user?._id && !currentUser.user?.id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -73,6 +76,14 @@ export default function DashboardLayout({
         </div>
       </div>
     );
+  }
+
+  // If initialized but no user, the useEffect will handle redirect
+  // In the meantime, show the dashboard (middleware already verified the cookie)
+  if (currentUser.isInitialized && !currentUser.user?._id) {
+    // Don't show loading screen, let the dashboard render
+    // The middleware has already verified the user has a valid cookie
+    console.log('[DashboardLayout] User initialized but no _id, letting dashboard render (middleware verified cookie)');
   }
 
   return (

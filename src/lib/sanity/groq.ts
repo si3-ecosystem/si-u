@@ -253,7 +253,8 @@ export const siherGuidesSessionQuery = groq`
       date,
       time,
       guideName,
-      // Add category field for filtering
+      guidesRsvp,
+      rsvpSettings,
       category->{
         _id,
         title,
@@ -457,7 +458,6 @@ export const fixSessionsQuery = groq`
     topicTitle,
     topicDesc,
     sessionTitle,
-    fixRsvp,
     sessionDescription,
      banner->{
       title,
@@ -494,6 +494,7 @@ export const fixSessionsQuery = groq`
         shareableUrl
       },
       _id,
+      fixRsvp,
       title,
       description,
       category->{_id, title, slug},
