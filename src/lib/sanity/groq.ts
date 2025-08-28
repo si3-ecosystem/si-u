@@ -764,3 +764,54 @@ export const seoSettingsQuery = groq`
     }
   }
 `;
+
+export const liveSessionsQuery = groq`
+  *[_type == "liveSession"] | order(scheduledDate desc) {
+    _id,
+    title,
+    description,
+    scheduledDate,
+    scheduledTime,
+    status,
+    attendeeCount,
+    maxAttendees,
+    speakerName,
+    speakerImage {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background
+    },
+    thumbnail {
+      ...,
+      "blurDataURL": asset->metadata.lqip,
+      "ImageColor": asset->metadata.palette.dominant.background,
+      alt
+    },
+    category,
+    meetingUrl,
+    recordingUrl,
+    proofOfAttendance
+  }
+`;
+
+export const liveSessionSchemaQuery = groq`
+  *[_type == "liveSessionSchema"][0] {
+    _id,
+    title,
+    description,
+    banner-> {
+      title,
+      description,
+      thumbnail {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      },
+      background {
+        ...,
+        "blurDataURL": asset->metadata.lqip,
+        "ImageColor": asset->metadata.palette.dominant.background
+      }
+    }
+  }
+`;

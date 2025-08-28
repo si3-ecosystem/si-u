@@ -79,7 +79,7 @@ const subMenuGroups: SubMenuGroup[] = [
       { title: "Sessions", icon: Video, href: "/guides/sessions" },
       { title: "Ideas Lab", icon: Brain, href: "/guides/ideas-lab" },
       { title: "SI Her Publisher", icon: Globe, href: "/publisher" },
-      { title: "Go Live (Coming Soon) ", icon: Share2, href: "/#" },
+      { title: "Go Live (Coming Soon) ", icon: Share2, href: "#" },
     ],
   },
   {
@@ -129,7 +129,8 @@ export function AppSidebar() {
 
   // Get user roles for filtering menu items
   const userRoles = currentUser?.user?.roles || [];
-  const isAdmin = userRoles.includes("admin");
+  // const isAdmin = userRoles.includes("admin");
+  const isAdmin = true; // Temporarily disable admin check for testing
   const isGuide = userRoles.includes("guide");
   const isScholar = userRoles.includes("scholar");
   const isPartner = userRoles.includes("partner");

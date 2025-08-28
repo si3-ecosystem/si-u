@@ -27,6 +27,8 @@ import {
   guidesByIdQuery,
   dashboardBannerQuery,
   seoSettingsQuery,
+  liveSessionsQuery,
+  liveSessionSchemaQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -217,6 +219,27 @@ export async function getDashboardBanner() {
 export async function getSeoSettings() {
   if (client) {
     return (await client.fetch(seoSettingsQuery)) || {};
+  }
+  return {};
+}
+
+export async function getSiherGoLive() {
+  if (client) {
+    return (await client.fetch(seoSettingsQuery)) || {};
+  }
+  return {};
+}
+
+export async function getLiveSessionsData() {
+  if (client) {
+    return (await client.fetch(liveSessionsQuery)) || [];
+  }
+  return [];
+}
+
+export async function getLiveSessionSchema() {
+  if (client) {
+    return (await client.fetch(liveSessionSchemaQuery)) || {};
   }
   return {};
 }

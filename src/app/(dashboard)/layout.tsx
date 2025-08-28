@@ -52,7 +52,8 @@ export default function DashboardLayout({
     );
   }
 
-  if (currentUser.isInitialized && !currentUser.user?._id) {
+  console.log(currentUser);
+  if (currentUser.isInitialized && !currentUser.user?._id && !currentUser.user?.id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
