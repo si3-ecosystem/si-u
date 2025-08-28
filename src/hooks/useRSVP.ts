@@ -5,12 +5,13 @@ import { RSVPStatus, CreateRSVPRequest, UpdateRSVPRequest } from '@/types/rsvp';
 import { RSVPService } from '@/services/rsvpService';
 import { ErrorHandler } from '@/utils/errorHandler';
 import { useAppSelector } from '@/redux/store';
+import { GuidesSession } from '@/types/siherguides/session';
 
 /**
  * Hook for managing RSVP operations with optimistic updates
  * Enhanced to work with the new guides session structure
  */
-export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any }) {
+export function useRSVP(eventId: string, sessionConfig?: GuidesSession) {
   const queryClient = useQueryClient();
   const queryKey = ['rsvp', 'event', eventId];
 
@@ -170,8 +171,10 @@ export function useRSVP(eventId: string, sessionConfig?: { rsvpSettings?: any })
 
   // Check if RSVP deadline has passed
   const isRSVPDeadlinePassed = () => {
-    if (!rsvpSettings?.rsvpDeadline) return false;
-    return new Date() > new Date(rsvpSettings.rsvpDeadline);
+    // Use rsvpDeadline if provided, otherwise use session end date or start date
+    const deadline = rsvpSettings?.rsvpDeadline || sessionConfig?.endDate || sessionConfig?.date;
+    if (!deadline) return false;
+    return new Date() > new Date(deadline);
   };
 
   // Check if user has a temporary email

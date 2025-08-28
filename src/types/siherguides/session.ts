@@ -215,4 +215,10 @@ export interface FixCard {
     };
     shareableUrl?: string;
   };
+  
+  // Enhanced RSVP Configuration
+  rsvpSettings?: RSVPSettings;
+  emailSettings?: EmailSettings;
+  location?: SessionLocation;
+  organizer?: SessionOrganizer;
 }

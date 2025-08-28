@@ -25,6 +25,8 @@ export function Grow3dgeSessionCard({
   toggleDropdown,
   setOpenDropdownId,
 }: Grow3dgeSessionCardProps) {
+
+  console.log("session", session);
   // Handle both multiple partners and legacy single partner
   const getPartnerLogos = () => {
     if (session?.partners && session.partners.length > 0) {
@@ -322,47 +324,50 @@ export function Grow3dgeSessionCard({
                 </button>
               )} */}
 
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    // If external RSVP URL is provided, redirect to it
-                    if (hasExternalRSVP) {
-                      window.open(session.fixRsvp, "_blank");
-                      return;
+              {/* Only show RSVP button if rsvpSettings exists and is enabled */}
+              {session.rsvpSettings?.enabled && (
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      // If external RSVP URL is provided, redirect to it
+                      if (hasExternalRSVP) {
+                        window.open(session.fixRsvp, "_blank");
+                        return;
+                      }
+                      // Otherwise, use the dropdown functionality
+                      toggleDropdown(session._id);
+                    }}
+                    disabled={
+                      hasExternalRSVP
+                        ? false
+                        : !config.isRSVPEnabled ||
+                          config.isDeadlinePassed ||
+                          isCreating ||
+                          isUpdating ||
+                          isDeleting
                     }
-                    // Otherwise, use the dropdown functionality
-                    toggleDropdown(session._id);
-                  }}
-                  disabled={
-                    hasExternalRSVP
-                      ? false
-                      : !config.isRSVPEnabled ||
-                        config.isDeadlinePassed ||
-                        isCreating ||
-                        isUpdating ||
-                        isDeleting
-                  }
-                  className={getButtonStyle()}
-                >
-                  {getButtonText()}
-                </button>
+                    className={getButtonStyle()}
+                  >
+                    {getButtonText()}
+                  </button>
 
-                {!hasExternalRSVP && openDropdownId === session._id && (
-                  <AttendEventDropdown
-                    rsvpLink={session?.fixRsvp}
-                    onClose={() => setOpenDropdownId(null)}
-                    eventId={session._id}
-                    currentStatus={rsvpStatus}
-                    hasRSVP={hasRSVP}
-                    hasValidEmail={config.hasValidEmail}
-                    isDeleting={isDeleting}
-                    onCalendarAdd={handleCalendarAdd}
-                    onJoinChannel={handleJoinChannel}
-                    onCancelAttendance={handleCancelAttendance}
-                    onOpenRSVPForm={handleDirectRSVP}
-                  />
-                )}
-              </div>
+                  {!hasExternalRSVP && openDropdownId === session._id && (
+                    <AttendEventDropdown
+                      rsvpLink={session?.fixRsvp}
+                      onClose={() => setOpenDropdownId(null)}
+                      eventId={session._id}
+                      currentStatus={rsvpStatus}
+                      hasRSVP={hasRSVP}
+                      hasValidEmail={config.hasValidEmail}
+                      isDeleting={isDeleting}
+                      onCalendarAdd={handleCalendarAdd}
+                      onJoinChannel={handleJoinChannel}
+                      onCancelAttendance={handleCancelAttendance}
+                      onOpenRSVPForm={handleDirectRSVP}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
