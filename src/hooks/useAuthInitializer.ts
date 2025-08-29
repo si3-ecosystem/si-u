@@ -108,7 +108,6 @@ export function useAuthInitializer() {
                 if (
                     error.message.includes("no longer exists")
                 ) {
-                  AuthDebugger.forceLoginRedirect();
                     console.log(
                         "[useAuthInitializer] Invalid token detected - clearing cookies and forcing logout"
                     );
