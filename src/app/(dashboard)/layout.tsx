@@ -55,8 +55,9 @@ export default function DashboardLayout({
       </div>
     );
   }
-
-  if (currentUser.isInitialized && !currentUser.user?._id && !currentUser.user?.id) {
+  
+  // If already redirected, just show a loader until Next.js replaces the route
+  if (hasRedirected) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -66,7 +67,8 @@ export default function DashboardLayout({
       </div>
     );
   }
-
+  
+  // If user not initialized yet → still loading
   if (!currentUser.isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -77,14 +79,13 @@ export default function DashboardLayout({
       </div>
     );
   }
-
+  
   // If initialized but no user, the useEffect will handle redirect
-  // In the meantime, show the dashboard (middleware already verified the cookie)
   if (currentUser.isInitialized && !currentUser.user?._id) {
-    // Don't show loading screen, let the dashboard render
-    // The middleware has already verified the user has a valid cookie
-    console.log('[DashboardLayout] User initialized but no _id, letting dashboard render (middleware verified cookie)');
-  }
+    console.log(
+      '[DashboardLayout] User initialized but no _id, letting dashboard render (middleware verified cookie)'
+    );
+  }  
 
   return (
     <ErrorBoundaryWrapper fallback={LayoutErrorFallback}>
