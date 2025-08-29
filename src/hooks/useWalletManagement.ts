@@ -6,7 +6,6 @@ import { forceUpdateUser } from "@/redux/slice/userSlice";
 import { useDisconnect } from "wagmi";
 import { toast } from "sonner";
 import { WalletService, WalletInfo } from "@/services/walletService";
-import { UnifiedAuthService } from "@/services/authService";
 import { TempEmailDetector } from "@/utils/tempEmailDetector";
 
 export function useWalletManagement() {
