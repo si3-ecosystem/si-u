@@ -116,7 +116,7 @@ export function useAuthInitializer() {
                     document.cookie =
                         "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                     document.cookie =
-                        "si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";t
+                        "si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
                     localStorage.removeItem("si3-jwt");
                     localStorage.removeItem("token");
@@ -126,8 +126,10 @@ export function useAuthInitializer() {
                         window.location.href = "/login";
                     }, 100);
 
-                    store.dispatch(initializeUser({}));
+                    return; // Don't dispatch initializeUser
                 }
+                // Initialize as not logged in
+                store.dispatch(initializeUser({}));
             }
         };
 
