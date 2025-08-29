@@ -158,12 +158,6 @@ const userSlice = createSlice({
     // Initialize user from token (first login or page refresh)
     initializeUser: (state: UserState, action: PayloadAction<UserData>) => {
       const userData = action.payload;
-
-        // Ensure _id exists if id is provided
-  if (userData.id && !userData._id) {
-    userData._id = userData.id;
-  }
-  
       addDebugLog(state, 'initializeUser', userData);
 
       state.user = { ...userData };

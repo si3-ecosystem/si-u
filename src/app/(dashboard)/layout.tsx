@@ -4,7 +4,7 @@ import { Header } from "@/components/organisms/layout/Header";
 import { AppSidebar } from "@/components/organisms/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ErrorBoundaryWrapper, LayoutErrorFallback } from "@/components/ErrorBoundary";
 import { AuthDebugger } from "@/utils/debugAuth";
@@ -19,8 +19,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
-  // inside DashboardLayout
-const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
@@ -28,9 +26,6 @@ const pathname = usePathname();
 
   useEffect(() => {
     if (!isClient || hasRedirected) return;
-
-      // Skip auth checks on public routes
-  if (pathname === "/login" || pathname === "/register") return;
 
     // Check for redirect loop
     if (AuthDebugger.checkRedirectLoop()) {
@@ -44,11 +39,6 @@ const pathname = usePathname();
 
       if (!isAuthenticated) {
         console.log('[DashboardLayout] User not authenticated, redirecting to login');
-
-        localStorage.removeItem("si3-jwt");
-        document.cookie =
-          "si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
         setHasRedirected(true);
         router.replace('/login');
         return;
