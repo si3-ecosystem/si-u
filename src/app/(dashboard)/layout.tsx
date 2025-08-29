@@ -39,6 +39,11 @@ export default function DashboardLayout({
 
       if (!isAuthenticated) {
         console.log('[DashboardLayout] User not authenticated, redirecting to login');
+
+        localStorage.removeItem("si3-jwt");
+        document.cookie =
+          "si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
         setHasRedirected(true);
         router.replace('/login');
         return;

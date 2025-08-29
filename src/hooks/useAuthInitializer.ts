@@ -128,7 +128,6 @@ export function useAuthInitializer() {
 
                     return; // Don't dispatch initializeUser
                 }
-                
                 // Initialize as not logged in
                 store.dispatch(initializeUser({}));
             }
