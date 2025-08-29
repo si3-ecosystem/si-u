@@ -26,37 +26,28 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!isClient || hasRedirected) return;
-  
+
     // Check for redirect loop
     if (AuthDebugger.checkRedirectLoop()) {
       AuthDebugger.forceLoginRedirect();
       return;
     }
-  
+
+    // Simplified auth check - only redirect if user is initialized and clearly not authenticated
     if (currentUser.isInitialized) {
       const isAuthenticated = !!currentUser.user?._id;
-  
+
       if (!isAuthenticated) {
         console.log('[DashboardLayout] User not authenticated, redirecting to login');
         setHasRedirected(true);
-        
-        // CLEAR THE INVALID COOKIE/TOKEN FIRST
-        // Clear any auth tokens/cookies
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        // Add any other cookie names you use for auth
-        
-        // Clear localStorage if you store tokens there
-        localStorage.removeItem('token');
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('si3-jwt');
-        
-        // Now redirect
-        window.location.href = '/login';
+        router.replace('/login');
         return;
       }
+
+      console.log('[DashboardLayout] User authenticated:', currentUser.user?.email);
     }
   }, [isClient, currentUser.isInitialized, currentUser.user?._id, router, hasRedirected]);
+
   if (!isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen">
