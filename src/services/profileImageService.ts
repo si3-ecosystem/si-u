@@ -3,9 +3,9 @@
  * Handles profile image uploads to IPFS via Pinata with automatic profile updates
  */
 
-import { apiClient } from './api';
-import { ApiResponse } from '@/types/rsvp';
-import { UserData } from '@/redux/slice/userSlice';
+import { apiClient } from "./api";
+import { ApiResponse } from "@/types/rsvp";
+import { UserData } from "@/redux/slice/userSlice";
 
 // Response interface for profile image upload
 export interface ProfileImageUploadResponse {
@@ -26,7 +26,7 @@ export interface ProfileImageUploadError {
 // File validation constraints
 export const PROFILE_IMAGE_CONSTRAINTS = {
   MAX_SIZE: 5 * 1024 * 1024, // 5MB
-  ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+  ALLOWED_TYPES: ["image/jpeg", "image/jpg", "image/png", "image/webp"],
   MAX_DIMENSION: 2048, // Max width/height in pixels
 } as const;
 
@@ -39,7 +39,7 @@ export class ProfileImageService {
     if (!PROFILE_IMAGE_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
       return {
         isValid: false,
-        error: 'Please select a valid image file (JPEG, PNG, or WebP)',
+        error: "Please select a valid image file (JPEG, PNG, or WebP)",
       };
     }
 
@@ -58,30 +58,24 @@ export class ProfileImageService {
   /**
    * Validate image dimensions (optional - for better UX)
    */
-  static async validateImageDimensions(file: File): Promise<{ isValid: boolean; error?: string }> {
+  static async validateImageDimensions(
+    file: File
+  ): Promise<{ isValid: boolean; error?: string }> {
     return new Promise((resolve) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
 
       img.onload = () => {
         URL.revokeObjectURL(url);
-        
-        if (img.width > PROFILE_IMAGE_CONSTRAINTS.MAX_DIMENSION || 
-            img.height > PROFILE_IMAGE_CONSTRAINTS.MAX_DIMENSION) {
-          resolve({
-            isValid: false,
-            error: `Image dimensions must be less than ${PROFILE_IMAGE_CONSTRAINTS.MAX_DIMENSION}x${PROFILE_IMAGE_CONSTRAINTS.MAX_DIMENSION} pixels`,
-          });
-        } else {
-          resolve({ isValid: true });
-        }
+
+        resolve({ isValid: true });
       };
 
       img.onerror = () => {
         URL.revokeObjectURL(url);
         resolve({
           isValid: false,
-          error: 'Invalid image file',
+          error: "Invalid image file",
         });
       };
 
@@ -93,7 +87,9 @@ export class ProfileImageService {
    * Upload profile image to IPFS and update user profile
    * Uses the recommended /api/pinata/upload-profile-image endpoint
    */
-  static async uploadProfileImage(file: File): Promise<ApiResponse<ProfileImageUploadResponse>> {
+  static async uploadProfileImage(
+    file: File
+  ): Promise<ApiResponse<ProfileImageUploadResponse>> {
     // Validate file before upload
     const validation = this.validateImageFile(file);
     if (!validation.isValid) {
@@ -108,45 +104,54 @@ export class ProfileImageService {
 
     // Create FormData for multipart upload
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append("image", file);
 
     try {
       // Use apiClient which handles authentication headers automatically
       const response = await apiClient.post<ProfileImageUploadResponse>(
-        '/pinata/upload-profile-image',
+        "/pinata/upload-profile-image",
         formData
       );
 
-      console.log('📡 ProfileImageService - Raw API Response:', response);
-      console.log('📡 ProfileImageService - Response Type:', typeof response);
-      console.log('📡 ProfileImageService - Response Keys:', Object.keys(response || {}));
+      console.log("📡 ProfileImageService - Raw API Response:", response);
+      console.log("📡 ProfileImageService - Response Type:", typeof response);
+      console.log(
+        "📡 ProfileImageService - Response Keys:",
+        Object.keys(response || {})
+      );
 
       // Check if response is already in ApiResponse format or direct data
-      if (response && typeof response === 'object') {
+      if (response && typeof response === "object") {
         // If response has a 'data' property, it's already wrapped
-        if ('data' in response) {
-          console.log('📡 Response already wrapped, using as-is');
+        if ("data" in response) {
+          console.log("📡 Response already wrapped, using as-is");
           return response as ApiResponse<ProfileImageUploadResponse>;
         } else {
           // If response is the direct data, wrap it
-          console.log('📡 Response is direct data, wrapping it');
+          console.log("📡 Response is direct data, wrapping it");
           const wrappedResponse: ApiResponse<ProfileImageUploadResponse> = {
-            status: 'success',
-            data: response as unknown as ProfileImageUploadResponse
+            status: "success",
+            data: response as unknown as ProfileImageUploadResponse,
           };
-          console.log('📡 ProfileImageService - Wrapped Response:', wrappedResponse);
-          console.log('📡 ProfileImageService - User Data:', wrappedResponse.data?.user);
+          console.log(
+            "📡 ProfileImageService - Wrapped Response:",
+            wrappedResponse
+          );
+          console.log(
+            "📡 ProfileImageService - User Data:",
+            wrappedResponse.data?.user
+          );
           return wrappedResponse;
         }
       }
 
-      throw new Error('Invalid response format');
+      throw new Error("Invalid response format");
     } catch (error) {
       // Handle specific error cases
       if (error instanceof Error) {
         throw new Error(`Profile image upload failed: ${error.message}`);
       }
-      throw new Error('Profile image upload failed. Please try again.');
+      throw new Error("Profile image upload failed. Please try again.");
     }
   }
 
@@ -154,12 +159,14 @@ export class ProfileImageService {
    * Upload image to IPFS without updating profile (for general use)
    * Uses the /api/pinata/upload endpoint
    */
-  static async uploadImageOnly(file: File): Promise<ApiResponse<{
-    success: boolean;
-    url: string;
-    ipfsHash: string;
-    originalName: string;
-  }>> {
+  static async uploadImageOnly(file: File): Promise<
+    ApiResponse<{
+      success: boolean;
+      url: string;
+      ipfsHash: string;
+      originalName: string;
+    }>
+  > {
     // Validate file before upload
     const validation = this.validateImageFile(file);
     if (!validation.isValid) {
@@ -168,7 +175,7 @@ export class ProfileImageService {
 
     // Create FormData for multipart upload
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append("image", file);
 
     try {
       // Use apiClient for consistent error handling
@@ -177,14 +184,14 @@ export class ProfileImageService {
         url: string;
         ipfsHash: string;
         originalName: string;
-      }>('/pinata/upload', formData);
+      }>("/pinata/upload", formData);
 
       return response;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Image upload failed: ${error.message}`);
       }
-      throw new Error('Image upload failed. Please try again.');
+      throw new Error("Image upload failed. Please try again.");
     }
   }
 
@@ -192,13 +199,13 @@ export class ProfileImageService {
    * Get file size in human-readable format
    */
   static formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    
+    if (bytes === 0) return "0 Bytes";
+
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   }
 
   /**

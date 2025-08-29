@@ -3,13 +3,12 @@
  * Handles HTTP requests with authentication and error handling
  */
 
-import { UnifiedAuthService } from './authService';
 import { ApiResponse, ApiError } from '@/types/rsvp';
 
 export class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.si3.space' || 'http://localhost:8080') {
     // Ensure the base URL always ends with /api
     this.baseURL = baseURL.endsWith('/api') ? baseURL : `${baseURL}/api`;
   }

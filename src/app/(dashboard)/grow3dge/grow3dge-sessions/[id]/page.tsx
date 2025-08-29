@@ -24,7 +24,9 @@ export default function FixCardDetailPage() {
 
   // Check if user has partner role
   const hasPartnerRole =
-    isClient && (currentUser?.user?.roles?.includes("partner") || currentUser?.user?.roles?.includes("admin"));
+    isClient &&
+    (currentUser?.user?.roles?.includes("partner") ||
+      currentUser?.user?.roles?.includes("admin"));
 
   const { data, isLoading } = useQuery({
     queryKey: cardId ? [`fixCard-${cardId}`] : [],
@@ -52,12 +54,13 @@ export default function FixCardDetailPage() {
               <div className="space-y-2">
                 <h3 className="font-semibold">Partner Access Required</h3>
                 <p>
-                  This session content is exclusively available to our partner community.
-                  Partners have access to detailed session content, videos, and resources.
+                  This session content is exclusively available to our partner
+                  community. Partners have access to detailed session content,
+                  videos, and resources.
                 </p>
                 <p className="text-sm">
-                  If you believe you should have access, please contact your account manager
-                  or reach out to our support team.
+                  If you believe you should have access, please contact your
+                  account manager or reach out to our support team.
                 </p>
               </div>
             </AlertDescription>
@@ -86,6 +89,7 @@ export default function FixCardDetailPage() {
           pdfUrl={data.pdfFile?.asset?.url}
           videoUrl={data.videoUrl}
           pdfGuide={data.pdfGuide}
+          hideDownloadButton={data?.pdfGuide?.enabled}
         />
       </div>
     </section>
