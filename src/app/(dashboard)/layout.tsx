@@ -4,7 +4,7 @@ import { Header } from "@/components/organisms/layout/Header";
 import { AppSidebar } from "@/components/organisms/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/redux/store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ErrorBoundaryWrapper, LayoutErrorFallback } from "@/components/ErrorBoundary";
 import { AuthDebugger } from "@/utils/debugAuth";
@@ -19,6 +19,8 @@ export default function DashboardLayout({
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
+  // inside DashboardLayout
+const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
@@ -26,6 +28,9 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!isClient || hasRedirected) return;
+
+      // Skip auth checks on public routes
+  if (pathname === "/login" || pathname === "/register") return;
 
     // Check for redirect loop
     if (AuthDebugger.checkRedirectLoop()) {
