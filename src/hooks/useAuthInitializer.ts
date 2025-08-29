@@ -5,6 +5,7 @@ import { useAppSelector } from "@/redux/store";
 import { apiClient } from "@/services/api";
 import { initializeUser } from "@/redux/slice/userSlice";
 import { store } from "@/redux/store";
+import { AuthDebugger } from "@/utils/debugAuth";
 
 /**
  * Simplified hook to initialize authentication state from server
@@ -105,9 +106,9 @@ export function useAuthInitializer() {
 
                 // CRITICAL: If token is invalid, clear it immediately
                 if (
-                    error.response?.status === 401 &&
-                    errorMessage.includes("no longer exists")
+                    error.message.includes("no longer exists")
                 ) {
+                  AuthDebugger.forceLoginRedirect();
                     console.log(
                         "[useAuthInitializer] Invalid token detected - clearing cookies and forcing logout"
                     );
