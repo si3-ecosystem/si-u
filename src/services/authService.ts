@@ -287,15 +287,6 @@ export class UnifiedAuthService {
       });
 
       if (response.status === 'success' && response.data) {
-        console.log('[AuthService] Wallet verification response:', {
-          hasUser: !!response.data.user,
-          hasToken: !!response.data.token,
-          userEmail: response.data.user?.email,
-          userId: response.data.user?.id,
-          user_Id: response.data.user?._id,
-          fullUserData: response.data.user
-        });
-
         // Normalize user data - ensure _id field exists
         const normalizedUser = {
           ...response.data.user,

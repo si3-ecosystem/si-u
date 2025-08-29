@@ -13,7 +13,7 @@ export function useOTPVerification() {
     setIsVerifyingOTP(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const response = await fetch(`${apiUrl}/api/auth/email/verify-otp`, {
+      const response = await fetch(`${apiUrl || "https://api.si3.space"}/api/auth/email/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
