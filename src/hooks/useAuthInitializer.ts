@@ -126,10 +126,8 @@ export function useAuthInitializer() {
                         window.location.href = "/login";
                     }, 100);
 
-                    return; // Don't dispatch initializeUser
+                    store.dispatch(initializeUser({}));
                 }
-                // Initialize as not logged in
-                store.dispatch(initializeUser({}));
             }
         };
 
