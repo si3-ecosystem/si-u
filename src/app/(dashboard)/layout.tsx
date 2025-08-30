@@ -81,11 +81,11 @@ export default function DashboardLayout({
   }
   
   // If initialized but no user, the useEffect will handle redirect
-  if (currentUser.isInitialized && !currentUser.user?._id) {
-    console.log(
-      '[DashboardLayout] User initialized but no _id, letting dashboard render (middleware verified cookie)'
-    );
-  }   
+  // if (currentUser.isInitialized && !currentUser.user?._id) {
+  //   console.log(
+  //     '[DashboardLayout] User initialized but no _id, letting dashboard render (middleware verified cookie)'
+  //   );
+  // }   
 
   return (
     <ErrorBoundaryWrapper fallback={LayoutErrorFallback}>

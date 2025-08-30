@@ -13,7 +13,6 @@ import WalletSignature from "./wallet/WalletSignature";
 import { AuthDebugger } from "@/utils/debugAuth";
 
 type AuthState = "initial" | "otp" | "wallet_signature";
-
 interface WalletData {
   address: string;
   name: string;
