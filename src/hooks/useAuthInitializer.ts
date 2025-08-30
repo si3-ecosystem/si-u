@@ -63,9 +63,23 @@ export function useAuthInitializer() {
           store.dispatch(initializeUser({}));
         }
       } catch (error) {
-        console.log('[useAuthInitializer] Server auth failed, user not authenticated:', error.message);
-        // Initialize as not logged in
-        store.dispatch(initializeUser({}));
+    if (error.response?.status === 401) {
+      console.log("[useAuthInitializer] Access token expired, trying refresh...");
+      try {
+        await apiClient.post("/auth/refresh");
+        // Retry /auth/me after refreshing
+        const retry = await apiClient.get("/auth/me");
+        const userData = retry.data?.user || retry.data?.data?.user || retry.data;
+
+        if (userData?.id) {
+          store.dispatch(initializeUser({ ...userData, _id: userData.id }));
+          return;
+        }
+      } catch (refreshError) {
+        console.log("[useAuthInitializer] Refresh failed");
+      }
+    }
+    store.dispatch(initializeUser({}));
       }
     };
 
