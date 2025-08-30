@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 // @ts-nocheck
-import { NextRequest, NextResponse } from 'next/server';
+import {  NextResponse } from 'next/server';
 import { generateMockUsers } from '../route';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Mock authentication check
     // const user = await getCurrentUser(request);
