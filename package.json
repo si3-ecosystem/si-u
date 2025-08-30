@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "heroku-postbuild": "npm install --legacy-peer-deps && next build"
   },
   "dependencies": {
     "@formo/analytics": "^1.19.6",
