@@ -242,7 +242,7 @@ export const PartnerProgramForm = memo<PartnerProgramFormProps>(
                       <FormItem className="flex flex-col gap-0.5">
                         <FormLabel htmlFor="" className="text-base font-medium">
                           What type of partnership(s) are you interested in
-                          exploring?*
+                          exploring?
                           <span className="text-red-500">*</span>
                         </FormLabel>
                         <ul className="flex flex-col gap-2.5">
