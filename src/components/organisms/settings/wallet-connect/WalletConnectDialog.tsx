@@ -51,7 +51,7 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
 
     try {
       // 1) Request signature message for this address
-      const messageResp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/wallet/request-signature`, {
+      const messageResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/wallet/request-signature`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wallet_address: address }),
@@ -67,7 +67,7 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
       const signature = await signMessageAsync({ message });
 
       // 3) POST connect for existing user
-      const connectResp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/wallet/connect`, {
+      const connectResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/wallet/connect`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
