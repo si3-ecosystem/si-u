@@ -3,7 +3,7 @@
 import React from 'react';
 import { OptimizedCommentSection } from './OptimizedCommentSection';
 import { ContentType, UserRole } from '@/types/comment';
-import { useAppSelector } from '@/redux/store';
+import { useUserRole } from '@/utils/auth/getUserRoleFromAuthV2';
 
 interface GuideIdeasLabCommentSectionProps {
   contentId: string;
@@ -15,9 +15,7 @@ export function GuideIdeasLabCommentSection({
   contentId, 
   className 
 }: GuideIdeasLabCommentSectionProps) {
-  const user = useAppSelector(state => state.user);
-  const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'guide') ? 'guide' : 'scholar' ;
-
+  const userRole: UserRole = useUserRole('guide');
   const contentType: ContentType = 'guide_ideas_lab';
 
   return (

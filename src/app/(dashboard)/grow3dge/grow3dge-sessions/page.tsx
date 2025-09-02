@@ -3,7 +3,7 @@ import { PopularTopics } from "@/components/organisms/grow3dge/grow3dge-sessions
 import Grow3dgeWorkShops from "@/components/organisms/grow3dge/Grow3dgeWorkShops";
 import { useFixSessions } from "@/hooks/useFixSessions";
 import { useGrow3dgeSessions } from "@/hooks/useGrow3dgeSessions";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
@@ -13,7 +13,7 @@ import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 export default function FixxSessionsPage() {
   const { loading, sessions } = useFixSessions();
   const [isClient, setIsClient] = useState(false);
-  const currentUser = useAppSelector((state) => state.user);
+  const { user } = useCurrentUserV2();
 
   useEffect(() => {
     setIsClient(true);
@@ -21,8 +21,8 @@ export default function FixxSessionsPage() {
 
   const hasPartnerRole =
     isClient &&
-    (currentUser?.user?.roles?.includes("partner") ||
-      currentUser?.user?.roles?.includes("admin"));
+    !!user &&
+    (user.roles?.includes("partner") || user.roles?.includes("admin"));
 
   const {
     globalFilter,

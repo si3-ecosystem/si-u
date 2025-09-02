@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useAppSelector } from '@/redux/store';
 import { UserRole } from '@/types/api';
 
 interface UseAdminAuthReturn {
@@ -16,40 +15,35 @@ interface UseAdminAuthReturn {
 export function useAdminAuth(): UseAdminAuthReturn {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { 
-    user, 
-    isLoggedIn, 
-    isInitialized, 
-    isInitializing 
-  } = useSelector((state: RootState) => state.user);
+  const authV2 = useAppSelector((s) => (s as any).authV2);
+  const status = authV2?.status as 'idle' | 'loading' | 'authenticated' | 'unauthenticated';
+  const user = authV2?.user;
 
   // Ensure we're on the client side
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Only calculate admin status after mounting
-  // const isAdmin = isMounted && isLoggedIn && user?.roles?.includes('admin' as UserRole);
-  const isAdmin = true; // Temporarily disable admin check for testing
-  const isLoading = !isMounted || isInitializing || !isInitialized;
-  const checkingAuth = !isMounted || !isInitialized;
+  // Determine admin status using authV2
+  const isAdmin = !!(status === 'authenticated' && user?.roles?.includes('admin' as UserRole));
+  const isLoading = !isMounted || status === 'idle' || status === 'loading';
+  const checkingAuth = isLoading;
 
   useEffect(() => {
-    // Only redirect if we're mounted, done initializing and user is not admin
-    if (isMounted && isInitialized && !isInitializing) {
-      if (!isLoggedIn) {
-        console.log('[useAdminAuth] User not logged in, redirecting to login');
-        router.replace('/login?redirect=/admin/dashboard');
-        return;
-      }
+    if (!isMounted) return;
 
-      if (!isAdmin) {
-        console.log('[useAdminAuth] User not admin, redirecting to unauthorized');
-        router.replace('/error?reason=unauthorized&role=admin');
-        return;
-      }
+    if (status === 'unauthenticated') {
+      console.log('[useAdminAuth] User not logged in (authV2), redirecting to login');
+      router.replace('/login?redirect=/admin/users');
+      return;
     }
-  }, [isMounted, isInitialized, isInitializing, isLoggedIn, isAdmin, router]);
+
+    if (status === 'authenticated' && !isAdmin) {
+      console.log('[useAdminAuth] User not admin (authV2), redirecting to unauthorized');
+      router.replace('/error?reason=unauthorized&role=admin');
+      return;
+    }
+  }, [isMounted, status, isAdmin, router]);
 
   return {
     isAdmin,

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getGrow3dgeIdeasLabSessionData } from "@/lib/sanity/client";
 import { useGrow3dgeIdeasLab } from "@/hooks/useGrow3dgeIdeasLab";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import Loading from "@/app/loading";
 import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 import { ContentListing } from "@/components/organisms/content/ContentListing";
@@ -42,7 +42,7 @@ export default function Grow3dgeIdeaLabPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isClient, setIsClient] = useState(false);
 
-  const currentUser = useAppSelector((state) => state.user);
+  const { user } = useCurrentUserV2();
 
   useEffect(() => {
     setIsClient(true);
@@ -58,9 +58,7 @@ export default function Grow3dgeIdeaLabPage() {
 
   // Check if user has partner role
   const hasPartnerRole =
-    isClient &&
-    (currentUser?.user?.roles?.includes("partner") ||
-      currentUser?.user?.roles?.includes("admin"));
+    isClient && !!user && (user.roles?.includes("partner") || user.roles?.includes("admin"));
 
   if (isLoading) return <Loading />;
 

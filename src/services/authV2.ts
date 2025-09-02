@@ -51,6 +51,11 @@ export const authApiV2 = {
         connectedWallet: payload.connectedWallet,
         network: payload.network,
       }),
+    verifySignature: async (address: string, signature: string) =>
+      apiClient.post('/auth/wallet/verify-signature', {
+        wallet_address: address,
+        signature,
+      }),
     disconnect: async () => apiClient.delete('/auth/wallet/disconnect'),
   },
 };

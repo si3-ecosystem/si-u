@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getFixCardById } from "@/lib/sanity/client/getFixCardById";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
@@ -16,7 +16,7 @@ export default function FixCardDetailPage() {
   const { id } = useParams();
   const cardId = Array.isArray(id) ? id[0] : id;
   const [isClient, setIsClient] = useState(false);
-  const currentUser = useAppSelector((state) => state.user);
+  const { user } = useCurrentUserV2();
 
   useEffect(() => {
     setIsClient(true);
@@ -24,9 +24,7 @@ export default function FixCardDetailPage() {
 
   // Check if user has partner role
   const hasPartnerRole =
-    isClient &&
-    (currentUser?.user?.roles?.includes("partner") ||
-      currentUser?.user?.roles?.includes("admin"));
+    isClient && !!user && (user.roles?.includes("partner") || user.roles?.includes("admin"));
 
   const { data, isLoading } = useQuery({
     queryKey: cardId ? [`fixCard-${cardId}`] : [],

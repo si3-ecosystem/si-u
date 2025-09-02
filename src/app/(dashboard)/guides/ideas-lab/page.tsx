@@ -6,8 +6,10 @@ import type { IdeaLabsSession } from "@/types/idealabs_session";
 import Loading from "@/app/loading";
 import { Highlights } from "@/components/organisms/guides/ideas-lab/Highlights";
 import { ContentBanner } from "@/components/molecules/content/ContentBanner";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 export default function IdeaLabsPage() {
+  useCurrentUserV2();
   const { data, isLoading, error } = useQuery<IdeaLabsSession>({
     queryKey: ["idea-labs-session"],
     queryFn: getIdeaLabsSessionData,
@@ -16,6 +18,7 @@ export default function IdeaLabsPage() {
   const cards = data?.cards || [];
   const ideaLabs = useIdeaLabs(cards);
 
+  
   if (isLoading) return <Loading />;
 
   if (error || !data)

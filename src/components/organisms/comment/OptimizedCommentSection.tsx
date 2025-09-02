@@ -23,8 +23,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CommentErrorBoundary } from "./CommentErrorBoundary";
 import { useOptimizedComments } from "@/hooks/useOptimizedComments";
 import { ContentType, UserRole } from "@/types/comment";
-import { useAppSelector } from "@/redux/store";
 import { cn } from "@/lib/utils";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import { OptimizedCommentForm } from "./OptimizedCommentForm";
 import { OptimizedCommentItem } from "./OptimizedCommentItem";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -59,19 +59,9 @@ export function OptimizedCommentSection({
     "newest"
   );
 
-  const currentUser = useAppSelector((state) => state.user);
+  const { user, isAuthenticated } = useCurrentUserV2();
 
-  const getCurrentUserId = () => {
-    if (currentUser?.user) {
-      return currentUser.user._id || currentUser.user.id;
-    }
-    if (currentUser?._id || currentUser?.id) {
-      return currentUser._id || currentUser.id;
-    }
-    return "anonymous";
-  };
-
-  const currentUserId = getCurrentUserId();
+  const currentUserId = user?._id || (user as any)?.id || "anonymous";
 
   const {
     comments,
@@ -103,7 +93,8 @@ export function OptimizedCommentSection({
       guide_ideas_lab: ["guide", "admin"],
       scholar_session: ["scholar", "admin"],
       scholar_ideas_lab: ["scholar", "admin"],
-    };
+      "grow3dge-idea-lab": ["partner", "admin"],
+    } as Record<ContentType, UserRole[]> & { [key: string]: UserRole[] };
     return accessMap[contentType]?.includes(userRole);
   }, [contentType, userRole]);
 

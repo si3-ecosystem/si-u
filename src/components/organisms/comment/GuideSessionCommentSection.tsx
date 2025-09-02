@@ -3,7 +3,7 @@
 import React from 'react';
 import { OptimizedCommentSection } from './OptimizedCommentSection';
 import { ContentType, UserRole } from '@/types/comment';
-import { useAppSelector } from '@/redux/store';
+import { useUserRole } from '@/utils/auth/getUserRoleFromAuthV2';
 
 interface GuideSessionCommentSectionProps {
   contentId: string;
@@ -18,10 +18,8 @@ export function GuideSessionCommentSection({
   contentId, 
   className 
 }: GuideSessionCommentSectionProps) {
-  // Get user role from Redux store
-  const user = useAppSelector(state => state.user);
-  const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'guide') ? 'guide' : 'scholar' ;
-
+  // Get user role from AuthV2
+  const userRole: UserRole = useUserRole('guide');
   const contentType: ContentType = 'guide_session';
 
 

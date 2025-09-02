@@ -8,8 +8,10 @@ import type { SiherGuidesSession } from "@/types/siherguides/session";
 import Loading from "@/app/loading";
 import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 import { useGuidesSessionsWithFiltering } from "@/hooks/useGuidesSessionsWithFiltering";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 export default function SessionsPage() {
+  const { user } = useCurrentUserV2(); // keep for future role gating
   const { data, isLoading, error } = useQuery<SiherGuidesSession>({
     queryKey: ["siher-guides-session"],
     queryFn: getSiherGuidesSessionData,

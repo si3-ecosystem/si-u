@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGrow3dgeIdeasLabCardById } from "@/lib/sanity/client";
 import { PortableText as PortableTextComponent } from "@portabletext/react";
 import { useParams } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import { useState, useEffect } from "react";
 import Loading from "@/app/loading";
 import { ContentDetailLayout } from "@/components/organisms/layout/ContentDetailLayout";
@@ -17,7 +17,7 @@ import { Lock } from "lucide-react";
 export default function Grow3dgeIdeaLabDetail() {
   const [isClient, setIsClient] = useState(false);
   const params = useParams();
-  const currentUser = useAppSelector((state) => state.user);
+  const { user } = useCurrentUserV2();
   const id = params?.id as string;
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function Grow3dgeIdeaLabDetail() {
   });
 
   // Check if user has partner role
-  const hasPartnerRole = isClient && (currentUser?.user?.roles?.includes('partner') || currentUser?.user?.roles?.includes('admin'));
+  const hasPartnerRole = isClient && !!user && (user.roles?.includes('partner') || user.roles?.includes('admin'));
 
   if (isLoading) return <Loading />;
 
