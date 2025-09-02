@@ -14,8 +14,8 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
 import { useMemo } from "react";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 import {
   Sidebar,
@@ -120,13 +120,11 @@ const subMenuGroups: SubMenuGroup[] = [
 export function AppSidebar() {
   const pathname = usePathname();
   const { open, isMobile, setOpenMobile } = useSidebar();
-  const currentUser = useAppSelector((state) => state.user);
+  const { user, isAuthenticated } = useCurrentUserV2();
 
   // Get user roles for filtering menu items
-  const userRoles = currentUser?.user?.roles || [];
-  // const isAdmin = userRoles.includes("admin");
-  // const isAdmin = true; // Temporarily disable admin check for testing
-  const userEmail = currentUser?.user?.email || "";
+  const userRoles = (isAuthenticated && user?.roles) ? user.roles : [];
+  const userEmail = (isAuthenticated && user?.email) ? user.email : "";
   const isAdmin = userRoles.includes("admin");
   const isGuide = userRoles.includes("guide");
   const isPartner = userRoles.includes("partner");

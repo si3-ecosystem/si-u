@@ -1437,16 +1437,16 @@ export class UnifiedAuthService {
 
       // List of all possible paths where cookies might be stored
       const paths = [
-        "/",
-        "/login",
-        "/dashboard",
-        "/admin",
-        "/profile",
-        "/settings",
-        "/guides",
-        "/scholars",
-        "/grow3dge",
-        "/communities",
+        '/', 
+        '/login', 
+        '/home', 
+        '/admin', 
+        '/profile', 
+        '/settings',
+        '/guides',
+        '/scholars',
+        '/grow3dge',
+        '/communities'
       ];
 
       // List of possible domains

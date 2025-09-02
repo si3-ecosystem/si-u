@@ -43,7 +43,7 @@ export class AuthDebugger {
     console.log('[AuthDebugger] Clearing all auth cookies...');
     
     const cookiesToClear = ['si3-jwt', 'auth-token', 'token', 'jwt'];
-    const paths = ['/', '/login', '/dashboard'];
+    const paths = ['/', '/login', '/home'];
     const domains = [window.location.hostname, `.${window.location.hostname}`, 'localhost'];
     
     cookiesToClear.forEach(cookieName => {

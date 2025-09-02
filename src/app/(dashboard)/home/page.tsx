@@ -8,7 +8,7 @@ import { SessionsCompleted } from "@/components/molecules/icons/SessionsComplete
 import { LearningProgress } from "@/components/organisms/dashboard/dashboardLearningProgress";
 import { DashboardProfileHeader } from "@/components/organisms/dashboard/dashboardProfileHeader";
 import { UpcomingSessions } from "@/components/organisms/dashboard/dashboardUpcomingSessions";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardBanner } from "@/lib/sanity/client";
 import Loading from "@/app/loading";
@@ -80,8 +80,7 @@ const sessionsData = [
 
 export default function DashboardPage() {
   const router = useRouter();
-  const currentUser = useAppSelector(state => state.user);
-  const [isClient, setIsClient] = React.useState(false);
+  const { user, isAuthenticated, isLoading: isUserLoading } = useCurrentUserV2();
 
    const { data, isLoading } = useQuery({
     queryKey: ["dashboardBanner"],
@@ -89,20 +88,14 @@ export default function DashboardPage() {
   });
 
 
-  // Ensure client-side rendering for user data to prevent hydration mismatch
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Get user data with fallbacks - only on client side and when user is initialized
-  const isUserReady = isClient && currentUser?.isInitialized;
-  const username = isUserReady ? getDisplayUsername(currentUser?.user) : "No username";
-  const walletAddress = isUserReady ? currentUser?.user?.walletAddress : null;
+  const isUserReady = isAuthenticated && !!user;
+  const username = isUserReady ? getDisplayUsername(user) : "No username";
+  const walletAddress = isUserReady ? user?.wallet_address : null;
   const subtext = isUserReady && walletAddress ?
     `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth` :
     "user.siher.eth";
   const avatarUrl = isUserReady ?
-    (getProfileImageUrl(currentUser?.user) || "/placeholder.png") :
+    (getProfileImageUrl(user) || "/placeholder.png") :
     "/placeholder.png";
 
   const handleShareProfile = () => {
@@ -121,7 +114,7 @@ export default function DashboardPage() {
     console.log("Explore sessions clicked");
   };
 
-  if(isLoading) return <Loading />;
+  if(isLoading || isUserLoading) return <Loading />;
 
   return (
     <div className="min-h-screen w-full bg-[#f6f6f6]">

@@ -1,8 +1,9 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { UnifiedAuthService } from "@/services/authService";
 import { useEffect, useRef } from "react";
+import { store } from "@/redux/store";
+import { setUnauthenticated } from "@/redux/slice/authSliceV2";
 
 // Create auth-aware query client
 const createAuthAwareQueryClient = () => {
@@ -12,8 +13,8 @@ const createAuthAwareQueryClient = () => {
         retry: (failureCount, error: any) => {
           // Don't retry on 401 errors - handle auth failure
           if (error?.status === 401 || error?.statusCode === 401) {
-            console.log('[QueryClient] 401 error detected, triggering logout');
-            UnifiedAuthService.logout();
+            console.log('[QueryClient] 401 error detected, marking unauthenticated');
+            try { store.dispatch(setUnauthenticated()); } catch {}
             return false;
           }
           // Retry other errors up to 3 times
@@ -26,8 +27,8 @@ const createAuthAwareQueryClient = () => {
         retry: (failureCount, error: any) => {
           // Don't retry on 401 errors
           if (error?.status === 401 || error?.statusCode === 401) {
-            console.log('[QueryClient] 401 error in mutation, triggering logout');
-            UnifiedAuthService.logout();
+            console.log('[QueryClient] 401 error in mutation, marking unauthenticated');
+            try { store.dispatch(setUnauthenticated()); } catch {}
             return false;
           }
           // Don't retry mutations by default
@@ -53,13 +54,16 @@ export function TanstackClientProvider({
   const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    // Listen for auth events to clear cache
-    const cleanup = UnifiedAuthService.onAuthEvent('logout', () => {
-      console.log('[TanstackClientProvider] Logout event received, clearing cache');
-      queryClient.clear();
+    // Clear cache when unauthenticated
+    const unsubscribe = store.subscribe(() => {
+      const state: any = store.getState();
+      if (state?.authV2?.status === 'unauthenticated') {
+        console.log('[TanstackClientProvider] Clearing cache on unauthenticated');
+        queryClient.clear();
+      }
     });
 
-    cleanupRef.current = cleanup;
+    cleanupRef.current = unsubscribe;
 
     return () => {
       if (cleanupRef.current) {

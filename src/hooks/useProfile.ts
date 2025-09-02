@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UpdateProfileRequest } from '@/services/profileService';
 import { ErrorHandler } from '@/utils/errorHandler';
 import { useAppSelector } from '@/redux/store';
+import { useCurrentUserV2 } from '@/hooks/auth/useCurrentUserV2';
 import { UnifiedAuthService } from '@/services/authService';
 
 /**
@@ -12,38 +13,40 @@ import { UnifiedAuthService } from '@/services/authService';
 export function useProfile() {
   const queryClient = useQueryClient();
 
-  // Get user data from Redux store instead of API call
-  const currentUser = useAppSelector(state => state.user);
+  // Prefer authV2 user; fallback to legacy only if authV2 not authenticated
+  const { user: v2User, isAuthenticated: v2Authed, isLoading: v2Loading } = useCurrentUserV2();
+  const legacyState = useAppSelector(state => state.user);
+  const srcUser = v2Authed ? (v2User as any) : (legacyState?.user as any);
 
-  // Extract profile data from Redux user state
-  const profile = currentUser?.user ? {
-    _id: currentUser.user._id,
-    email: currentUser.user.email,
-    username: currentUser.user.username,
-    name: currentUser.user.name || `${currentUser.user.firstName || ''} ${currentUser.user.lastName || ''}`.trim(),
-    firstName: currentUser.user.firstName,
-    lastName: currentUser.user.lastName,
-    phone: currentUser.user.phone,
-    bio: currentUser.user.bio,
-    avatar: currentUser.user.avatar,
-    profileImage: currentUser.user.profileImage,
-    roles: currentUser.user.roles || [],
-    isVerified: currentUser.user.isVerified || currentUser.user.isEmailVerified || false,
-    isEmailVerified: currentUser.user.isEmailVerified || currentUser.user.isVerified || false,
-    newsletter: currentUser.user.newsletter || false,
-    interests: currentUser.user.interests || [],
-    companyName: currentUser.user.companyName,
-    wallet_address: currentUser.user.wallet_address,
-    personalValues: currentUser.user.personalValues || [],
-    companyAffiliation: currentUser.user.companyAffiliation,
-    digitalLinks: currentUser.user.digitalLinks || [],
-    createdAt: currentUser.user.createdAt,
-    updatedAt: currentUser.user.updatedAt,
+  // Extract profile data from selected source
+  const profile = srcUser ? {
+    _id: srcUser._id,
+    email: srcUser.email,
+    username: srcUser.username,
+    name: srcUser.name || `${srcUser.firstName || ''} ${srcUser.lastName || ''}`.trim(),
+    firstName: srcUser.firstName,
+    lastName: srcUser.lastName,
+    phone: srcUser.phone,
+    bio: srcUser.bio,
+    avatar: srcUser.avatar,
+    profileImage: srcUser.profileImage,
+    roles: srcUser.roles || [],
+    isVerified: srcUser.isVerified || srcUser.isEmailVerified || false,
+    isEmailVerified: srcUser.isEmailVerified || srcUser.isVerified || false,
+    newsletter: srcUser.newsletter || false,
+    interests: srcUser.interests || [],
+    companyName: srcUser.companyName,
+    wallet_address: srcUser.wallet_address,
+    personalValues: srcUser.personalValues || [],
+    companyAffiliation: srcUser.companyAffiliation,
+    digitalLinks: srcUser.digitalLinks || [],
+    createdAt: srcUser.createdAt,
+    updatedAt: srcUser.updatedAt,
   } : null;
 
-  // Check if we're still loading user data
-  const isLoading = !currentUser?.isInitialized || (!currentUser?.user && currentUser?.isLoggedIn);
-  const error = null; // No error since we're using Redux data
+  // Loading derived from authV2 primarily
+  const isLoading = v2Loading && !v2Authed;
+  const error = null; // No error since we're using Redux-driven data
 
   // Mutation for updating profile
   const updateProfileMutation = useMutation({

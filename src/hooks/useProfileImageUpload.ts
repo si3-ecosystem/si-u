@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector, store } from '@/redux/store';
 import { updateUserProfile } from '@/redux/slice/userSlice';
+import { mergeUser as mergeUserV2 } from '@/redux/slice/authSliceV2';
 import { ProfileImageService, ProfileImageUploadResponse } from '@/services/profileImageService';
 import { UnifiedAuthService } from '@/services/authService';
 import { ErrorHandler } from '@/utils/errorHandler';
@@ -87,6 +88,8 @@ export function useProfileImageUpload(
           console.log('🖼️ New profileImage URL:', response.data.user.profileImage);
 
           dispatch(updateUserProfile(response.data.user));
+          // Also update authV2 store so all v2 consumers update immediately
+          dispatch(mergeUserV2({ profileImage: response.data.user.profileImage }));
           console.log('✅ Redux dispatch called');
 
           // Verify Redux state was updated immediately

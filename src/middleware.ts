@@ -17,16 +17,13 @@ export function middleware(request: NextRequest) {
   // because those are Next.js API routes, not backend API calls
   // The backend API calls are made directly to localhost:8080 and will include cookies automatically
 
-  // For authentication routes, handle redirects
+  // Allow /login to render even if a token cookie exists to avoid redirect loops
   if (request.nextUrl.pathname === '/login') {
-    if (token) {
-      console.log('[Middleware] User has token, redirecting from login to dashboard');
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
+    return response;
   }
 
   // For protected routes, check authentication
-  const protectedRoutes = ['/dashboard', '/profile', '/settings', '/admin'];
+  const protectedRoutes = ['/home', '/profile', '/settings', '/admin'];
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   );

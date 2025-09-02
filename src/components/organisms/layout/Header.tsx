@@ -8,9 +8,9 @@ import { Grid, User, Settings } from "lucide-react";
 
 import { ProfileDropdown } from "./ProfileDropdown";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
-import { useAppSelector } from "@/redux/store";
 import { getDisplayUsername } from "@/lib/utils/username";
 import { getProfileImageUrl } from "@/utils/profileImageUtils";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 // import {
 //   Notification,
@@ -19,8 +19,8 @@ import { getProfileImageUrl } from "@/utils/profileImageUtils";
 
 const profileMenuItems = [
   {
-    label: "Dashboard",
-    href: "/dashboard",
+    label: "Home",
+    href: "/home",
     icon: <Grid className="h-5 w-5" />,
     showChevron: true,
   },
@@ -72,26 +72,15 @@ const profileMenuItems = [
 
 export function Header() {
   const { open } = useSidebar();
-  const currentUser = useAppSelector((state) => state.user);
-  const [isClient, setIsClient] = React.useState(false);
+  const { user, isAuthenticated, isLoading } = useCurrentUserV2();
 
-  // Ensure client-side rendering for user data to prevent hydration mismatch
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Get user data with fallbacks - only on client side and when user is initialized
-  const isUserReady = isClient && currentUser?.isInitialized;
-  const username = isUserReady
-    ? getDisplayUsername(currentUser?.user)
+  const username = !isLoading && isAuthenticated ? getDisplayUsername(user) : "Loading...";
+  const walletAddress = !isLoading && isAuthenticated ? user?.wallet_address : null;
+  const subtext = !isLoading && isAuthenticated && walletAddress
+    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth`
     : "Loading...";
-  const walletAddress = isUserReady ? currentUser?.user?.walletAddress : null;
-  const subtext =
-    isUserReady && walletAddress
-      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}.siher.eth`
-      : "Loading...";
-  const avatarUrl = isUserReady
-    ? getProfileImageUrl(currentUser?.user) || "/placeholder.png"
+  const avatarUrl = !isLoading && isAuthenticated
+    ? getProfileImageUrl(user) || "/placeholder.png"
     : "/placeholder.png";
 
   // const handleMarkAllRead = () => {

@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { useProfileImageUpload } from '@/hooks/useProfileImageUpload';
-import { useAppSelector } from '@/redux/store';
+import { useCurrentUserV2 } from '@/hooks/auth/useCurrentUserV2';
 import { cn } from '@/lib/utils';
 import { getProfileImageUrl, getUserInitials } from '@/utils/profileImageUtils';
 
@@ -37,10 +37,7 @@ export function ProfileImageUpload({
   onError,
 }: ProfileImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const currentUser = useAppSelector(state => {
-  
-    return state.user.user;
-  });
+  const { user: currentUser } = useCurrentUserV2();
 
 
 
@@ -64,7 +61,7 @@ export function ProfileImageUpload({
     },
   });
 
-  const currentImageUrl = getProfileImageUrl(currentUser);
+  const currentImageUrl = getProfileImageUrl(currentUser as any);
 
   const displayImageUrl = previewUrl || currentImageUrl;
 

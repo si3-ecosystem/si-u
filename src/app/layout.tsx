@@ -9,7 +9,9 @@ import "./globals.css";
 import ReduxProvider from "@/providers/ReduxProvider";
 import WalletProvider from "@/providers/WagmiProvider";
 import { TanstackClientProvider } from "@/providers/TanstackClientProvider";
-import { AuthInitializer } from "@/providers/AuthInitializer";
+import AuthV2Provider from "@/providers/AuthV2Provider";
+// import AuthV2LegacyBridge from "@/providers/AuthV2LegacyBridge";
+// Removed legacy AuthInitializer to avoid conflicting auth states
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 
 export const metadata: Metadata = {
@@ -29,14 +31,14 @@ export default function RootLayout({
       >
         <WalletProvider>
           <ReduxProvider>
-            <AuthInitializer>
             <AnalyticsProvider writeKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmlnaW4iOiJodHRwczovL2FwcC5zaTMuc3BhY2UvIiwicHJvamVjdF9pZCI6ImtzOEhVX0t5S29TVThPS2o5SG01QyIsImlhdCI6MTc1NTU0MjEzMH0.5Ek4-N2UM4nESbagZk9--H5Rm2iXYlqe0UFVidqK8jk'>
               <TanstackClientProvider>
-                {children}
-                <Toaster />
+                <AuthV2Provider>
+                  {children}
+                  <Toaster />
+                </AuthV2Provider>
               </TanstackClientProvider>
               </AnalyticsProvider>
-            </AuthInitializer>
           </ReduxProvider>
         </WalletProvider>
       </body>
