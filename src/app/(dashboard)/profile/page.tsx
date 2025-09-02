@@ -5,7 +5,7 @@ import { KollabsSection } from "@/components/organisms/profile/KollabsSection";
 import { ProfileHeader } from "@/components/organisms/profile/ProfileHeader";
 import { StatsGrid } from "@/components/organisms/profile/StatsGrid";
 import { SuggestedKollaboards } from "@/components/organisms/profile/SuggestedKollaboards";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import {
   kollabs,
   profileStats,
@@ -14,7 +14,7 @@ import {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const currentUser = useAppSelector((state) => state.user);
+  const { user, isAuthenticated } = useCurrentUserV2();
 
   const handleEditProfile = () => {
     router.push("/settings");
@@ -24,9 +24,9 @@ export default function ProfilePage() {
     console.log("Share profile clicked");
   };
 
-  const userEmail = currentUser?.user?.email || "";
-  const username = currentUser?.user?.username || "";
-  const website = currentUser?.user?.website || "";
+  const userEmail = isAuthenticated ? (user?.email || "") : "";
+  const username = isAuthenticated ? (user?.username || "") : "";
+  const website = isAuthenticated ? (user?.website || "") : "";
 
   return (
     <section className="container w-full mx-auto px-4 flex flex-col gap-8 md:gap-12">

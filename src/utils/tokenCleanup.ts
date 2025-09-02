@@ -90,7 +90,7 @@ export class TokenCleanup {
   static clearAllAuthCookies(): void {
     if (typeof window === 'undefined') return;
 
-    const paths = ['/', '/login', '/dashboard', '/admin', '/profile', '/settings'];
+    const paths = ['/', '/login', '/home', '/admin', '/profile', '/settings'];
     const domains = [
       window.location.hostname,
       `.${window.location.hostname}`,

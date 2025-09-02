@@ -68,7 +68,7 @@ const LoginOTP: React.FC<LoginOTPProps> = ({ email, onBack, onSuccess }) => {
         // before redirecting to prevent middleware/client state mismatch
         setTimeout(() => {
           console.log('[LoginOTP] Redirecting to dashboard after successful OTP verification');
-          router.push("/dashboard");
+          router.push("/home");
         }, 1500);
       } catch (error: any) {
         setError(

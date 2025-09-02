@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import ConfirmLogoutDialog from "./ConfirmLogoutDialog";
 import { useDispatch } from "react-redux";
 import { setLogoutModalOpen } from "@/redux/slice/modalSlice";
-import { UnifiedAuthService } from "@/services/authService";
+import { useAuthV2 } from "@/hooks/auth/useAuthV2";
 
 const LogoutButton = () => {
   const dispatch = useDispatch();
+  const { logout } = useAuthV2();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -44,9 +45,10 @@ const LogoutButton = () => {
       // Close modal first
       dispatch(setLogoutModalOpen(false));
 
-      // Use UnifiedAuthService for comprehensive logout with redirect
-      // The service now handles all cleanup and redirect internally
-      await UnifiedAuthService.logout({ redirect: true });
+      await logout();
+      if (typeof window !== 'undefined') {
+        window.location.replace('/login');
+      }
 
       console.log("[LogoutButton] Logout process initiated successfully");
     } catch (error) {

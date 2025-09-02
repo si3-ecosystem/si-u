@@ -123,7 +123,7 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
             sessionStorage.removeItem('force-login');
 
             console.log('[WalletSignature] Redirecting to dashboard...');
-            router.replace("/dashboard");
+            router.replace("/home");
             return;
           }
 
@@ -138,7 +138,7 @@ const WalletSignature: React.FC<WalletSignatureProps> = ({
         });
 
         // Still redirect, but log the issue
-        router.replace("/dashboard");
+        router.replace("/home");
       };
 
       // Start token persistence verification

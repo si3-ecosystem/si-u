@@ -3,7 +3,7 @@
 import React from "react";
 // import { Button } from "@/components/ui/button";
 import { ProfileEditForm } from "@/components/organisms/profile/ProfileEditForm";
-import { AccountWalletSection } from "./AccountWalletSection";
+import { AccountWalletSectionV2 as AccountWalletSection } from "./AccountWalletSectionV2";
 import { SupportSection } from "./SupportSection";
 import { NotificationSection } from "./NotificationSection";
 import { ProfileImageSection } from "./ProfileImageSection";
@@ -13,14 +13,6 @@ export default function Settings() {
   // const handleLogout = () => {
   //   console.log("Logout clicked");
   // };
-
-  const handleDisconnectWallet = () => {
-    console.log("Wallet disconnected");
-  };
-
-  const handleConnectWallet = () => {
-    console.log("Wallet connected");
-  };
 
   const handleImageUpdate = (imageUrl: string, userData: any) => {
     console.log("Profile image updated:", { imageUrl, userData });
@@ -46,10 +38,7 @@ export default function Settings() {
               onImageUpdate={handleImageUpdate}
               onError={handleImageError}
             />
-            <AccountWalletSection
-              onDisconnectWallet={handleDisconnectWallet}
-              onConnectWallet={handleConnectWallet}
-            />
+            <AccountWalletSection />
             <SupportSection />
 
             {/* <Button

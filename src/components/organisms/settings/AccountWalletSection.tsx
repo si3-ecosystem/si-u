@@ -36,8 +36,16 @@ export function AccountWalletSection({
     connectWallet,
     handleAuthSuccess,
     copyWalletAddress,
+    loadWalletInfo,
   } = useWalletManagement();
 
+  // Debug logging for wallet info changes
+  console.log('[AccountWalletSection] Render with wallet info:', {
+    walletInfo,
+    isLoading,
+    isWalletConnected,
+    hasWalletInfo: !!walletInfo?.address
+  });
 
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
@@ -56,8 +64,21 @@ export function AccountWalletSection({
   };
 
   // Handle auth success with callback
-  const handleWalletAuthSuccess = () => {
+  const handleWalletAuthSuccess = async () => {
     const result = handleAuthSuccess();
+    
+    // Instead of hard reload, refresh the wallet information
+    try {
+      await loadWalletInfo();
+      console.log('[AccountWalletSection] Wallet info refreshed after connection');
+    } catch (error) {
+      console.warn('[AccountWalletSection] Failed to refresh wallet info:', error);
+      // Fallback: reload the page if refresh fails
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+    
     setShowAuthDialog(false);
     if (result.success) {
       onConnectWallet?.();

@@ -1,40 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import Settings from "@/components/organisms/settings";
-import { useAppSelector } from "@/redux/store";
-import { UnifiedAuthService } from "@/services/authService";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 export default function SettingsPage() {
-  const currentUser = useAppSelector((state) => state.user);
-  const hasInitializedRef = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (hasInitializedRef.current) {
-      return;
-    }
-
-    const refreshUserData = async () => {
-      try {
-        await UnifiedAuthService.forceRefreshUserData();
-
-        hasInitializedRef.current = true;
-        setIsLoading(false);
-      } catch (error) {
-        console.log("[SettingsPage] Error during data refresh:", error);
-        hasInitializedRef.current = true;
-        setIsLoading(false);
-      }
-    };
-
-    if (currentUser.isLoggedIn) {
-      refreshUserData();
-    } else {
-      hasInitializedRef.current = true;
-      setIsLoading(false);
-    }
-  }, []);
+  const { isLoading } = useCurrentUserV2();
 
   if (isLoading) {
     return (
