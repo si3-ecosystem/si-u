@@ -8,7 +8,7 @@ import { ApiResponse, ApiError } from '@/types/rsvp';
 export class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.si3.space' || 'http://localhost:8080') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.si3.space') {
     // Ensure the base URL always ends with /api
     this.baseURL = baseURL.endsWith('/api') ? baseURL : `${baseURL}/api`;
   }
@@ -29,7 +29,8 @@ export class ApiClient {
         // The si3-jwt cookie will be sent automatically with credentials: 'include'
         ...options.headers,
       },
-      credentials: 'include', // Include cookies for authentication
+      credentials: 'include', // Include cookies for authentication,
+      mode: 'cors', // Enable CORS
       ...options,
     };
 
