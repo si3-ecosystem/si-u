@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet } from "lucide-react";
+import { Wallet } from "lucide-react"; // unchanged
 import WalletConnectDialog from "@/components/organisms/settings/wallet-connect/WalletConnectDialog";
 import { WalletDisplay } from "./wallet/WalletDisplay";
 import { WalletActions } from "./wallet/WalletActions";
@@ -11,7 +11,7 @@ import { useWalletV2 } from "@/hooks/auth/useWalletV2";
 import { toast } from "sonner";
 
 export function AccountWalletSectionV2() {
-  const { user, walletInfo, isWalletConnected, isEmailVerified, connect, disconnect, reloadFromServer } = useWalletV2();
+  const { user, walletInfo, isWalletConnected, isEmailVerified, disconnect, reloadFromServer } = useWalletV2();
 
   // Ensure we sync from server on mount so existing wallet_address is reflected
   useEffect(() => { reloadFromServer(); }, [reloadFromServer]);
@@ -68,6 +68,18 @@ export function AccountWalletSectionV2() {
         </CardHeader>
         <CardContent>
           <EmailVerificationWarning isWalletConnected={isWalletConnected} isEmailVerified={isEmailVerified} />
+
+          {/* Email & Username display */}
+          <div className="space-y-3 border border-gray-200 rounded-lg p-4 mb-4">
+            <div className="flex justify-between">
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <p className="text-sm font-medium">{user?.email || '—'}</p>
+            </div>
+            <div className="flex justify-between">
+              <label className="text-sm font-medium text-gray-700">Username</label>
+              <p className="text-sm font-medium">{user?.username || 'No username'}</p>
+            </div>
+          </div>
 
           <WalletDisplay
             walletInfo={{

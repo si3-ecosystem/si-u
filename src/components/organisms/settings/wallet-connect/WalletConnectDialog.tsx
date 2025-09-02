@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useDisconnect, useSignMessage, useAccount } from "wagmi";
-import { WalletService, WalletInfo, WalletType, NetworkType } from "@/services/walletService";
+import { useSignMessage } from "wagmi";
+import { WalletType, NetworkType } from "@/services/walletService";
+import { authApiV2 } from "@/services/authV2";
 // UnifiedAuthService removed in V2 flow
 
 import WalletProviderList from "./components/WalletProviderList";
@@ -24,8 +24,6 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
   const [address, setAddress] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "summary" | "signing" | "done">("select");
   const [loading, setLoading] = useState(false);
-  const { disconnect } = useDisconnect();
-  const { address: wagmiAddress, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
 
   const handleProviderSelected = async (wallet: WalletType, addr: string) => {
@@ -125,7 +123,7 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
 
         {step === "done" && (
           <div className="text-center space-y-4">
-            <div className="text-green-600 font-semibold">
+            <div className="text-brand text-xl font-semibold text-center">
               ✓ Wallet connected successfully!
             </div>
             <p className="text-sm text-gray-600">

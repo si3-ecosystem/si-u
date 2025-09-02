@@ -13,7 +13,7 @@ export function useAuthV2() {
     dispatch(setAuthLoading());
     try {
       const res = await authApiV2.me();
-      const user = (res as any).data?.user || (res as any).data || res?.data?.data || null;
+      const user = (res as any).data?.user || (res as any).data?.data?.user || (res as any).data || null;
       if (user?.id || user?._id) {
         dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
         return true;
@@ -50,7 +50,7 @@ export function useAuthV2() {
       // Fetch full profile to avoid placeholders/dummy data
       try {
         const meRes = await authApiV2.me();
-        const user = (meRes as any).data?.user || (meRes as any).data || meRes?.data?.data || null;
+        const user = (meRes as any).data?.user || (meRes as any).data?.data?.user || (meRes as any).data || null;
         if (user) {
           dispatch(mergeUser({ ...user, _id: user._id || user.id }));
         }
