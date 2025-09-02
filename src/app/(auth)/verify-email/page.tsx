@@ -21,7 +21,7 @@ export default function VerifyEmailPage() {
   // If user is already verified, redirect to dashboard
   useEffect(() => {
     if (isVerified) {
-      router.push('/dashboard');
+      router.push('/home');
     }
   }, [isVerified, router]);
 
@@ -62,7 +62,7 @@ export default function VerifyEmailPage() {
 
   const handleSkipForNow = () => {
     // Allow user to continue to dashboard without verification
-    router.push('/dashboard');
+    router.push('/home');
   };
 
   const handleBackToLogin = () => {

@@ -19,8 +19,8 @@ import { getProfileImageUrl } from "@/utils/profileImageUtils";
 
 const profileMenuItems = [
   {
-    label: "Dashboard",
-    href: "/dashboard",
+    label: "Home",
+    href: "/home",
     icon: <Grid className="h-5 w-5" />,
     showChevron: true,
   },

@@ -1180,7 +1180,7 @@ export class UnifiedAuthService {
       const paths = [
         '/', 
         '/login', 
-        '/dashboard', 
+        '/home', 
         '/admin', 
         '/profile', 
         '/settings',

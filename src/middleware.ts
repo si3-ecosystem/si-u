@@ -21,12 +21,12 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === '/login') {
     if (token) {
       console.log('[Middleware] User has token, redirecting from login to dashboard');
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL('/home', request.url));
     }
   }
 
   // For protected routes, check authentication
-  const protectedRoutes = ['/dashboard', '/profile', '/settings', '/admin'];
+  const protectedRoutes = ['/home', '/profile', '/settings', '/admin'];
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   );
