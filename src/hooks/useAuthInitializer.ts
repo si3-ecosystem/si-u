@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useAppSelector } from '@/redux/store';
+import { useAppSelector, store } from '@/redux/store';
 import { apiClient } from '@/services/api';
 import { initializeUser } from '@/redux/slice/userSlice';
-import { store } from '@/redux/store';
+import { setAllContent } from '@/redux/slice/contentSlice';
 
 /**
  * Simplified hook to initialize authentication state from server
@@ -31,7 +31,7 @@ export function useAuthInitializer() {
         console.log('[useAuthInitializer] Fetching user data from server...');
 
         // Try to get user data from server using cookies
-        const response = await apiClient.get('/auth/me');
+        const response = await apiClient.get<{ status: string; data: { user: any } }>('/auth/me');
 
         console.log('[useAuthInitializer] Full response object:', response);
         console.log('[useAuthInitializer] Response.data:', response.data);
@@ -42,7 +42,7 @@ export function useAuthInitializer() {
         const userData = response.data?.user || response.data?.data?.user || response.data;
         console.log('[useAuthInitializer] Extracted user data:', userData);
 
-        if (userData && userData.id) {
+        if (userData && (userData.id || userData._id)) {
           console.log('[useAuthInitializer] Found user data with id:', userData.id);
 
           // Normalize user data - ensure _id field exists (server returns 'id')
@@ -56,6 +56,30 @@ export function useAuthInitializer() {
 
           // Initialize user in Redux store
           store.dispatch(initializeUser(normalizedUserData));
+
+          // Process webcontent if available
+          if (userData?.webcontent) {
+            console.log('[useAuthInitializer] Processing webcontent data');
+            
+            const webcontent = userData.webcontent;
+            const contentData = {
+              landing: webcontent.landing,
+              slider: webcontent.slider,
+              value: webcontent.value,
+              live: webcontent.live,
+              organizations: webcontent.organizations,
+              timeline: webcontent.timeline,
+              available: webcontent.available,
+              socialChannels: webcontent.socialChannels,
+              isNewWebpage: webcontent.isNewWebpage,
+              domain: webcontent.domain
+            };
+
+            console.log('[useAuthInitializer] Updating content slice with actual webcontent data');
+            store.dispatch(setAllContent(contentData));
+          } else {
+            console.log('[useAuthInitializer] No webcontent found - skipping content update');
+          }
         } else {
           console.log('[useAuthInitializer] No valid user data from server');
           console.log('[useAuthInitializer] Response structure did not match expected format');
