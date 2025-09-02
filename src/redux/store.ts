@@ -14,6 +14,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import { createLogger } from "redux-logger";
 import userReducer from "./slice/userSlice";
+import authV2Reducer from "./slice/authSliceV2";
 import pushReducer from "./slice/pushSlice";
 import modalsReducer from "./slice/modalSlice";
 import communityReducer from "./slice/communitySlice";
@@ -38,6 +39,7 @@ export const store: Store = configureStore({
     community: communityReducer,
     comments: commentReducer,
     content: persistedContentReducer,
+    authV2: authV2Reducer,
   },
 
   middleware: (getDefaultMiddleware) => {

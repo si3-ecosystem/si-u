@@ -32,11 +32,21 @@ export function useWalletManagement() {
   }, []);
 
   useEffect(() => {
+    console.log('[useWalletManagement] User state changed:', {
+      hasWalletInfo: !!currentUser?.user?.walletInfo?.address,
+      hasWalletAddress: !!currentUser?.user?.wallet_address,
+      walletInfo: currentUser?.user?.walletInfo,
+      walletAddress: currentUser?.user?.wallet_address,
+      isLoading
+    });
+    
     // Check if user has valid wallet info with address
     if (currentUser?.user?.walletInfo?.address) {
+      console.log('[useWalletManagement] Setting wallet info from walletInfo');
       setWalletInfo(currentUser.user.walletInfo);
       setIsLoading(false);
     } else if (currentUser?.user?.wallet_address) {
+      console.log('[useWalletManagement] Setting wallet info from wallet_address');
       setWalletInfo({
         address: currentUser.user.wallet_address,
         connectedWallet: "Other",
@@ -45,6 +55,7 @@ export function useWalletManagement() {
       setIsLoading(false);
     } else if (currentUser?.user) {
       // User exists but no valid wallet data - clear wallet info
+      console.log('[useWalletManagement] Clearing wallet info - no wallet data');
       setWalletInfo(null);
       setIsLoading(false);
     }
@@ -53,6 +64,21 @@ export function useWalletManagement() {
     currentUser?.user?.wallet_address,
     currentUser?.user,
   ]);
+
+  // Add a separate effect to handle loading state when wallet info changes
+  useEffect(() => {
+    console.log('[useWalletManagement] Loading state effect triggered:', {
+      hasWalletInfo: !!walletInfo?.address,
+      hasUserWalletInfo: !!currentUser?.user?.walletInfo?.address,
+      hasUserWalletAddress: !!currentUser?.user?.wallet_address,
+      isLoading
+    });
+    
+    if (walletInfo?.address || (!currentUser?.user?.walletInfo?.address && !currentUser?.user?.wallet_address)) {
+      console.log('[useWalletManagement] Setting loading to false');
+      setIsLoading(false);
+    }
+  }, [walletInfo, currentUser?.user?.walletInfo?.address, currentUser?.user?.wallet_address]);
 
   const loadWalletInfo = async () => {
     // Only use existing data if it has a valid address
@@ -259,11 +285,31 @@ export function useWalletManagement() {
   const handleAuthSuccess = () => {
     setIsConnecting(false);
 
-    // Refresh our local wallet info from the updated user state
+    // Immediately refresh our local wallet info from the updated user state
+    if (currentUser?.user?.walletInfo?.address) {
+      console.log('[useWalletManagement] Setting wallet info from walletInfo in handleAuthSuccess');
+      setWalletInfo(currentUser.user.walletInfo);
+    } else if (currentUser?.user?.wallet_address) {
+      console.log('[useWalletManagement] Setting wallet info from wallet_address in handleAuthSuccess');
+      setWalletInfo({
+        address: currentUser.user.wallet_address,
+        connectedWallet: "Other",
+        network: "Mainnet",
+      });
+    }
+    
+    // Also try to load fresh wallet info from the server
+    console.log('[useWalletManagement] Loading fresh wallet info from server');
+    loadWalletInfo();
+    
+    // Force a re-render by updating the component state
+    // This ensures the UI updates immediately
     setTimeout(() => {
-      if (currentUser?.user?.walletInfo?.address) {
+      console.log('[useWalletManagement] Forcing UI update after wallet connection');
+      // Check if we need to update the wallet info again
+      if (currentUser?.user?.walletInfo?.address && !walletInfo?.address) {
         setWalletInfo(currentUser.user.walletInfo);
-      } else if (currentUser?.user?.wallet_address) {
+      } else if (currentUser?.user?.wallet_address && !walletInfo?.address) {
         setWalletInfo({
           address: currentUser.user.wallet_address,
           connectedWallet: "Other",
@@ -274,11 +320,8 @@ export function useWalletManagement() {
 
     toast.success("Wallet connected successfully!");
 
-    // Hard reload to ensure clean UI state after wallet connection
-    console.log("Performing hard reload after wallet connection...");
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000); // Small delay to show success message
+    // Don't do hard reload - let the UI update naturally
+    console.log("Wallet connection successful, UI will update automatically");
 
     return { success: true };
   };

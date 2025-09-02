@@ -29,6 +29,7 @@ interface UserData {
   notificationSettings?: any;
   walletInfo?: any;
   settingsUpdatedAt?: string;
+  isEmailVerified?: boolean; // Added for email verification status
 }
 
 interface UserState {
@@ -282,11 +283,29 @@ const userSlice = createSlice({
     forceUpdateUser: (state: UserState, action: PayloadAction<UserData>) => {
       const newUserData = action.payload;
 
+      console.log('[UserSlice] forceUpdateUser called with:', {
+        hasId: !!newUserData._id,
+        userId: newUserData._id,
+        userEmail: newUserData.email,
+        isVerified: newUserData.isVerified,
+        isEmailVerified: newUserData.isEmailVerified,
+        hasWalletAddress: !!newUserData.wallet_address,
+        walletAddress: newUserData.wallet_address
+      });
 
       // Directly replace user data without any field preservation
       state.user = { ...newUserData };
       state.lastUpdated = Date.now();
-      state.isLoggedIn = !!newUserData._id;
+      
+      // Preserve login state if user has verified email or other valid authentication
+      // Only logout if user has no ID or no verified email
+      const hasValidAuth = newUserData._id && (
+        newUserData.isVerified || 
+        newUserData.isEmailVerified || 
+        newUserData.email // If they have an email, they can still authenticate
+      );
+      
+      state.isLoggedIn = hasValidAuth;
 
       // Update address from wallet_address or clear it
       if (newUserData.wallet_address) {
@@ -294,6 +313,15 @@ const userSlice = createSlice({
       } else {
         state.address = null;
       }
+
+      console.log('[UserSlice] forceUpdateUser result:', {
+        isLoggedIn: state.isLoggedIn,
+        hasUser: !!state.user._id,
+        userEmail: state.user.email,
+        walletAddress: state.address
+      });
+
+      addDebugLog(state, 'forceUpdateUser', newUserData, ['_id', 'email', 'isVerified', 'isEmailVerified']);
     },
 
     // Set connection status

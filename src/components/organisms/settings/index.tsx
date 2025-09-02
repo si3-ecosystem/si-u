@@ -3,7 +3,7 @@
 import React from "react";
 // import { Button } from "@/components/ui/button";
 import { ProfileEditForm } from "@/components/organisms/profile/ProfileEditForm";
-import { AccountWalletSection } from "./AccountWalletSection";
+import { AccountWalletSectionV2 as AccountWalletSection } from "./AccountWalletSectionV2";
 import { SupportSection } from "./SupportSection";
 import { NotificationSection } from "./NotificationSection";
 import { ProfileImageSection } from "./ProfileImageSection";

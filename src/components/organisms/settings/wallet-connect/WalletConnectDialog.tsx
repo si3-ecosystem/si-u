@@ -50,24 +50,18 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
     });
 
     try {
-      // 1) Request signature message for this address
-      const messageResp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/wallet/request-signature`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet_address: address }),
-        credentials: "include",
-      });
-      const messageJson = await messageResp.json();
-      if (messageJson.status !== "success") throw new Error(messageJson.message || "Failed to get signature message");
-
-      const message = messageJson.data?.message as string;
-      if (!message) throw new Error("No signature message returned");
+      // 1) Request signature message using the auth service (server provides nonce)
+      const messageResponse = await UnifiedAuthService.requestWalletSignature(address);
+      if (!messageResponse?.data?.message) {
+        throw new Error("Failed to get signature message from server");
+      }
+      const message = messageResponse.data.message;
 
       // 2) Ask wallet to sign
       const signature = await signMessageAsync({ message });
 
-      // 3) POST connect for existing user
-      const connectResp = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/wallet/connect`, {
+      // 3) Connect wallet to EXISTING user (protected route). Do NOT use verify-signature here.
+      const connectResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/wallet/connect`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,47 +75,59 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
         }),
         credentials: "include",
       });
+
       const connectJson = await connectResp.json();
-      if (connectJson.status !== "success") throw new Error(connectJson.message || "Failed to connect wallet");
+      if (connectJson.status !== 'success') {
+        throw new Error(connectJson.message || 'Failed to connect wallet');
+      }
 
-      console.log('[WalletConnectDialog] Wallet connect response:', connectJson);
-
-      // 4) Handle wallet connection response
-      if (connectJson.data?.token && connectJson.data?.user) {
-        // If response includes new token and user data, apply auth update
+      // 4) Apply auth update from returned token/user
+      if (connectJson?.data?.token && connectJson?.data?.user) {
         console.log('[WalletConnectDialog] Applying auth update with new token');
+        
+        // Apply the auth update
         UnifiedAuthService.applyAuthUpdate({
           user: connectJson.data.user,
-          token: connectJson.data.token
+          token: connectJson.data.token,
         });
-
+        
+        // Wait a bit for token storage to complete
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
         // Verify the auth update was successful
-        await new Promise(resolve => setTimeout(resolve, 500));
         const authState = UnifiedAuthService.getAuthState();
         console.log('[WalletConnectDialog] Auth state after update:', {
           isAuthenticated: authState.isAuthenticated,
           hasUser: !!authState.user,
-          hasToken: !!authState.token
+          hasToken: !!authState.token,
+          tokenStored: !!localStorage.getItem('si3-jwt')
         });
+        
+        // Double-check that we're properly authenticated
+        if (!authState.isAuthenticated || !authState.token) {
+          console.warn('[WalletConnectDialog] Auth state not properly updated, forcing refresh');
+          await UnifiedAuthService.forceRefreshAuth();
+        }
       } else {
-        // If no token in response, just refresh the current user data
-        console.log('[WalletConnectDialog] No token in response, refreshing auth state');
-        const refreshSuccess = await UnifiedAuthService.forceRefreshAuth();
-        console.log('[WalletConnectDialog] Auth refresh result:', refreshSuccess);
+        // Fallback: refresh auth if payload shape differs
+        console.log('[WalletConnectDialog] No token/user in response, refreshing auth state');
+        await UnifiedAuthService.forceRefreshAuth();
       }
 
       console.log('[WalletConnectDialog] Wallet connection successful');
       toast.success("Wallet connected successfully");
       setStep("done");
+
+      // Notify parent and close dialog shortly after
       onSuccess?.();
-      onOpenChange(false);
+      setTimeout(() => {
+        onOpenChange(false);
+        setSelectedWallet(null);
+        setAddress(null);
+        setStep("select");
+      }, 800);
     } catch (e: any) {
       console.error('[WalletConnectDialog] Wallet connect failed:', e);
-      console.error('[WalletConnectDialog] Error details:', {
-        message: e?.message,
-        stack: e?.stack,
-        response: e?.response
-      });
       toast.error(e?.message || "Wallet connection failed");
     } finally {
       setLoading(false);
@@ -160,6 +166,17 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
             onConfirm={handleConnect}
             loading={loading}
           />
+        )}
+
+        {step === "done" && (
+          <div className="text-center space-y-4">
+            <div className="text-green-600 font-semibold">
+              ✓ Wallet connected successfully!
+            </div>
+            <p className="text-sm text-gray-600">
+              Your wallet has been connected and your account has been updated.
+            </p>
+          </div>
         )}
       </DialogContent>
     </Dialog>

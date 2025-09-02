@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
-import AuthContainer from "@/components/organisms/auth/login/AuthContainer";
+import AuthContainerV2 from "@/components/authv2/AuthContainerV2";
 
 export const metadata = {
   title: "SI U | Login",
@@ -19,7 +19,7 @@ const LoginPage = () => {
       />
 
       <div className="h-screen absolute justify-center sm:-translate-y-0 sm:bottom-0 sm:left-6 lg:left-32 flex flex-col sm:justify-end">
-        <AuthContainer />
+        <AuthContainerV2 />
       </div>
     </div>
   );
