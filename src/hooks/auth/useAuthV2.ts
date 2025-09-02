@@ -44,7 +44,17 @@ export function useAuthV2() {
           document.cookie = `si3-jwt=${encodeURIComponent(data.token)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
         } catch {}
       }
-      dispatch(setAuthenticated({ ...data.user, _id: data.user._id || data.user.id }));
+      // Set immediate user from verify response
+      const immediateUser = { ...data.user, _id: data.user._id || data.user.id };
+      dispatch(setAuthenticated(immediateUser));
+      // Fetch full profile to avoid placeholders/dummy data
+      try {
+        const meRes = await authApiV2.me();
+        const user = (meRes as any).data?.user || (meRes as any).data || meRes?.data?.data || null;
+        if (user) {
+          dispatch(mergeUser({ ...user, _id: user._id || user.id }));
+        }
+      } catch {}
       return true;
     }
     return false;
@@ -64,7 +74,8 @@ export function useAuthV2() {
 
   const refresh = useCallback(async () => {
     const res = await authApiV2.refreshProfile();
-    const user = (res as any).data?.user || (res as any).data || res?.data?.data || null;
+    const data: any = (res as any).data || res;
+    const user = data?.user || data?.data?.user || null;
     if (user) dispatch(mergeUser({ ...user, _id: user._id || user.id }));
   }, [dispatch]);
 

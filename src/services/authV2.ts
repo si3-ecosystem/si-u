@@ -41,10 +41,17 @@ export const authApiV2 = {
 
   // Wallet
   wallet: {
-    info: async () => apiClient.get('/user/wallet/info'),
-    connect: async (payload: { address: string; connectedWallet: string; network: string }) =>
-      apiClient.post('/user/wallet/connect', payload),
-    disconnect: async () => apiClient.delete('/user/wallet/disconnect'),
+    info: async () => apiClient.get('/auth/wallet/info'),
+    requestSignature: async (address: string) =>
+      apiClient.post<{ message: string }>('/auth/wallet/request-signature', { wallet_address: address }),
+    connectWithSignature: async (payload: { address: string; signature: string; connectedWallet: string; network: string }) =>
+      apiClient.post('/auth/wallet/connect', {
+        wallet_address: payload.address,
+        signature: payload.signature,
+        connectedWallet: payload.connectedWallet,
+        network: payload.network,
+      }),
+    disconnect: async () => apiClient.delete('/auth/wallet/disconnect'),
   },
 };
 

@@ -2,17 +2,16 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAppSelector } from '@/redux/store';
+import { useCurrentUserV2 } from '@/hooks/auth/useCurrentUserV2';
 
 export function AuthGateV2({ children }: { children: React.ReactNode }) {
-  const { status, user } = useAppSelector((s) => (s as any).authV2 || { status: 'idle' });
+  const { isAuthenticated, isLoading } = useCurrentUserV2();
   const router = useRouter();
   const pathname = usePathname();
   const [hasRedirected, setHasRedirected] = useState(false);
 
   const isLoginRoute = useMemo(() => pathname?.startsWith('/login') || pathname?.includes('/(auth)/'), [pathname]);
-  const isAuthed = status === 'authenticated' && !!(user?._id || user?.id);
-  const isLoading = status === 'idle' || status === 'loading';
+  const isAuthed = isAuthenticated;
 
   useEffect(() => {
     if (isLoading) return;

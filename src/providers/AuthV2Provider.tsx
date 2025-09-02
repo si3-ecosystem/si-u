@@ -13,24 +13,28 @@ export function AuthV2Provider({ children }: { children: React.ReactNode }) {
     dispatch(setAuthLoading());
   }, [dispatch]);
 
-  useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => authApiV2.me(),
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
-    onSuccess: (res) => {
-      const user = (res as any).data?.user || (res as any).data || (res as any).data?.data || null;
-      if (user?._id || user?.id) {
-        dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
-      } else {
-        dispatch(setUnauthenticated());
-      }
-    },
-    onError: () => {
-      dispatch(setUnauthenticated());
-    },
   });
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (error) {
+      dispatch(setUnauthenticated());
+      return;
+    }
+    const res: any = data as any;
+    const user = res?.data?.user || res?.data?.data?.user || res?.data || null;
+    if (user?._id || user?.id) {
+      dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
+    } else {
+      dispatch(setUnauthenticated());
+    }
+  }, [data, error, isLoading, dispatch]);
 
   return <>{children}</>;
 }

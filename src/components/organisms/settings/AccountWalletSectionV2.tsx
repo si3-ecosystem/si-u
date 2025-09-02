@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet } from "lucide-react";
 import WalletConnectDialog from "@/components/organisms/settings/wallet-connect/WalletConnectDialog";
@@ -12,6 +12,9 @@ import { toast } from "sonner";
 
 export function AccountWalletSectionV2() {
   const { user, walletInfo, isWalletConnected, isEmailVerified, connect, disconnect, reloadFromServer } = useWalletV2();
+
+  // Ensure we sync from server on mount so existing wallet_address is reflected
+  useEffect(() => { reloadFromServer(); }, [reloadFromServer]);
 
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -66,7 +69,15 @@ export function AccountWalletSectionV2() {
         <CardContent>
           <EmailVerificationWarning isWalletConnected={isWalletConnected} isEmailVerified={isEmailVerified} />
 
-          <WalletDisplay walletInfo={walletInfo as any} isWalletConnected={isWalletConnected} onCopyAddress={copyWalletAddress} />
+          <WalletDisplay
+            walletInfo={{
+              address: user?.wallet_address || walletInfo?.address,
+              network: walletInfo?.network,
+              connectedWallet: walletInfo?.connectedWallet,
+            } as any}
+            isWalletConnected={!!(user?.wallet_address || walletInfo?.address)}
+            onCopyAddress={copyWalletAddress}
+          />
 
           <WalletActions
             isWalletConnected={isWalletConnected}

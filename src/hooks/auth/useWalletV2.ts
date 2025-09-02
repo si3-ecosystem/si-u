@@ -8,27 +8,44 @@ import { toast } from 'sonner';
 
 export function useWalletV2() {
   const dispatch = useAppDispatch();
-  const user = (useAppSelector((s) => (s as any).authV2.user));
+  const authV2User = (useAppSelector((s) => (s as any).authV2.user));
+  const legacyUser = (useAppSelector((s) => (s as any).user.user));
+  const user = authV2User && (authV2User._id || authV2User.id) ? authV2User : legacyUser;
 
-  const walletInfo = useMemo(() => user?.walletInfo || (user?.wallet_address ? { address: user.wallet_address } : null), [user]);
-  const isWalletConnected = !!walletInfo?.address;
+  // Normalize wallet info: prefer wallet_address as source of truth for address
+  const walletInfo = useMemo(() => {
+    const address = user?.wallet_address || user?.walletInfo?.address || null;
+    const network = user?.walletInfo?.network || null;
+    const connectedWallet = user?.walletInfo?.connectedWallet || null;
+    return address ? { address, network, connectedWallet } : null;
+  }, [user]);
+
+  const isWalletConnected = !!(user?.wallet_address || user?.walletInfo?.address);
   const isEmailVerified = !!(user?.isVerified || user?.isEmailVerified);
 
   const reloadFromServer = useCallback(async () => {
     try {
-      const info = await authApiV2.wallet.info();
-      const data = (info as any).data?.walletInfo ?? (info as any).data?.data?.walletInfo ?? null;
-      dispatch(mergeUser({ walletInfo: data, wallet_address: data?.address }));
+      // Fetch canonical user and merge
+      const me = await authApiV2.me();
+      const res: any = me as any;
+      const serverUser = res?.data?.user || res?.data?.data?.user || res?.data || null;
+      if (serverUser) {
+        const mergedWallet = serverUser.wallet_address || serverUser.walletInfo?.address
+          ? { address: serverUser.wallet_address || serverUser.walletInfo?.address, network: serverUser.walletInfo?.network, connectedWallet: serverUser.walletInfo?.connectedWallet }
+          : undefined;
+        dispatch(mergeUser({ ...serverUser, _id: serverUser._id || serverUser.id, walletInfo: mergedWallet, wallet_address: mergedWallet?.address }));
+      }
     } catch {}
   }, [dispatch]);
 
   const connect = useCallback(async (payload: { address: string; connectedWallet: string; network: string }) => {
-    const res = await authApiV2.wallet.connect(payload);
-    const data = (res as any).data?.walletInfo ?? (res as any).data?.data?.walletInfo;
-    dispatch(mergeUser({ walletInfo: data, wallet_address: data?.address }));
-    toast.success('Wallet connected');
-    await reloadFromServer();
-  }, [dispatch, reloadFromServer]);
+    // Step 1: request signature message
+    const nonceRes = await authApiV2.wallet.requestSignature(payload.address);
+    const message = (nonceRes as any).data?.message || (nonceRes as any).data?.data?.message;
+    if (!message) throw new Error('Failed to get signature message from server');
+    // Step 2: caller should sign message outside; here we assume signature is provided separately in another UI flow
+    // For settings dialog we still sign via wagmi component, which calls connectWithSignature directly
+  }, []);
 
   const disconnect = useCallback(async () => {
     await authApiV2.wallet.disconnect();
