@@ -11,17 +11,26 @@ import { useWalletV2 } from "@/hooks/auth/useWalletV2";
 import { toast } from "sonner";
 
 export function AccountWalletSectionV2() {
-  const { user, walletInfo, isWalletConnected, isEmailVerified, disconnect, reloadFromServer } = useWalletV2();
+  const {
+    user,
+    walletInfo,
+    isWalletConnected,
+    isEmailVerified,
+    disconnect,
+    reloadFromServer,
+  } = useWalletV2();
 
   // Ensure we sync from server on mount so existing wallet_address is reflected
-  useEffect(() => { reloadFromServer(); }, [reloadFromServer]);
+  useEffect(() => {
+    reloadFromServer();
+  }, [reloadFromServer]);
 
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const hasTempEmail = useMemo(() => {
-    const email = user?.email || '';
+    const email = user?.email || "";
     return !!email && /@wallet\.temp$/i.test(email);
   }, [user?.email]);
 
@@ -67,26 +76,19 @@ export function AccountWalletSectionV2() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <EmailVerificationWarning isWalletConnected={isWalletConnected} isEmailVerified={isEmailVerified} />
-
-          {/* Email & Username display */}
-          <div className="space-y-3 border border-gray-200 rounded-lg p-4 mb-4">
-            <div className="flex justify-between">
-              <label className="text-sm font-medium text-gray-700">Email</label>
-              <p className="text-sm font-medium">{user?.email || '—'}</p>
-            </div>
-            <div className="flex justify-between">
-              <label className="text-sm font-medium text-gray-700">Username</label>
-              <p className="text-sm font-medium">{user?.username || 'No username'}</p>
-            </div>
-          </div>
+          <EmailVerificationWarning
+            isWalletConnected={isWalletConnected}
+            isEmailVerified={isEmailVerified}
+          />
 
           <WalletDisplay
-            walletInfo={{
-              address: user?.wallet_address || walletInfo?.address,
-              network: walletInfo?.network,
-              connectedWallet: walletInfo?.connectedWallet,
-            } as any}
+            walletInfo={
+              {
+                address: user?.wallet_address || walletInfo?.address,
+                network: walletInfo?.network,
+                connectedWallet: walletInfo?.connectedWallet,
+              } as any
+            }
             isWalletConnected={!!(user?.wallet_address || walletInfo?.address)}
             onCopyAddress={copyWalletAddress}
           />
@@ -104,10 +106,13 @@ export function AccountWalletSectionV2() {
         </CardContent>
       </Card>
 
-      <WalletConnectDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} onSuccess={handleWalletAuthSuccess} />
+      <WalletConnectDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+        onSuccess={handleWalletAuthSuccess}
+      />
     </>
   );
 }
 
 export default AccountWalletSectionV2;
-

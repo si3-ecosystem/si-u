@@ -121,16 +121,7 @@ export default function WalletConnectDialog({ open, onOpenChange, onSuccess }: W
           />
         )}
 
-        {step === "done" && (
-          <div className="text-center space-y-4">
-            <div className="text-brand text-xl font-semibold text-center">
-              ✓ Wallet connected successfully!
-            </div>
-            <p className="text-sm text-gray-600">
-              Your wallet has been connected and your account has been updated.
-            </p>
-          </div>
-        )}
+       
       </DialogContent>
     </Dialog>
   );
