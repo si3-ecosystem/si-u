@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { PortableText as PortableTextComponent } from "@portabletext/react";
-import Iframe from "react-iframe";
 import getVideoId from "get-video-id";
 
 import { urlForImage } from "./image";
@@ -107,13 +106,12 @@ const IframePreview = ({ value }) => {
     : url;
 
   return (
-    <Iframe
-      url={finalURL}
+    <iframe
+      src={finalURL}
       width="100%"
       height={height || "350"}
       className={cn(!height && "aspect-video", "rounded-md")}
-      display="block"
-      position="relative"
+      style={{ display: "block", position: "relative" }}
       frameBorder={0}
       allowFullScreen
       loading="lazy"

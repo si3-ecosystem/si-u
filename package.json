@@ -55,7 +55,6 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.55.0",
     "react-hot-toast": "^2.5.2",
-    "react-iframe": "^1.8.5",
     "react-is": "^19.1.1",
     "react-modern-drawer": "^1.4.0",
     "react-redux": "^9.2.0",
