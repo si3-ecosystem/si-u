@@ -3,7 +3,8 @@
 import React from 'react';
 import { OptimizedCommentSection } from './OptimizedCommentSection';
 import { ContentType, UserRole } from '@/types/comment';
-import { useAppSelector } from '@/redux/store';
+import { usePathname } from 'next/navigation';
+import { useUserRole } from '@/utils/auth/getUserRoleFromAuthV2';
 
 interface IdeasLabCommentSectionProps {
   contentId: string;
@@ -14,11 +15,16 @@ export function IdeasLabCommentSection({
   contentId, 
   className 
 }: IdeasLabCommentSectionProps) {
-  const user = useAppSelector(state => state.user);
+  // Determine role via unified helper
+  const userRole: UserRole = useUserRole();
 
-  const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'guide') ? 'guide' : 'scholar' ;
-
-  const contentType: ContentType = userRole === 'guide' ? 'guide_ideas_lab' : 'scholar_ideas_lab';
+  // Map content type based on route: guides or scholars or grow3dge
+  const pathname = usePathname();
+  const contentType: ContentType = pathname?.startsWith('/guides')
+    ? 'guide_ideas_lab'
+    : pathname?.startsWith('/scholars')
+      ? 'scholar_ideas_lab'
+      : 'grow3dge-idea-lab';
 
   return (
     <OptimizedCommentSection

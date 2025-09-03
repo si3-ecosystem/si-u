@@ -6,6 +6,7 @@ import { useScholarsIdeasLab } from "@/hooks/useScholarsIdeasLab";
 import Loading from "@/app/loading";
 import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 import { ContentListing } from "@/components/organisms/content/ContentListing";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 import { CommentNotifications } from "@/components/molecules/comment/CommentNotifications";
 import { useState } from "react";
@@ -36,6 +37,7 @@ function EnhancedContentListing({
 }
 
 export default function ScholarsIdeaLabPage() {
+  useCurrentUserV2();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 

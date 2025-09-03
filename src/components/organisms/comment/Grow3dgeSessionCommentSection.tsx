@@ -5,23 +5,14 @@ import { OptimizedCommentSection } from './OptimizedCommentSection';
 import { ContentType, UserRole } from '@/types/comment';
 import { useUserRole } from '@/utils/auth/getUserRoleFromAuthV2';
 
-interface GuideSessionCommentSectionProps {
+interface Grow3dgeSessionCommentSectionProps {
   contentId: string;
   className?: string;
 }
 
-/**
- * Pre-configured comment section specifically for Guide Session pages
- * This component handles all the configuration and user context automatically
- */
-export function GuideSessionCommentSection({ 
-  contentId, 
-  className 
-}: GuideSessionCommentSectionProps) {
-  // Get user role from AuthV2
-  const userRole: UserRole = useUserRole('guide');
-  const contentType: ContentType = 'guide_session';
-
+export function Grow3dgeSessionCommentSection({ contentId, className }: Grow3dgeSessionCommentSectionProps) {
+  const userRole: UserRole = useUserRole('partner');
+  const contentType: ContentType = 'grow3dge-session';
 
   return (
     <OptimizedCommentSection
@@ -29,7 +20,7 @@ export function GuideSessionCommentSection({
       contentType={contentType}
       userRole={userRole}
       showStats={true}
-      maxDepth={2} 
+      maxDepth={2}
       pageSize={20}
       autoRefresh={false}
       refreshInterval={30000}
@@ -37,3 +28,4 @@ export function GuideSessionCommentSection({
     />
   );
 }
+

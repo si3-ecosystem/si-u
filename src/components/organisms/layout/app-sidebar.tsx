@@ -128,8 +128,9 @@ export function AppSidebar() {
   const isAdmin = userRoles.includes("admin");
   const isGuide = userRoles.includes("guide");
   const isPartner = userRoles.includes("partner");
-  
-  // List of allowed scholar emails
+  const isScholar = userRoles.includes("scholar");
+
+  // List of allowed scholar emails (legacy allowlist)
   const allowedScholarEmails = [
     "shoagasraful4231@gmail.com",
     "asraful.islam@tutors.es",
@@ -148,7 +149,8 @@ export function AppSidebar() {
   ];
   
   // Check if user is an allowed scholar
-  const isAllowedScholar = allowedScholarEmails.includes(userEmail.toLowerCase());
+  // Scholar visibility: either role-based or allowlist (temporary)
+  const isAllowedScholar = isScholar || allowedScholarEmails.includes(userEmail.toLowerCase());
 
   // Filter menu items based on roles
   const filteredMainMenuItems = useMemo(() => {

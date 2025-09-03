@@ -3,7 +3,7 @@
 import React from 'react';
 import { OptimizedCommentSection } from './OptimizedCommentSection';
 import { ContentType, UserRole } from '@/types/comment';
-import { useAppSelector } from '@/redux/store';
+import { useUserRole } from '@/utils/auth/getUserRoleFromAuthV2';
 
 interface ScholarSessionCommentSectionProps {
   contentId: string;
@@ -14,9 +14,7 @@ export function ScholarSessionCommentSection({
   contentId, 
   className 
 }: ScholarSessionCommentSectionProps) {
-  const user = useAppSelector(state => state.user);
-  const userRole: UserRole = user?.user?.roles.some((role:string)=> role === 'scholar') ? 'scholar' : 'scholar' ;
-
+  const userRole: UserRole = useUserRole('scholar');
   const contentType: ContentType = 'scholar_session';
 
   return (

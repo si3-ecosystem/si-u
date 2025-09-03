@@ -1,7 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 
 import { WalletDialog } from "./WalletDialog";
 
@@ -39,7 +38,6 @@ const WalletIcon = () => (
 
 function InjectedWallet({ onWalletConnected }: InjectedWalletProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { isConnected, address, connector } = useAccount();
 
   const handleWalletConnected = useCallback(
     (address: string, name: string) => {

@@ -29,6 +29,7 @@ export interface UserProfile {
     platform: string;
     url: string;
   }>;
+  telegramHandle?: string; // Private contact handle, not displayed publicly
   createdAt: string;
   updatedAt: string;
   // New fields from backend implementation
@@ -56,6 +57,7 @@ export interface UpdateProfileRequest {
     platform: string;
     url: string;
   }>;
+  telegramHandle?: string;
 }
 
 export class ProfileService {

@@ -7,6 +7,7 @@ import { AccountWalletSectionV2 as AccountWalletSection } from "./AccountWalletS
 import { SupportSection } from "./SupportSection";
 import { NotificationSection } from "./NotificationSection";
 import { ProfileImageSection } from "./ProfileImageSection";
+import { TelegramHandleSection } from "./TelegramHandleSection";
 // import { LogOut } from "lucide-react";
 
 export default function Settings() {
@@ -39,6 +40,7 @@ export default function Settings() {
               onError={handleImageError}
             />
             <AccountWalletSection />
+            <TelegramHandleSection />
             <SupportSection />
 
             {/* <Button

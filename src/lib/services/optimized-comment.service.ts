@@ -184,7 +184,7 @@ export class OptimizedCommentService extends BaseService {
    */
   async getUserReaction(commentId: string): Promise<{ userReaction: string | null }> {
     this.logRequest('GET', `/api/comments/${commentId}/my-reaction`);
-    
+
     try {
       const response = await this.get<{ userReaction: string | null }>(
         `/api/comments/${commentId}/my-reaction`
@@ -193,7 +193,12 @@ export class OptimizedCommentService extends BaseService {
         throw new Error('No response data received from server');
       }
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      // Gracefully handle "no reaction yet" or unauthenticated states
+      const status = error?.statusCode || error?.status;
+      if (status === 404 || status === 401) {
+        return { userReaction: null };
+      }
       this.logError('getUserReaction', error);
       throw error;
     }

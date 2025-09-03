@@ -25,7 +25,7 @@ const AdminGuard = dynamic(() => import('@/components/organisms/admin/AdminGuard
   )
 });
 
-const AdminUsersTable = dynamic(() => import('@/components/organisms/admin/AdminUsersTable').then(mod => ({ default: mod.AdminUsersTable })), {
+const AdminUsersTable = dynamic(() => import('@/components/organisms/admin/AdminUsersTable').then(mod => ({ default: (mod as any).AdminUsersTable || (mod as any).default })), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center py-8">

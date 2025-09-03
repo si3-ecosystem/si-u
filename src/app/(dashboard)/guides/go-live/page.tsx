@@ -6,8 +6,10 @@ import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 import { LiveSessionsManager } from "@/components/organisms/live-sessions/LiveSessionsManager";
 import Loading from "@/app/loading";
 import { useState } from "react";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 export default function LiveSessionsPage() {
+  useCurrentUserV2();
   const [globalFilter, setGlobalFilter] = useState("");
 
   const { data: schemaData, isLoading: schemaLoading } = useQuery({

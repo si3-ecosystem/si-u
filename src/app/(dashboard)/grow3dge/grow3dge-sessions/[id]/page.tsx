@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getFixCardById } from "@/lib/sanity/client/getFixCardById";
-import { useAppSelector } from "@/redux/store";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
@@ -11,12 +11,13 @@ import { FixCardHeader } from "@/components/organisms/fixx/FixCardHeader";
 import { FixCardVideoPlayer } from "@/components/organisms/fixx/FixCardVideoPlayer";
 import { FixCardOverview } from "@/components/organisms/fixx/FixCardOverview";
 import { FixCardActions } from "@/components/organisms/fixx/FixCardActions";
+import { Grow3dgeSessionCommentSection } from "@/components/organisms/comment/Grow3dgeSessionCommentSection";
 
 export default function FixCardDetailPage() {
   const { id } = useParams();
   const cardId = Array.isArray(id) ? id[0] : id;
   const [isClient, setIsClient] = useState(false);
-  const currentUser = useAppSelector((state) => state.user);
+  const { user } = useCurrentUserV2();
 
   useEffect(() => {
     setIsClient(true);
@@ -24,14 +25,12 @@ export default function FixCardDetailPage() {
 
   // Check if user has partner role
   const hasPartnerRole =
-    isClient &&
-    (currentUser?.user?.roles?.includes("partner") ||
-      currentUser?.user?.roles?.includes("admin"));
+    isClient && !!user && (user.roles?.includes("partner") || user.roles?.includes("admin"));
 
   const { data, isLoading } = useQuery({
     queryKey: cardId ? [`fixCard-${cardId}`] : [],
     queryFn: async () => {
-      const card = await getFixCardById(cardId);
+      const card = await getFixCardById(cardId as string);
       return card || {};
     },
     enabled: !!cardId,
@@ -91,6 +90,12 @@ export default function FixCardDetailPage() {
           pdfGuide={data.pdfGuide}
           hideDownloadButton={data?.pdfGuide?.enabled}
         />
+
+      {/* Comments for partners/admin on grow3dge sessions */}
+      <div className="bg-white p-6 mt-6 rounded-lg border">
+        <Grow3dgeSessionCommentSection contentId={data._id} />
+      </div>
+
       </div>
     </section>
   );

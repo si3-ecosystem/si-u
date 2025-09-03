@@ -18,7 +18,6 @@ export function ProfileHeader({
   username,
   website,
   className = "",
-  email,
   onEditProfile = () => {},
   onShare = () => {},
 }: ProfileHeaderProps) {
@@ -44,7 +43,6 @@ export function ProfileHeader({
         )}
       </div>
       <h1 className="text-2xl font-bold mb-1 font-clesmont">{username}</h1>
-      <p className="text-gray-500 mb-2 font-roobert">{email}</p>
       {website && (
         <p className="text-sm text-purple-600 font-roobert mb-4">{website}</p>
       )}
