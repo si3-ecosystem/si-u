@@ -94,9 +94,15 @@ export function OptimizedCommentSection({
       scholar_session: ["scholar", "admin"],
       scholar_ideas_lab: ["scholar", "admin"],
       "grow3dge-idea-lab": ["partner", "admin"],
+      "grow3dge-session": ["partner", "admin"],
     } as Record<ContentType, UserRole[]> & { [key: string]: UserRole[] };
-    return accessMap[contentType]?.includes(userRole);
-  }, [contentType, userRole]);
+
+    const allowed = accessMap[contentType] || [];
+    const userRoles = (user?.roles || []) as UserRole[];
+
+    // Allow if any of the user's roles match the allowed list OR the derived userRole matches
+    return allowed.some((r) => userRoles.includes(r)) || allowed.includes(userRole);
+  }, [contentType, user, userRole]);
 
   const sortedComments = useMemo(() => {
     if (!comments.length) return [];
