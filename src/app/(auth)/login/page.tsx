@@ -1,4 +1,7 @@
 import React from "react";
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import Image from "next/image";
 
 import AuthContainerV2 from "@/components/authv2/AuthContainerV2";

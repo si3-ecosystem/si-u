@@ -40,7 +40,6 @@ export default function Settings() {
               onError={handleImageError}
             />
             <AccountWalletSection />
-            <TelegramHandleSection />
             <SupportSection />
 
             {/* <Button
@@ -55,7 +54,7 @@ export default function Settings() {
           <div className=" space-y-6">
             <NotificationSection />
             <ProfileEditForm />
-
+            <TelegramHandleSection />
           </div>
         </div>
       </div>
