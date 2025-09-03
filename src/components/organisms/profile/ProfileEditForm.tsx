@@ -149,7 +149,7 @@ export function ProfileEditForm() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg lg:text-xl font-bold">
-              Edit Profile
+              Edit Profile (private)
             </CardTitle>
             <p className="text-gray-600">Loading your profile information...</p>
           </CardHeader>
@@ -170,10 +170,10 @@ export function ProfileEditForm() {
         <CardHeader>
           <CardTitle className="text-lg lg:text-xl font-bold">
             {isProfileComplete
-              ? "Profile Settings"
+              ? "Profile Settings (private)"
               : stepManager.currentStep === "profile"
-              ? "Complete Your Profile"
-              : "Edit Profile"}
+              ? "Complete Your Profile (private)"
+              : "Edit Profile (private)"}
           </CardTitle>
           <p className="text-gray-600">
             {isProfileComplete

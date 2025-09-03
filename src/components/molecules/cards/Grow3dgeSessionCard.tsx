@@ -182,7 +182,7 @@ export function Grow3dgeSessionCard({
       return "Register Now";
     }
 
-    if (!config.isRSVPEnabled) return "RSVP Disabled";
+    if (!config.isRSVPEnabled) return ;
     if (config.isDeadlinePassed) return "RSVP Closed";
     if (!config.hasValidEmail) return "Update Email to RSVP";
     if (isCreating || isUpdating || isDeleting) return "Updating...";
@@ -325,7 +325,7 @@ export function Grow3dgeSessionCard({
               )} */}
 
               {/* Only show RSVP button if rsvpSettings exists and is enabled */}
-              {session.rsvpSettings?.enabled && (
+              {session.rsvpSettings?.enabled ===true && (
                 <div className="relative">
                   <button
                     onClick={() => {

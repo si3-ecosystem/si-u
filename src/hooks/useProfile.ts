@@ -40,6 +40,7 @@ export function useProfile() {
     personalValues: srcUser.personalValues || [],
     companyAffiliation: srcUser.companyAffiliation,
     digitalLinks: srcUser.digitalLinks || [],
+    telegramHandle: srcUser.telegramHandle,
     createdAt: srcUser.createdAt,
     updatedAt: srcUser.updatedAt,
   } : null;

@@ -13,7 +13,7 @@ interface AddUserDialogProps {
   onCreated?: () => void;
 }
 
-const AVAILABLE_ROLES = ['admin', 'guide', 'scholar', 'partner'] as const;
+const AVAILABLE_ROLES = ['admin', 'guide', 'scholar', 'partner', 'team'] as const;
 
 export function AddUserDialog({ onCreated }: AddUserDialogProps) {
   const [open, setOpen] = useState(false);

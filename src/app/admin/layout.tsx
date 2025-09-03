@@ -38,10 +38,10 @@ export default function AdminLayout({
                 Users
               </a>
               <a 
-                href="/guides/sessions" 
+                href="/home" 
                 className="text-gray-600 hover:text-gray-900 transition-colors"
               >
-                Back to Sessions
+                Back to Home
               </a>
             </nav>
           </div>

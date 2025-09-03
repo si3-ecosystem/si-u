@@ -115,7 +115,7 @@ export function SessionCard({
 
   const getButtonText = () => {
     // Always show appropriate text regardless of external RSVP
-    if (!config.isRSVPEnabled) return "RSVP Disabled";
+    if (!config.isRSVPEnabled) return;
     if (config.isDeadlinePassed) return "RSVP Closed";
     if (!config.hasValidEmail) return "Update Email to RSVP";
     if (isCreating || isUpdating || isDeleting) return "Updating...";
@@ -237,20 +237,22 @@ export function SessionCard({
             </div>
 
             <div className="mt-4 md:mt-0 relative max-lg:w-full">
-              <button
-                onClick={() => {
-                  // Always use dropdown functionality regardless of external RSVP
-                  toggleDropdown(session._id);
-                }}
-                className={getButtonStyle()}
-                disabled={
-                  !config.isRSVPEnabled ||
-                  config.isDeadlinePassed ||
-                  !config.hasValidEmail
-                }
-              >
-                {getButtonText()}
-              </button>
+              {config.isRSVPEnabled===true && (
+                <button
+                  onClick={() => {
+                    // Always use dropdown functionality regardless of external RSVP
+                    toggleDropdown(session._id);
+                  }}
+                  className={getButtonStyle()}
+                  disabled={
+                    !config.isRSVPEnabled ||
+                    config.isDeadlinePassed ||
+                    !config.hasValidEmail
+                  }
+                >
+                  {getButtonText()}
+                </button>
+              )}
 
               {openDropdownId === session._id && (
                 <AttendEventDropdown
