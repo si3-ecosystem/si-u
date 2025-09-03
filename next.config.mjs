@@ -1,3 +1,5 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -24,8 +26,13 @@ const nextConfig = {
       },
     ],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
+  webpack: (config) => {
+    // Add path alias resolution for deployment environments
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve('./src'),
+    };
+    return config;
   },
 };
 
