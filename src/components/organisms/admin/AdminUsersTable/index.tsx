@@ -10,11 +10,13 @@ import { UsersStats } from '../users/Stats';
 import { Controls } from '../users/Controls';
 import { UsersPagination } from '../users/Pagination';
 import { getAdminUserColumns } from '../users/Columns';
+import { useCurrentUserV2 } from '@/hooks/auth/useCurrentUserV2';
 
 interface AdminUsersTableProps { className?: string; }
 
 export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
   const [copiedWallet, setCopiedWallet] = useState<string | null>(null);
+  const { user: currentUser } = useCurrentUserV2();
 
   const {
     users, isLoading, isError, pagination, stats, statsLoading, statsError,
@@ -31,8 +33,14 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
   };
 
   const columns = useMemo(
-    () => getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, refetchStats }),
-    [copiedWallet, refetch, refetchStats]
+    () => getAdminUserColumns({
+      copiedWallet,
+      copyToClipboard,
+      refetch,
+      refetchStats,
+      currentUserRoles: currentUser?.roles || []
+    }),
+    [copiedWallet, refetch, refetchStats, currentUser?.roles]
   );
 
   const table = useReactTable({
@@ -79,6 +87,7 @@ export function AdminUsersTable({ className = '' }: AdminUsersTableProps) {
           exportUsers={exportUsers}
           refetch={refetch}
           refetchStats={refetchStats}
+          currentUserRoles={currentUser?.roles || []}
         />
         <CardContent className="space-y-4">
           <div className="overflow-x-auto">

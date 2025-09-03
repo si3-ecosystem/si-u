@@ -19,10 +19,15 @@ interface ControlsProps {
   exportUsers: () => void;
   refetch: () => void;
   refetchStats: () => void;
+  currentUserRoles?: string[];
 }
 
 export function Controls(props: ControlsProps) {
-  const { filters, isLoading, updateFilter, clearFilters, paginationState, setPageSize, exportUsers, refetch, refetchStats } = props;
+  const { filters, isLoading, updateFilter, clearFilters, paginationState, setPageSize, exportUsers, refetch, refetchStats, currentUserRoles = [] } = props;
+
+  // Role-based access control
+  const isCurrentUserAdmin = currentUserRoles.includes('admin');
+  const canCreateUsers = isCurrentUserAdmin;
   return (
     <>
       <CardHeader>
@@ -32,7 +37,9 @@ export function Controls(props: ControlsProps) {
             Users Management
           </span>
           <div className="flex items-center gap-2">
-            <AddUserDialog onCreated={() => { refetch(); refetchStats(); }} />
+            {canCreateUsers && (
+              <AddUserDialog onCreated={() => { refetch(); refetchStats(); }} />
+            )}
             <Button onClick={exportUsers} variant="outline" size="sm" disabled={isLoading}>
               <Download className="h-4 w-4 mr-2" />
               Export
@@ -64,6 +71,7 @@ export function Controls(props: ControlsProps) {
               <SelectItem value="guide">Guide</SelectItem>
               <SelectItem value="scholar">Scholar</SelectItem>
               <SelectItem value="partner">Partner</SelectItem>
+              <SelectItem value="team">Team</SelectItem>
             </SelectContent>
           </Select>
 

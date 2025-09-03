@@ -2,15 +2,16 @@
 
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Copy, Check, Pencil } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditUserRolesDialog } from '@/components/organisms/admin/EditUserRolesDialog';
-
+import { DeleteUserDialog } from '@/components/organisms/admin/DeleteUserDialog';
 export interface GetColumnsParams {
   copiedWallet: string | null;
   copyToClipboard: (text: string) => void;
   refetch: () => void;
   refetchStats: () => void;
+  currentUserRoles?: string[];
 }
 
 const truncateWallet = (address: string) => {
@@ -19,7 +20,7 @@ const truncateWallet = (address: string) => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
-export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, refetchStats }: GetColumnsParams): ColumnDef<any>[] {
+export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, refetchStats, currentUserRoles = [] }: GetColumnsParams): ColumnDef<any>[] {
   return [
     {
       accessorKey: 'email',
@@ -142,17 +143,51 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
       cell: ({ row }) => {
         const id = row.original._id || row.original.id;
         const roles = row.original.roles || ['scholar'];
+        const email = row.original.email;
+        const name = row.original.name || `${row.original.firstName || ''} ${row.original.lastName || ''}`.trim() || row.original.username || 'Unknown User';
+
+        // Get current user's roles for access control
+        const isCurrentUserAdmin = currentUserRoles.includes('admin');
+        const isCurrentUserTeam = currentUserRoles.includes('team');
+
+        // Only admin users can edit/delete, team users can only view
+        const canEdit = isCurrentUserAdmin;
+        const canDelete = isCurrentUserAdmin;
+
+        if (!canEdit && !canDelete) {
+          return (
+            <span className="text-sm text-gray-500">View Only</span>
+          );
+        }
+
         return (
-          <EditUserRolesDialog
-            userId={id}
-            currentRoles={roles}
-            onUpdated={() => { refetch(); refetchStats(); }}
-            trigger={
-              <Button variant="outline" size="sm" className="h-8 px-2">
-                <Pencil className="h-3.5 w-3.5 mr-1" /> Roles
-              </Button>
-            }
-          />
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <EditUserRolesDialog
+                userId={id}
+                currentRoles={roles}
+                onUpdated={() => { refetch(); refetchStats(); }}
+                trigger={
+                  <Button variant="outline" size="sm" className="h-8 px-2">
+                    <Pencil className="h-3.5 w-3.5 mr-1" /> Roles
+                  </Button>
+                }
+              />
+            )}
+            {canDelete && (
+              <DeleteUserDialog
+                userId={id}
+                userEmail={email}
+                userName={name}
+                onDeleted={() => { refetch(); refetchStats(); }}
+                trigger={
+                  <Button variant="outline" size="sm" className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                  </Button>
+                }
+              />
+            )}
+          </div>
         );
       },
     },

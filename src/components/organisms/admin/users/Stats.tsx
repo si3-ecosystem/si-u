@@ -5,7 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 
-export function UsersStats({ stats, statsLoading, statsError, refetchStats }: any) {
+interface StatsData {
+  overview?: {
+    totalUsers: number;
+    verifiedUsers: number;
+    walletVerifiedUsers: number;
+    usersWithWallets: number;
+    subscribedToNewsletter: number;
+  };
+  roleSummary?: {
+    roleBreakdown: Array<{
+      role: string;
+      count: number;
+      percentage: number;
+    }>;
+  };
+  activity?: {
+    activeUsers: number;
+  };
+}
+
+interface UsersStatsProps {
+  stats: StatsData | null;
+  statsLoading: boolean;
+  statsError: Error | null;
+  refetchStats: () => void;
+}
+
+export function UsersStats({ stats, statsLoading, statsError, refetchStats }: UsersStatsProps) {
   if (statsLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -40,7 +67,7 @@ export function UsersStats({ stats, statsLoading, statsError, refetchStats }: an
     );
   }
 
-  if (!stats) {
+  if (!stats || !stats.overview) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-8">
@@ -62,27 +89,27 @@ export function UsersStats({ stats, statsLoading, statsError, refetchStats }: an
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.overview.totalUsers}</div>
+              <div className="text-2xl font-bold text-blue-600">{stats?.overview?.totalUsers ?? 0}</div>
               <div className="text-sm text-gray-600">Total Users</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{stats.overview.verifiedUsers}</div>
+              <div className="text-2xl font-bold text-green-600">{stats?.overview?.verifiedUsers ?? 0}</div>
               <div className="text-sm text-gray-600">Verified</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{stats.overview.walletVerifiedUsers}</div>
+              <div className="text-2xl font-bold text-purple-600">{stats?.overview?.walletVerifiedUsers ?? 0}</div>
               <div className="text-sm text-gray-600">Wallet Verified</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{stats.overview.usersWithWallets}</div>
+              <div className="text-2xl font-bold text-orange-600">{stats?.overview?.usersWithWallets ?? 0}</div>
               <div className="text-sm text-gray-600">With Wallets</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600">{stats.overview.subscribedToNewsletter}</div>
+              <div className="text-2xl font-bold text-indigo-600">{stats?.overview?.subscribedToNewsletter ?? 0}</div>
               <div className="text-sm text-gray-600">Newsletter</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-teal-600">{stats.activity.activeUsers}</div>
+              <div className="text-2xl font-bold text-teal-600">{stats?.activity?.activeUsers ?? 0}</div>
               <div className="text-sm text-gray-600">Active Users</div>
             </div>
           </div>
@@ -95,13 +122,17 @@ export function UsersStats({ stats, statsLoading, statsError, refetchStats }: an
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.roleSummary.roleBreakdown.map(({ role, count, percentage }: any) => (
+            {stats?.roleSummary?.roleBreakdown?.map?.(({ role, count, percentage }: any) => (
               <div key={role} className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-xl font-bold">{count}</div>
-                <div className="text-sm text-gray-600 capitalize">{role}</div>
-                <div className="text-xs text-gray-500">{percentage}%</div>
+                <div className="text-xl font-bold">{count ?? 0}</div>
+                <div className="text-sm text-gray-600 capitalize">{role ?? 'unknown'}</div>
+                <div className="text-xs text-gray-500">{percentage ?? 0}%</div>
               </div>
-            ))}
+            )) ?? (
+              <div className="text-center p-3 bg-gray-50 rounded-lg col-span-full">
+                <div className="text-sm text-gray-600">No role data available</div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

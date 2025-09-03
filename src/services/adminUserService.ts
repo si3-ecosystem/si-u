@@ -11,6 +11,11 @@ export interface UpdateUserRolesPayload {
   roles: string[];
 }
 
+export interface DeleteUserPayload {
+  reason: string;
+  confirmEmail: string;
+}
+
 export class AdminUserService {
   static async createUser(payload: CreateAdminUserPayload) {
     // Backend not implemented yet; this will call the expected endpoint
@@ -19,6 +24,14 @@ export class AdminUserService {
 
   static async updateUserRoles(userId: string, roles: string[]) {
     return apiClient.patch(`/admin/users/${userId}/role`, { roles } as UpdateUserRolesPayload);
+  }
+
+  static async deleteUser(userId: string, payload: DeleteUserPayload) {
+    return apiClient.delete(`/admin/users/${userId}/hard-delete`, payload);
+  }
+
+  static async clearUsersCache() {
+    return apiClient.delete('/admin/users/cache');
   }
 }
 
