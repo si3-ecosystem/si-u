@@ -32,20 +32,14 @@ export default function WalletProviderList({ onSelected }: Props) {
 
       let walletAddress: string | undefined;
       if (target) {
-        // Check if this connector is already connected
-        if (target.id === connector?.id && isConnected && address) {
-          console.log("Wallet already connected, using existing connection");
-          walletAddress = address; // Use the address from useAccount hook
-        } else {
-          // Disconnect any existing connection first
-          if (isConnected && connector) {
-            console.log("Disconnecting existing wallet before connecting new one");
+        // Always force a clean connect flow to satisfy "fresh wallet login after logout"
+        if (isConnected && connector) {
+          try {
             await disconnectAsync();
-          }
-
-          const res = await connectAsync({ connector: target });
-          walletAddress = res.accounts?.[0];
+          } catch {}
         }
+        const res = await connectAsync({ connector: target, chainId: undefined });
+        walletAddress = res.accounts?.[0];
       }
 
       if (!walletAddress) {

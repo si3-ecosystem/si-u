@@ -1,6 +1,7 @@
 "use client";
 import { LogOut } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useDisconnect } from "wagmi";
 
 import { Button } from "@/components/ui/button";
 import ConfirmLogoutDialog from "./ConfirmLogoutDialog";
@@ -11,6 +12,7 @@ import { useAuthV2 } from "@/hooks/auth/useAuthV2";
 const LogoutButton = () => {
   const dispatch = useDispatch();
   const { logout } = useAuthV2();
+  const { disconnectAsync } = useDisconnect();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -44,6 +46,20 @@ const LogoutButton = () => {
 
       // Close modal first
       dispatch(setLogoutModalOpen(false));
+
+      // Force-disconnect any existing wallet connector to prevent auto-reconnection
+      try { await disconnectAsync(); } catch {}
+      try {
+        // Clear wagmi/walletconnect caches to ensure a fresh connect next time
+        if (typeof window !== 'undefined') {
+          Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith('wc@2:') || key.includes('walletconnect') || key.includes('wagmi')) {
+              localStorage.removeItem(key);
+            }
+          });
+          sessionStorage.clear();
+        }
+      } catch {}
 
       await logout();
       if (typeof window !== 'undefined') {

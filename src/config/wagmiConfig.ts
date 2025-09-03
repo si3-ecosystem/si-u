@@ -7,6 +7,7 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://siu.si3.space";
 export const config = createConfig({
   chains: [mainnet, polygon, sepolia],
   ssr: false,
+  autoConnect: false, // prevent auto-connecting on mount
   connectors: [
     walletConnect({
       projectId: "fc0b7f76086b5fccf0fc5d12449e7d3e",
@@ -20,7 +21,7 @@ export const config = createConfig({
       showQrModal: true,
       disableProviderPing: false
     }),
-    injected(),
+    injected({ shimDisconnect: true }), // persist disconnect to avoid phantom sessions
     safe(),
   ],
   transports: {

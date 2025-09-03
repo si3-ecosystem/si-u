@@ -80,7 +80,6 @@ export function ErrorBoundaryWrapper({
 
 // Default fallback component for layout errors
 export function LayoutErrorFallback({ 
-  error, 
   resetError 
 }: { 
   error?: Error; 
