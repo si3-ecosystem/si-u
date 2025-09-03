@@ -34,7 +34,7 @@ export interface AdminUserData {
 }
 
 // Generate mock users data with comprehensive information
-function generateMockUsers(): AdminUserData[] {
+export function generateMockUsers(): AdminUserData[] {
   const roles: UserRole[] = ['admin', 'guide', 'scholar', 'partner'];
   const companies = ['Tech Corp', 'StartupXYZ', 'Innovation Lab', 'Digital Agency', 'Freelancer', null];
   const wallets = ['MetaMask', 'Zerion', 'WalletConnect', 'Other', null];
