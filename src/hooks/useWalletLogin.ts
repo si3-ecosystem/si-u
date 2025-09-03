@@ -41,8 +41,7 @@ export function useWalletLogin(onAfterAuth?: () => void) {
   const connectAndLogin = useCallback((connector: any, handlers: { onOpenChange: (open: boolean) => void; onWalletConnected?: (address: string, name: string) => void; setIsConnecting: (b: boolean) => void; setConnectionError: (m: string) => void; }) => {
     handlers.setConnectionError("");
     handlers.setIsConnecting(true);
-    // Ensure no existing connector session persists
-    (async () => { try { await disconnectAsync(); } catch {} })();
+  
     connect({ connector }, {
       onSuccess: async (data) => {
         const first = data.accounts[0];
