@@ -3,26 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // Get the JWT token from cookies
   const token = request.cookies.get('si3-jwt')?.value;
 
-  console.log('[Next.js Middleware] Processing request:', {
-    pathname: request.nextUrl.pathname,
-    hasToken: !!token,
-    tokenLength: token?.length,
-    cookies: request.cookies.getAll().map(c => ({ name: c.name, hasValue: !!c.value }))
-  });
-
-  // Note: We don't need to add Authorization header for /api/ routes
-  // because those are Next.js API routes, not backend API calls
-  // The backend API calls are made directly to localhost:8080 and will include cookies automatically
-
-  // Allow /login to render even if a token cookie exists to avoid redirect loops
   if (request.nextUrl.pathname === '/login') {
     return response;
   }
 
-  // For protected routes, check authentication
   const protectedRoutes = ['/home', '/profile', '/settings', '/admin'];
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
