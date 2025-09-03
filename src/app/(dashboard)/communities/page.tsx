@@ -1,6 +1,6 @@
 "use client";
 
-import Loading from "@/app/loading";
+import Loading from "../../../app/loading"
 import { CollabCard } from "@/components/molecules/cards/collabCard";
 import { ContentBanner } from "@/components/molecules/content/ContentBanner";
 import { CommunitiesSearchAndFilter } from "@/components/organisms/communities/CommunitiesSearchAndFilter";
