@@ -12,7 +12,7 @@ interface AdminGuardProps {
 
 export function AdminGuard({ children, fallback }: AdminGuardProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const { isAdmin, isLoading, checkingAuth } = useAdminAuth();
+  const { canAccessAdmin, isLoading, checkingAuth } = useAdminAuth();
 
   // Ensure this component only renders on the client side to avoid hydration issues
   useEffect(() => {
@@ -41,7 +41,7 @@ export function AdminGuard({ children, fallback }: AdminGuardProps) {
   }
 
   // Show unauthorized state (this should rarely be reached due to middleware)
-  if (!isAdmin) {
+  if (!canAccessAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-96">
@@ -51,11 +51,11 @@ export function AdminGuard({ children, fallback }: AdminGuardProps) {
               Access Denied
             </h2>
             <p className="text-sm text-gray-600 text-center mb-4">
-              You don&apos;t have administrative privileges to access this page.
+              You don&apos;t have the required privileges to access this page.
             </p>
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <Shield className="h-4 w-4" />
-              <span>Admin access required</span>
+              <span>Admin or Team access required</span>
             </div>
           </CardContent>
         </Card>
@@ -63,6 +63,6 @@ export function AdminGuard({ children, fallback }: AdminGuardProps) {
     );
   }
 
-  // Render children if user is admin
+  // Render children if user is admin or team
   return <>{children}</>;
 }

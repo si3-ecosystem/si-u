@@ -61,7 +61,7 @@ export type ContentType =
   | 'grow3dge-session';
 
 // User roles
-export type UserRole = 'admin' | 'guide' | 'scholar' | "partner";
+export type UserRole = 'admin' | 'guide' | 'scholar' | 'partner' | 'team';
 
 // Generic content item
 export interface ContentItem {

@@ -7,6 +7,8 @@ import { UserRole } from '@/types/api';
 
 interface UseAdminAuthReturn {
   isAdmin: boolean;
+  isTeam: boolean;
+  canAccessAdmin: boolean;
   isLoading: boolean;
   user: any;
   checkingAuth: boolean;
@@ -24,8 +26,10 @@ export function useAdminAuth(): UseAdminAuthReturn {
     setIsMounted(true);
   }, []);
 
-  // Determine admin status using authV2
+  // Determine admin/team status using authV2
   const isAdmin = !!(status === 'authenticated' && user?.roles?.includes('admin' as UserRole));
+  const isTeam = !!(status === 'authenticated' && user?.roles?.includes('team' as UserRole));
+  const canAccessAdmin = isAdmin || isTeam;
   const isLoading = !isMounted || status === 'idle' || status === 'loading';
   const checkingAuth = isLoading;
 
@@ -38,15 +42,17 @@ export function useAdminAuth(): UseAdminAuthReturn {
       return;
     }
 
-    if (status === 'authenticated' && !isAdmin) {
-      console.log('[useAdminAuth] User not admin (authV2), redirecting to unauthorized');
+    if (status === 'authenticated' && !canAccessAdmin) {
+      console.log('[useAdminAuth] User not admin or team (authV2), redirecting to unauthorized');
       router.replace('/error?reason=unauthorized&role=admin');
       return;
     }
-  }, [isMounted, status, isAdmin, router]);
+  }, [isMounted, status, canAccessAdmin, router]);
 
   return {
     isAdmin,
+    isTeam,
+    canAccessAdmin,
     isLoading,
     user,
     checkingAuth,

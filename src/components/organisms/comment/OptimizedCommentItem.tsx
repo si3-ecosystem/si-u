@@ -49,6 +49,7 @@ interface OptimizedCommentItemProps {
   isUpdating?: boolean;
   isDeleting?: boolean;
   className?: string;
+  readOnly?: boolean;
 }
 
 export function OptimizedCommentItem({
@@ -64,6 +65,7 @@ export function OptimizedCommentItem({
   isUpdating = false,
   isDeleting = false,
   className = '',
+  readOnly = false,
 }: OptimizedCommentItemProps) {
   const {  isSmallMobile } = useResponsive();
 
@@ -85,11 +87,11 @@ export function OptimizedCommentItem({
   });
 
   const canReply = useMemo(() => {
-    return depth === 0 && !!onReply;
-  }, [depth, onReply]);
+    return !readOnly && depth === 0 && !!onReply;
+  }, [depth, onReply, readOnly]);
 
-  const canEdit = useMemo(() => comment.userId === currentUserId && !!onEdit, [comment.userId, currentUserId, onEdit]);
-  const canDelete = useMemo(() => comment.userId === currentUserId && !!onDelete, [comment.userId, currentUserId, onDelete]);
+  const canEdit = useMemo(() => !readOnly && comment.userId === currentUserId && !!onEdit, [comment.userId, currentUserId, onEdit, readOnly]);
+  const canDelete = useMemo(() => !readOnly && comment.userId === currentUserId && !!onDelete, [comment.userId, currentUserId, onDelete, readOnly]);
 
   const handleEdit = async (newContent: string) => {
     if (!onEdit || !newContent.trim()) return;
@@ -257,8 +259,8 @@ export function OptimizedCommentItem({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleLike}
-                disabled={isReacting || isUpdating || isDeleting}
+                onClick={readOnly ? undefined : toggleLike}
+                disabled={readOnly || isReacting || isUpdating || isDeleting}
                 className={cn(
                   'transition-colors',
                   isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
@@ -277,8 +279,8 @@ export function OptimizedCommentItem({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleDislike}
-                disabled={isReacting || isUpdating || isDeleting}
+                onClick={readOnly ? undefined : toggleDislike}
+                disabled={readOnly || isReacting || isUpdating || isDeleting}
                 className={cn(
                   'transition-colors',
                   isSmallMobile ? 'h-7 px-1.5 text-xs' : 'h-8 px-2 text-xs',
