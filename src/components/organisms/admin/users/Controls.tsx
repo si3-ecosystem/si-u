@@ -97,6 +97,17 @@ export function Controls(props: ControlsProps) {
             </SelectContent>
           </Select>
 
+          <Select value={filters.newsletter === null ? 'all' : String(filters.newsletter)} onValueChange={(value) => updateFilter('newsletter', value === 'all' ? null : value === 'true')}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Newsletter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All (newsletter)</SelectItem>
+              <SelectItem value="true">Newsletter: Yes</SelectItem>
+              <SelectItem value="false">Newsletter: No</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Button onClick={clearFilters} variant="outline" size="sm" className="whitespace-nowrap">
             <Filter className="h-4 w-4 mr-2" />
             Clear
