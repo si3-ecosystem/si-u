@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import Image from "next/image";
 import Link from "next/link";
+import NewsletterSubscribe from "./NewsletterSubscribe";
 
 const Footer = () => {
   const socialChannels = useSelector(
@@ -148,24 +149,12 @@ const Footer = () => {
               )}
             </div>
             {/* Newsletter Form */}
-            <div className="flex rounded-xl w-full lg:w-fit h-10 items-center bg-white">
-              <Image
-                src="https://res.cloudinary.com/dv52zu7pu/image/upload/v1751386798/mail_ibby6d.png"
-                alt=""
-                width={17}
-                height={17}
-                className="mx-2"
-              />
-              <input
-                type="email"
-                placeholder="Subscribe to our newsletter..."
-                className="focus:outline-none font-dm-sans w-full mr-3 lg:w-44"
-              />
-              <div className="flex justify-end h-full">
-                <button type="button" className="bg-[#C8BAFD] rounded-xl w-10">
-                  <ChevronRight className="size-4 mx-auto" />
-                </button>
-              </div>
+            <div onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsDropdownOpen(false)
+            }}>
+              <NewsletterSubscribe listKey="publisher" className="w-full" />
             </div>
           </section>
         </section>
