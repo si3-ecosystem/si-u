@@ -17,15 +17,18 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     (state: RootState) => state.content.organizations
   );
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [isRemoving, setIsRemoving] = useState<boolean>(false);
+  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleImageUpload = async (file: File) => {
+  const handleAddNewImage = async (file: File) => {
     if (!validateImage(file)) return;
     try {
       setIsUploading(true);
       toast.success("Uploading image...");
       const imageUrl = await uploadToCloudinary(file);
+      
+      // Add new image
       const updatedOrgs = [...organizations, imageUrl];
       dispatch(
         updateContent({
@@ -42,12 +45,37 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     }
   };
 
+  const handleReplaceImage = async (file: File, index: number) => {
+    if (!validateImage(file)) return;
+    try {
+      setUploadingIndex(index);
+      toast.success("Replacing image...");
+      const imageUrl = await uploadToCloudinary(file);
+      
+      // Replace existing image
+      const updatedOrgs = [...organizations];
+      updatedOrgs[index] = imageUrl;
+      dispatch(
+        updateContent({
+          section: "organizations",
+          data: updatedOrgs,
+        })
+      );
+      toast.success("Image replaced successfully!");
+    } catch (error) {
+      console.error("Replace error:", error);
+      toast.error("Failed to replace image");
+    } finally {
+      setUploadingIndex(null);
+    }
+  };
+
   const handleRemoveImage = async (index: number) => {
     if (organizations.length <= 1) {
       return;
     }
     try {
-      setIsRemoving(true);
+      setRemovingIndex(index);
       toast.success("Removing image...");
       const imageUrl = organizations[index];
       await removeFromCloudinary(imageUrl);
@@ -58,11 +86,12 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           data: updatedOrgs,
         })
       );
+      toast.success("Image removed successfully!");
     } catch (error) {
       console.error("Remove error:", error);
       toast.error("Failed to remove image");
     } finally {
-      setIsRemoving(false);
+      setRemovingIndex(null);
     }
   };
 
@@ -83,7 +112,7 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                   }}
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
-                      handleImageUpload(e.target.files[0]);
+                      handleAddNewImage(e.target.files[0]);
                     }
                   }}
                   disabled={isUploading}
@@ -95,6 +124,15 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                   onClick={() =>
                     !isUploading && fileInputRefs.current[0]?.click()
                   }
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !isUploading) {
+                      e.preventDefault();
+                      fileInputRefs.current[0]?.click();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Upload organization image"
                 >
                   {isUploading ? (
                     <>
@@ -147,47 +185,60 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                         }}
                         onChange={(e) => {
                           if (e.target?.files?.[0]) {
-                            handleImageUpload(e.target.files[0]);
+                            handleReplaceImage(e.target.files[0], index);
                           }
                         }}
-                        disabled={isUploading}
+                        disabled={isUploading || uploadingIndex === index}
                       />
                       <label
                         htmlFor={`upload-org-${index}`}
                         className={`flex items-center gap-1 py-1 px-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 cursor-pointer transition-colors ${
-                          isUploading ? "opacity-50 pointer-events-none" : ""
+                          isUploading || uploadingIndex === index ? "opacity-50 pointer-events-none" : ""
                         }`}
                         aria-label={
                           item
-                            ? "Change organization image"
+                            ? "Replace organization image"
                             : "Upload organization image"
                         }
                       >
-                        {item ? (
-                          <>
-                            <Edit className="size-3" />
-                            <span className="text-xs">Edit</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="size-3" />
-                            <span className="text-xs">Upload</span>
-                          </>
-                        )}
+                        {(() => {
+                          if (uploadingIndex === index) {
+                            return (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                                <span className="text-xs">Replacing...</span>
+                              </>
+                            );
+                          }
+                          if (item) {
+                            return (
+                              <>
+                                <Edit className="size-3" />
+                                <span className="text-xs">Replace</span>
+                              </>
+                            );
+                          }
+                          return (
+                            <>
+                              <Upload className="size-3" />
+                              <span className="text-xs">Upload</span>
+                            </>
+                          );
+                        })()}
                       </label>
                       {organizations.length > 1 && (
                         <button
                           type="button"
                           className={`flex items-center gap-1 py-1 px-2 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors ${
-                            isRemoving ? "opacity-50 pointer-events-none" : ""
+                            removingIndex === index ? "opacity-50 pointer-events-none" : ""
                           }`}
                           onClick={() => handleRemoveImage(index)}
-                          disabled={isRemoving}
+                          disabled={removingIndex === index}
                           aria-label={`Remove organization ${index + 1}`}
                         >
                           <Trash2 className="size-3" />
                           <span className="text-xs">
-                            {isRemoving ? "Removing..." : "Remove"}
+                            {removingIndex === index ? "Removing..." : "Remove"}
                           </span>
                         </button>
                       )}
@@ -195,18 +246,44 @@ const OrgsFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                   </div>
                 ))}
                 {organizations.length < 5 && (
-                  <button
-                    type="button"
-                    className={`flex gap-2 items-center text-[#a020f0] hover:text-purple-700 p-3 rounded-lg w-full mt-2 ${
-                      isUploading ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    onClick={() => fileInputRefs.current[0]?.click()}
-                    disabled={isUploading}
-                    aria-label="Add organization"
-                  >
-                    <Plus className="size-4" />
-                    <span>Add Organization</span>
-                  </button>
+                  <>
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      className="hidden"
+                      id="add-organization-input"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          handleAddNewImage(e.target.files[0]);
+                        }
+                      }}
+                      disabled={isUploading}
+                    />
+                    <button
+                      type="button"
+                      className={`flex gap-2 items-center text-[#a020f0] hover:text-purple-700 p-3 rounded-lg w-full mt-2 ${
+                        isUploading ? "opacity-50 pointer-events-none" : ""
+                      }`}
+                      onClick={() => {
+                        const input = document.getElementById('add-organization-input') as HTMLInputElement;
+                        input?.click();
+                      }}
+                      disabled={isUploading}
+                      aria-label="Add organization"
+                    >
+                      {isUploading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#a020f0]"></div>
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="size-4" />
+                          <span>Add Organization</span>
+                        </>
+                      )}
+                    </button>
+                  </>
                 )}
                 <p className="text-xs text-gray-500">
                   Supported formats: JPG, JPEG, PNG (max 2MB)

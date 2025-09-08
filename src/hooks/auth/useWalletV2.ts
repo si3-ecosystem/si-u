@@ -4,12 +4,37 @@ import { useCallback, useMemo } from 'react';
 import { authApiV2 } from '@/services/authV2';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { mergeUser } from '@/redux/slice/authSliceV2';
+import { setAllContent } from '@/redux/slice/contentSlice';
 import { toast } from 'sonner';
+
+// Helper function to process webcontent data
+const processWebContent = (user: any, dispatch: any) => {
+  if (user?.webcontent) {
+    console.log('[useWalletV2] Processing webcontent data');
+    
+    const webcontent = user.webcontent;
+    const contentData = {
+      landing: webcontent.landing,
+      slider: webcontent.slider,
+      value: webcontent.value,
+      live: webcontent.live,
+      organizations: webcontent.organizations,
+      timeline: webcontent.timeline,
+      available: webcontent.available,
+      socialChannels: webcontent.socialChannels,
+      isNewWebpage: webcontent.isNewWebpage,
+      domain: webcontent.domain
+    };
+
+    console.log('[useWalletV2] Updating content slice with webcontent data');
+    dispatch(setAllContent(contentData));
+  }
+};
 
 export function useWalletV2() {
   const dispatch = useAppDispatch();
-  const authV2User = (useAppSelector((s) => (s as any).authV2.user));
-  const legacyUser = (useAppSelector((s) => (s as any).user.user));
+  const authV2User = useAppSelector((s) => s.authV2.user);
+  const legacyUser = useAppSelector((s) => s.user.user);
   const user = authV2User && (authV2User._id || authV2User.id) ? authV2User : legacyUser;
 
   // Normalize wallet info: prefer wallet_address as source of truth for address
@@ -34,6 +59,7 @@ export function useWalletV2() {
           ? { address: serverUser.wallet_address || serverUser.walletInfo?.address, network: serverUser.walletInfo?.network, connectedWallet: serverUser.walletInfo?.connectedWallet }
           : undefined;
         dispatch(mergeUser({ ...serverUser, _id: serverUser._id || serverUser.id, walletInfo: mergedWallet, wallet_address: mergedWallet?.address }));
+        processWebContent(serverUser, dispatch);
       }
     } catch {}
   }, [dispatch]);
