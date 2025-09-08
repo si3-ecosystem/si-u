@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import apiClient from "@/utils/interceptor";
+import { apiClient } from "@/services/api";
 import Image from "next/image";
 
 interface User {
@@ -19,8 +19,9 @@ const People = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiClient.get("/users");
-        const formattedUsers = response.data.map((user: User) => ({
+        const response = await apiClient.get<User[]>("/users/getUsers");
+        const users = response.data || [];
+        const formattedUsers = users.map((user: User) => ({
           _id: user._id,
           fullName: user.fullName,
           image: user.image ?? "https://static-00.iconduck.com/assets.00/profile-default-icon-2048x2045-u3j7s5nj.png",

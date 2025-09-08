@@ -3,11 +3,36 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { setAuthLoading, setAuthenticated, setUnauthenticated, mergeUser } from '@/redux/slice/authSliceV2';
+import { setAllContent } from '@/redux/slice/contentSlice';
 import { authApiV2 } from '@/services/authV2';
+
+// Helper function to process webcontent data
+const processWebContent = (user: any, dispatch: any) => {
+  if (user?.webcontent) {
+    console.log('[useAuthV2] Processing webcontent data');
+    
+    const webcontent = user.webcontent;
+    const contentData = {
+      landing: webcontent.landing,
+      slider: webcontent.slider,
+      value: webcontent.value,
+      live: webcontent.live,
+      organizations: webcontent.organizations,
+      timeline: webcontent.timeline,
+      available: webcontent.available,
+      socialChannels: webcontent.socialChannels,
+      isNewWebpage: webcontent.isNewWebpage,
+      domain: webcontent.domain
+    };
+
+    console.log('[useAuthV2] Updating content slice with webcontent data');
+    dispatch(setAllContent(contentData));
+  }
+};
 
 export function useAuthV2() {
   const dispatch = useAppDispatch();
-  const auth = useAppSelector((s) => (s as any).authV2);
+  const auth = useAppSelector((s) => s.authV2);
 
   const bootstrap = useCallback(async () => {
     dispatch(setAuthLoading());
@@ -16,11 +41,13 @@ export function useAuthV2() {
       const user = (res as any).data?.user || (res as any).data?.data?.user || (res as any).data || null;
       if (user?.id || user?._id) {
         dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
+        processWebContent(user, dispatch);
         return true;
       }
       dispatch(setUnauthenticated());
       return false;
-    } catch (e) {
+    } catch (error) {
+      console.error('[useAuthV2] Error during bootstrap:', error);
       dispatch(setUnauthenticated());
       return false;
     }
@@ -53,8 +80,11 @@ export function useAuthV2() {
         const user = (meRes as any).data?.user || (meRes as any).data?.data?.user || (meRes as any).data || null;
         if (user) {
           dispatch(mergeUser({ ...user, _id: user._id || user.id }));
+          processWebContent(user, dispatch);
         }
-      } catch {}
+      } catch (error) {
+        console.error('[useAuthV2] Error fetching full profile:', error);
+      }
       return true;
     }
     return false;
@@ -76,7 +106,10 @@ export function useAuthV2() {
     const res = await authApiV2.refreshProfile();
     const data: any = (res as any).data || res;
     const user = data?.user || data?.data?.user || null;
-    if (user) dispatch(mergeUser({ ...user, _id: user._id || user.id }));
+    if (user) {
+      dispatch(mergeUser({ ...user, _id: user._id || user.id }));
+      processWebContent(user, dispatch);
+    }
   }, [dispatch]);
 
   return { auth, bootstrap, startEmail, verifyEmail, logout, refresh };
