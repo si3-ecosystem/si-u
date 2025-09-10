@@ -1,16 +1,30 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import Navbar from "@/components/publisher/main/Navbar";
 import Domain from "@/components/publisher/main/Domain";
 import DynamicComponent from "@/components/publisher/drawer";
 import EditablePage from "@/components/publisher/sections";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [editPage, setEditPage] = useState<string>("");
   const openDrawer = () => setIsOpen(true);
+  const { user } = useCurrentUserV2();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && !user.roles?.includes('guide') && !user.roles?.includes('admin')) {
+      router.replace('/error?reason=unauthorized&role=guide');
+    }
+  }, [user, router]);
+
+  if (user && !user.roles?.includes('guide') && !user.roles?.includes('admin')) {
+    return <div>Access denied</div>;
+  }
 
   return (
     <div className="h-screen font-firamono text-gray-800">
