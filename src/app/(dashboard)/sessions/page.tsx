@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CreateSessionModal from "@/components/organisms/sessions/SessionInfo";
 import { Button } from "@/components/ui/button";
+import NFTGatedLiveJoin from "@/components/organisms/sessions/NFTGatedLiveJoin";
 import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card"
@@ -89,6 +90,20 @@ export default function SessionsPage() {
 
   return (
     <div className="space-y-8">
+      {/* Test NFT-gated Livestream */}
+      {process.env.NEXT_PUBLIC_UNLOCK_LOCK_ADDRESS && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Test NFT-Gated Livestream</h2>
+                <p className="text-sm text-gray-600">Only wallets with a valid Unlock key can join.</p>
+              </div>
+            </div>
+            <NFTGatedLiveJoin lockAddress={process.env.NEXT_PUBLIC_UNLOCK_LOCK_ADDRESS as string} />
+          </CardContent>
+        </Card>
+      )}
       <div className="bg-gradient-to-r from-purple-400 to-purple-500 rounded-xl p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {metrics.map((metric) => (
