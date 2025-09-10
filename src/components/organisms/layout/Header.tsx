@@ -102,7 +102,7 @@ export function Header() {
         <Link href="/" className={cn(!open ? " md:block" : "md:hidden")}>
           <div className="px-4">
             <Image
-              src={"/logo.svg"}
+              src={"/logo-final.svg"}
               alt={"Logo"}
               width={120}
               height={40}
