@@ -70,7 +70,7 @@ export function Controls(props: ControlsProps) {
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="guide">Guide</SelectItem>
               <SelectItem value="scholar">Scholar</SelectItem>
-              <SelectItem value="partner">Partner</SelectItem>
+              <SelectItem value="partner">Grow3dge</SelectItem>
               <SelectItem value="team">Team</SelectItem>
             </SelectContent>
           </Select>

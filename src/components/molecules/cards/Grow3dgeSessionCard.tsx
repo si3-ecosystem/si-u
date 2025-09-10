@@ -25,8 +25,6 @@ export function Grow3dgeSessionCard({
   toggleDropdown,
   setOpenDropdownId,
 }: Grow3dgeSessionCardProps) {
-
-  console.log("session", session);
   // Handle both multiple partners and legacy single partner
   const getPartnerLogos = () => {
     if (session?.partners && session.partners.length > 0) {
@@ -182,7 +180,7 @@ export function Grow3dgeSessionCard({
       return "Register Now";
     }
 
-    if (!config.isRSVPEnabled) return ;
+    if (!config.isRSVPEnabled) return;
     if (config.isDeadlinePassed) return "RSVP Closed";
     if (!config.hasValidEmail) return "Update Email to RSVP";
     if (isCreating || isUpdating || isDeleting) return "Updating...";
@@ -253,6 +251,8 @@ export function Grow3dgeSessionCard({
                 : null) ||
               "/card_placeholder.png"
             }
+            loading="lazy"
+            decoding="async"
             alt={session.title}
             width={160}
             height={160}
@@ -325,7 +325,7 @@ export function Grow3dgeSessionCard({
               )} */}
 
               {/* Only show RSVP button if rsvpSettings exists and is enabled */}
-              {session.rsvpSettings?.enabled ===true && (
+              {session.rsvpSettings?.enabled === true && (
                 <div className="relative">
                   <button
                     onClick={() => {

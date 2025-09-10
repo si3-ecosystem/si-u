@@ -27,7 +27,7 @@ interface PopularTopicsProps {
     description?: string;
     topicTitle?: string;
     topicDesc?: string;
-    topics?: Topic[];  // Array of topics
+    topics?: Topic[]; // Array of topics
   };
   categoryCounts?: CategoryCount[];
   setSelectedCategory: (value: string) => void;
@@ -73,16 +73,17 @@ export function PopularTopics({
   }, [emblaApi, onSelect]);
 
   // Create display items from the topics array or fallback to category counts
-  const displayItems = data?.topics && data.topics.length > 0
-    ? data.topics // Use the topics array directly
-    : categoryCounts
-        .filter((count) => count.category !== "all")
-        .map((count) => ({
-          _id: count.category,
-          title:
-            count.category.charAt(0).toUpperCase() + count.category.slice(1),
-          slug: { current: count.category },
-        }));
+  const displayItems =
+    data?.topics && data.topics.length > 0
+      ? data.topics // Use the topics array directly
+      : categoryCounts
+          .filter((count) => count.category !== "all")
+          .map((count) => ({
+            _id: count.category,
+            title:
+              count.category.charAt(0).toUpperCase() + count.category.slice(1),
+            slug: { current: count.category },
+          }));
 
   return (
     <div className="relative">
@@ -92,17 +93,21 @@ export function PopularTopics({
             {data?.topicTitle || data?.title || "Popular Topics"}
           </h2>
           <p className="text-brandGray text-base leading-[140%] font-normal">
-            {data?.topicDesc || data?.description || "Explore sessions by category"}
+            {data?.topicDesc ||
+              data?.description ||
+              "Explore sessions by category"}
           </p>
         </div>
-        {selectedCategory && selectedCategory !== "all" && selectedCategory !== "" && (
-          <button
-            onClick={() => setSelectedCategory("all")}
-            className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            Clear Filter
-          </button>
-        )}
+        {selectedCategory &&
+          selectedCategory !== "all" &&
+          selectedCategory !== "" && (
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              Clear Filter
+            </button>
+          )}
       </div>
 
       <div className="relative">
@@ -117,15 +122,17 @@ export function PopularTopics({
                 <div
                   key={index}
                   className={`flex-shrink-0 flex flex-col max-w-[228px] w-full rounded-lg bg-white overflow-hidden border-2 transition-colors cursor-pointer ${
-                    selectedCategory === categorySlug 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:border-blue-300'
+                    selectedCategory === categorySlug
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300"
                   }`}
                   onClick={() => setSelectedCategory(categorySlug)}
                 >
                   {imageUrl && (
                     <div className="relative w-full h-20 mb-2 overflow-hidden rounded-md">
                       <Image
+                        loading="lazy"
+                        decoding="async"
                         src={imageUrl}
                         alt={item.title}
                         fill

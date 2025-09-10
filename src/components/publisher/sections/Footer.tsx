@@ -56,7 +56,7 @@ const Footer = () => {
         {/* Social & Controls */}
         <section className="flex flex-col md:flex-row justify-between items-center gap-3">
           {/* Social Channels */}
-          {socialChannels.length > 0 && (
+          {socialChannels?.length > 0 && (
             <div className="flex justify-between w-full md:justify-start gap-4">
               {socialChannels.map((channel) => {
                 if (!channel.url || !channel.icon) return null;

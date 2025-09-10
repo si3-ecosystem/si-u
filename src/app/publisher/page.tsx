@@ -17,12 +17,12 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (user && !user.roles?.includes('guide') && !user.roles?.includes('admin')) {
+    if (user && !user.roles?.includes('guide') && !user.roles?.includes('admin') && !user.roles?.includes('team')) {
       router.replace('/error?reason=unauthorized&role=guide');
     }
   }, [user, router]);
 
-  if (user && !user.roles?.includes('guide') && !user.roles?.includes('admin')) {
+  if (user && !user.roles?.includes('guide') && !user.roles?.includes('admin') && !user.roles?.includes('team')) {
     return <div>Access denied</div>;
   }
 

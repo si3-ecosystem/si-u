@@ -175,6 +175,8 @@ export function SessionCard({
             alt={session.title}
             width={160}
             height={160}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover rounded-lg"
           />
         </div>
@@ -237,7 +239,7 @@ export function SessionCard({
             </div>
 
             <div className="mt-4 md:mt-0 relative max-lg:w-full">
-              {config.isRSVPEnabled===true && (
+              {config.isRSVPEnabled === true && (
                 <button
                   onClick={() => {
                     // Always use dropdown functionality regardless of external RSVP

@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { urlForImage } from "@/lib/sanity/image";
-import { Calendar, Users, MoreVertical, Edit, Trash2, Copy } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Copy,
+} from "lucide-react";
 import { format } from "date-fns";
 import {
   DropdownMenu,
@@ -80,6 +87,8 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
               src={urlForImage(session.thumbnail)?.src || ""}
               alt={session.title}
               fill
+              loading="lazy"
+              decoding="async"
               className="object-cover"
             />
           ) : (
@@ -95,11 +104,12 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-3">
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className={`${getStatusColor(session.status)} text-xs font-medium`}
               >
-                {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                {session.status.charAt(0).toUpperCase() +
+                  session.status.slice(1)}
               </Badge>
               <span className="text-sm text-gray-500 flex items-center gap-1">
                 <Users className="w-4 h-4" />
@@ -122,7 +132,10 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
                   <Copy className="mr-2 h-4 w-4" />
                   Duplicate
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDeleteSession} className="text-red-600">
+                <DropdownMenuItem
+                  onClick={handleDeleteSession}
+                  className="text-red-600"
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </DropdownMenuItem>
@@ -133,7 +146,7 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
           <h3 className="font-semibold text-lg text-black mb-1">
             {session.title}
           </h3>
-          
+
           <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />

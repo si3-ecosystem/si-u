@@ -30,7 +30,7 @@ export function ContentBanner({
   setGlobalFilter,
 }: ContentBannerProps) {
   return (
-    <Card className="w-full min-h-[204px] md:min-h-[340px] px-8 lg:px-[120px] items-center flex py-8 lg:pb-0 lg:pt-6 relative z-10 !rounded-[30px] overflow-hidden">
+    <Card className=" min-h-[204px]  max-w-screen-2xl w-full md:min-h-[340px] px-8 lg:px-[120px] items-center flex py-8 lg:pb-0 lg:pt-6 relative z-10 !rounded-[30px] overflow-hidden">
       {backgroundImage && (
         <Image
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -38,6 +38,8 @@ export function ContentBanner({
           src={urlForImage(backgroundImage)?.src}
           alt="background"
           fill
+          priority
+          decoding="async"
           className="w-full absolute inset-0 z-0  object-cover object-center "
         />
       )}

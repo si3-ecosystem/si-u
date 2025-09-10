@@ -74,7 +74,7 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
           <div className="flex flex-wrap gap-1">
             {roles.map((role: string, index: number) => (
               <span key={`${role}-${index}`} className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badgeColors[role] || 'bg-gray-100 text-gray-800'}`}>
-                {role}
+                {role ==='partner' ? 'Grow3dge' : role}
               </span>
             ))}
           </div>

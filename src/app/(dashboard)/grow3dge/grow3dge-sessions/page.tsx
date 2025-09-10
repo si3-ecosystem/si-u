@@ -94,7 +94,7 @@ export default function FixxSessionsPage() {
         showSearch={true}
       />
 
-      <div className="px-4 mt-11 lg:px-6 pb-16">
+      <div className=" mt-11 pb-16">
         <PopularTopics
           data={{
             topicTitle: sessions?.topicTitle || "Popular Topics",

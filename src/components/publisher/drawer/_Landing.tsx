@@ -21,14 +21,27 @@ const LandingFieldsComponent = ({
 }) => {
   const dispatch = useDispatch();
   const reduxData = useSelector((state: RootState) => state.content.landing);
-  const [localData, setLocalData] = useState<LandingTypes>(reduxData);
+  const [localData, setLocalData] = useState<LandingTypes>(reduxData || {
+    title: "",
+    headline: "",
+    hashTags: [],
+    region: "",
+    organizationAffiliations: [],
+    communityAffiliations: [],
+    superPowers: [],
+    image: "",
+    fullName: "",
+    pronoun: ""
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    setLocalData(reduxData);
-  }, []);
+    if (reduxData) {
+      setLocalData(reduxData);
+    }
+  }, [reduxData]);
 
   const updateField = useCallback(
     (field: keyof LandingTypes, value: any) => {

@@ -40,6 +40,8 @@ export function SeasonSessionCard({ session }: SessionCardProps) {
             src={session.image || "/card_placeholder.png"}
             alt={session.title}
             width={160}
+            loading="lazy"
+            decoding="async"
             height={160}
             className="w-full h-full object-cover rounded-lg"
           />
