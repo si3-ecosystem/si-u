@@ -10,6 +10,7 @@ import {
   Presentation,
   LayoutDashboard,
   Globe,
+  Calendar
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,11 @@ const mainMenuItems: MenuItem[] = [
     title: "Communities",
     icon: Users,
     href: "/communities",
+  },
+  {
+    title: "Sessions",
+    icon: Calendar,
+    href: "/sessions",
   },
   {
     title: "Admin Dashboard",
