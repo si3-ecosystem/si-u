@@ -31,15 +31,15 @@ export function HighlightCard({
   showMetadata = true,
   contentId,
 }: HighlightCardProps) {
-  const { count: reduxCommentCount } = useReduxCommentCount(contentId || '');
+  const { count: reduxCommentCount } = useReduxCommentCount(contentId || "");
 
   const displayCommentCount = contentId ? reduxCommentCount : commentCount;
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
+      return new Date(dateString).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
       });
     } catch {
       return dateString;
@@ -53,6 +53,8 @@ export function HighlightCard({
           src={imageUrl}
           alt={title}
           fill
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover"
         />
         <Badge className="absolute top-2 left-2 text-xs text-black font-normal capitalize ">

@@ -125,7 +125,7 @@ export function UsersStats({ stats, statsLoading, statsError, refetchStats }: Us
             {stats?.roleSummary?.roleBreakdown?.map?.(({ role, count, percentage }: any) => (
               <div key={role} className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="text-xl font-bold">{count ?? 0}</div>
-                <div className="text-sm text-gray-600 capitalize">{role ?? 'unknown'}</div>
+                <div className="text-sm text-gray-600 capitalize">{role === 'partner' ? 'Grow3dge' : role ?? 'unknown'}</div>
                 <div className="text-xs text-gray-500">{percentage ?? 0}%</div>
               </div>
             )) ?? (

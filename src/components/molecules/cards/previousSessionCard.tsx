@@ -19,6 +19,8 @@ export function PreviousSessionCard({ session }: { session: GuidesSession }) {
                 alt={session.title}
                 width={320}
                 height={180}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-44 object-cover"
               />
             )}
@@ -50,6 +52,8 @@ export function PreviousSessionCard({ session }: { session: GuidesSession }) {
                     alt={session.partner?.title || ""}
                     width={320}
                     height={180}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-[30px] object-contain"
                   />
                 </div>
@@ -60,39 +64,41 @@ export function PreviousSessionCard({ session }: { session: GuidesSession }) {
             {/* Enhanced PDF Guide with configurable CTA */}
             {session.pdfGuide?.enabled && (
               <>
-                {session.pdfGuide.type === 'download' && session.pdfGuide.downloadFile?.asset?.url && (
-                  <a
-                    href={session.pdfGuide.downloadFile.asset.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                    className="flex-1"
-                  >
-                    <Button
-                      className="w-full h-11 bg-black text-white rounded-lg"
-                      variant="outline"
+                {session.pdfGuide.type === "download" &&
+                  session.pdfGuide.downloadFile?.asset?.url && (
+                    <a
+                      href={session.pdfGuide.downloadFile.asset.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="flex-1"
                     >
-                      <ArrowDownToLine className="mr-2 h-4 w-4" />
-                      {session.pdfGuide.title || "PDF Guide"}
-                    </Button>
-                  </a>
-                )}
-                {session.pdfGuide.type === 'url' && session.pdfGuide.shareableUrl && (
-                  <a
-                    href={session.pdfGuide.shareableUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button
-                      className="w-full h-11 bg-black text-white rounded-lg"
-                      variant="outline"
+                      <Button
+                        className="w-full h-11 bg-black text-white rounded-lg"
+                        variant="outline"
+                      >
+                        <ArrowDownToLine className="mr-2 h-4 w-4" />
+                        {session.pdfGuide.title || "PDF Guide"}
+                      </Button>
+                    </a>
+                  )}
+                {session.pdfGuide.type === "url" &&
+                  session.pdfGuide.shareableUrl && (
+                    <a
+                      href={session.pdfGuide.shareableUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1"
                     >
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      {session.pdfGuide.title || "View Guide"}
-                    </Button>
-                  </a>
-                )}
+                      <Button
+                        className="w-full h-11 bg-black text-white rounded-lg"
+                        variant="outline"
+                      >
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        {session.pdfGuide.title || "View Guide"}
+                      </Button>
+                    </a>
+                  )}
               </>
             )}
 

@@ -70,7 +70,7 @@ export function Controls(props: ControlsProps) {
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="guide">Guide</SelectItem>
               <SelectItem value="scholar">Scholar</SelectItem>
-              <SelectItem value="partner">Partner</SelectItem>
+              <SelectItem value="partner">Grow3dge</SelectItem>
               <SelectItem value="team">Team</SelectItem>
             </SelectContent>
           </Select>
@@ -94,6 +94,17 @@ export function Controls(props: ControlsProps) {
               <SelectItem value="all">All Users</SelectItem>
               <SelectItem value="true">With Wallet</SelectItem>
               <SelectItem value="false">No Wallet</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={filters.newsletter === null ? 'all' : String(filters.newsletter)} onValueChange={(value) => updateFilter('newsletter', value === 'all' ? null : value === 'true')}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Newsletter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All (newsletter)</SelectItem>
+              <SelectItem value="true">Newsletter: Yes</SelectItem>
+              <SelectItem value="false">Newsletter: No</SelectItem>
             </SelectContent>
           </Select>
 

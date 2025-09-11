@@ -20,8 +20,8 @@ export default function AdminLayout({
               <h1 className="text-xl font-semibold text-gray-900">
                 Admin Panel
               </h1>
-              <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">
-                Admin Only
+              <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">
+                Admin or Team
               </span>
             </div>
             <nav className="flex items-center gap-4 text-sm">

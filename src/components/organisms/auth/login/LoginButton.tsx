@@ -16,7 +16,6 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  console.log(connector);
 
   const { connect } = useConnect();
   const { status, address } = useAccount();
@@ -39,6 +38,8 @@ const LoginButton: FC<LoginButtonProps> = ({ connector }) => {
     try {
       connect({ connector: connector });
       dispatch(setConnected(true));
+
+      // @ts-expect-error ignore typescript error
       dispatch(setAddress(address));
     } catch (error) {
       console.error(error);

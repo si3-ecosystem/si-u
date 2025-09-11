@@ -50,7 +50,7 @@ export function EditUserRolesDialog({ userId, currentRoles, trigger, onUpdated }
           {AVAILABLE_ROLES.map(role => (
             <label key={role} className="flex items-center gap-2 text-sm">
               <Checkbox checked={selectedRoles.includes(role)} onCheckedChange={() => toggleRole(role)} />
-              <span className="capitalize">{role}</span>
+              <span className="capitalize">{role ==='partner' ? 'Grow3dge' : role}</span>
             </label>
           ))}
         </div>

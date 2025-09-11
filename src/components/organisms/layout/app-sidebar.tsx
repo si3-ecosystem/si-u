@@ -132,6 +132,7 @@ export function AppSidebar() {
   const userRoles = (isAuthenticated && user?.roles) ? user.roles : [];
   const userEmail = (isAuthenticated && user?.email) ? user.email : "";
   const isAdmin = userRoles.includes("admin");
+  const isTeam = userRoles.includes("team");
   const isGuide = userRoles.includes("guide");
   const isPartner = userRoles.includes("partner");
   const isScholar = userRoles.includes("scholar");
@@ -160,17 +161,17 @@ export function AppSidebar() {
 
   // Filter menu items based on roles
   const filteredMainMenuItems = useMemo(() => {
-    if (isAdmin) {
+    if (isAdmin || isTeam) {
       // Admin sees all main menu items
       return mainMenuItems;
     }
     
     // For non-admin users, filter out admin dashboard
     return mainMenuItems.filter(item => item.href !== "/admin/dashboard");
-  }, [isAdmin]);
+  }, [isAdmin, isTeam]);
 
   const filteredSubMenuGroups = useMemo(() => {
-    if (isAdmin) {
+    if (isAdmin || isTeam) {
       // Admin sees all submenu groups
       return subMenuGroups;
     }
@@ -187,7 +188,7 @@ export function AppSidebar() {
       }
       return false;
     });
-  }, [isAdmin, isGuide, isPartner, isAllowedScholar]);
+  }, [isAdmin, isTeam, isGuide, isPartner, isAllowedScholar]);
 
   if (!open) return null;
 
@@ -228,7 +229,7 @@ export function AppSidebar() {
             >
               <div className="px-4">
                 <Image
-                  src={"/logo.svg"}
+                  src={"/logo-final.svg"}
                   alt={"Logo"}
                   width={120}
                   height={40}

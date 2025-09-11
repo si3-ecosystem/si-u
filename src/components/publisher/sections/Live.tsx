@@ -156,9 +156,9 @@ const MediaComponent = ({ url, mediaType }: MediaComponentProps) => {
 };
 
 const Live = () => {
-  const data: LiveTypes = useSelector((state: RootState) => state.content.live);
+  const data: LiveTypes = useSelector((state: RootState) => state.content?.live) || {};
   const name: string = useSelector(
-    (state: RootState) => state.content.landing.fullName.trim().split(" ")[0]
+    (state: RootState) => state.content?.landing?.fullName?.trim().split(" ")[0] || ""
   );
   const [mediaType, setMediaType] = useState<"video" | "audio" | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);

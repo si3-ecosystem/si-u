@@ -59,7 +59,7 @@ export function OptimizedCommentSection({
     "newest"
   );
 
-  const { user, isAuthenticated } = useCurrentUserV2();
+  const { user } = useCurrentUserV2();
 
   const currentUserId = user?._id || (user as any)?.id || "anonymous";
 
@@ -87,7 +87,7 @@ export function OptimizedCommentSection({
     staleTime: autoRefresh ? refreshInterval : 5 * 60 * 1000,
   });
 
-  const canAccess = useMemo(() => {
+  const { canAccess, isTeamOnly } = useMemo(() => {
     const accessMap = {
       guide_session: ["guide", "admin"],
       guide_ideas_lab: ["guide", "admin"],
@@ -98,10 +98,20 @@ export function OptimizedCommentSection({
     } as Record<ContentType, UserRole[]> & { [key: string]: UserRole[] };
 
     const allowed = accessMap[contentType] || [];
-    const userRoles = (user?.roles || []) as UserRole[];
+    const roles = (user?.roles || []) as UserRole[];
+    const isAdmin = roles.includes('admin');
+    const isTeam = roles.includes('team');
+    const hasNonTeamAllowed = roles.some(r => ['guide','scholar','partner','admin'].includes(r));
 
-    // Allow if any of the user's roles match the allowed list OR the derived userRole matches
-    return allowed.some((r) => userRoles.includes(r)) || allowed.includes(userRole);
+    const can = isAdmin
+      || allowed.some((r) => roles.includes(r))
+      || allowed.includes(userRole)
+      || isTeam; // Team can view across content
+
+    return {
+      canAccess: can,
+      isTeamOnly: isTeam && !hasNonTeamAllowed && !isAdmin,
+    };
   }, [contentType, user, userRole]);
 
   const sortedComments = useMemo(() => {
@@ -269,18 +279,20 @@ export function OptimizedCommentSection({
                 transition={{ duration: 0.2 }}
                 className={cn("space-y-6", isSmallMobile && "space-y-4")}
               >
-                <div
-                  className={cn(
-                    "bg-white rounded-lg",
-                  )}
-                >
-                  <OptimizedCommentForm
-                    onSubmit={handleCreateComment}
-                    placeholder="Share your thoughts about this content..."
-                    isSubmitting={isCreating}
-                    minHeight="min-h-[100px]"
-                  />
-                </div>
+                {!isTeamOnly && (
+                  <div
+                    className={cn(
+                      "bg-white rounded-lg",
+                    )}
+                  >
+                    <OptimizedCommentForm
+                      onSubmit={handleCreateComment}
+                      placeholder="Share your thoughts about this content..."
+                      isSubmitting={isCreating}
+                      minHeight="min-h-[100px]"
+                    />
+                  </div>
+                )}
 
                 <Separator />
 
@@ -313,9 +325,10 @@ export function OptimizedCommentSection({
                           currentUserId={currentUserId}
                           depth={0}
                           maxDepth={maxDepth}
-                          onReply={handleReply}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
+                          onReply={isTeamOnly ? undefined : handleReply}
+                          onEdit={isTeamOnly ? undefined : handleEdit}
+                          onDelete={isTeamOnly ? undefined : handleDelete}
+                          readOnly={isTeamOnly}
                           isUpdating={isUpdating}
                           isDeleting={isDeleting}
                         />

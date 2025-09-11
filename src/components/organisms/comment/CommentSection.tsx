@@ -11,6 +11,7 @@ import { useReduxComments } from "@/hooks/useReduxComments";
 import { CommentSectionProps } from "@/types/comment";
 import { useAppSelector } from "@/redux/store";
 import { CommentDebugger } from "./CommentDebugger";
+import { useCurrentUserV2 } from "@/hooks/auth/useCurrentUserV2";
 
 export function CommentSection({
   contentId,
@@ -105,6 +106,13 @@ export function CommentSection({
 
   const currentUser = useAppSelector((state) => state.user);
   const currentUserId = currentUser?._id || currentUser?.id || "";
+  const { user } = useCurrentUserV2();
+
+  const roles = (user?.roles || []) as string[];
+  const isAdmin = roles.includes("admin");
+  const isTeam = roles.includes("team");
+  const hasNonTeamAllowed = roles.some((r) => ["guide", "scholar", "partner", "admin"].includes(r));
+  const teamOnly = isTeam && !hasNonTeamAllowed && !isAdmin;
 
   const canAccess = () => {
     const accessMap = {
@@ -112,8 +120,9 @@ export function CommentSection({
       guide_ideas_lab: ["guide", "admin"],
       scholar_session: ["scholar", "admin"],
       scholar_ideas_lab: ["scholar", "admin"],
-    };
-    return accessMap[contentType]?.includes(userRole);
+    } as Record<string, string[]>;
+    // Allow if userRole is allowed OR team/admin
+    return accessMap[contentType]?.includes(userRole) || isAdmin || isTeam;
   };
 
   const handleCreateComment = async (content: string) => {
@@ -264,14 +273,16 @@ export function CommentSection({
           <CommentDebugger contentId={contentId} />
 
           {/* Comment form */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <CommentForm
-              onSubmit={handleCreateComment}
-              placeholder="Share your thoughts about this content..."
-              isSubmitting={isCreating}
-              minHeight="min-h-[100px]"
-            />
-          </div>
+          {!teamOnly && (
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <CommentForm
+                onSubmit={handleCreateComment}
+                placeholder="Share your thoughts about this content..."
+                isSubmitting={isCreating}
+                minHeight="min-h-[100px]"
+              />
+            </div>
+          )}
 
           {/* Sort options */}
           {comments.length > 0 && (
@@ -317,9 +328,9 @@ export function CommentSection({
                   comment={comment}
                   currentUserId={currentUserId}
                   maxDepth={maxDepth}
-                  onReply={handleReply}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onReply={teamOnly ? undefined : handleReply}
+                  onEdit={teamOnly ? undefined : handleEdit}
+                  onDelete={teamOnly ? undefined : handleDelete}
                 />
               ))}
 

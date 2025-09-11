@@ -86,6 +86,9 @@ export interface AdminUserTableData {
   roles: string[];
   isVerified: boolean;
   newsletter: boolean;
+  // New granular newsletter flags from admin API (if present)
+  scholarsNewsletter?: boolean;
+  partnerNewsletter?: boolean;
   interests: string[];
   companyName?: string;
   companyAffiliation?: string;

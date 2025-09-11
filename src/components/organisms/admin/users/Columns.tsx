@@ -74,7 +74,7 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
           <div className="flex flex-wrap gap-1">
             {roles.map((role: string, index: number) => (
               <span key={`${role}-${index}`} className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badgeColors[role] || 'bg-gray-100 text-gray-800'}`}>
-                {role}
+                {role ==='partner' ? 'Grow3dge' : role}
               </span>
             ))}
           </div>
@@ -111,16 +111,20 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
       ),
     },
     {
-      accessorKey: 'companyName',
-      header: 'Company',
-      cell: ({ row }) => row.original.companyName || row.original.company || 'N/A',
+      accessorKey: 'scholarsNewsletter',
+      header: 'Scholars WL',
+      cell: ({ row }) => (
+        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.scholarsNewsletter ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+          {row.original.scholarsNewsletter ? 'Yes' : 'No'}
+        </span>
+      ),
     },
     {
-      accessorKey: 'newsletter',
-      header: 'Newsletter',
+      accessorKey: 'partnerNewsletter',
+      header: 'Partners NL',
       cell: ({ row }) => (
-        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.newsletter ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-          {row.original.newsletter ? 'Subscribed' : 'Not subscribed'}
+        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.partnerNewsletter ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+          {row.original.partnerNewsletter ? 'Yes' : 'No'}
         </span>
       ),
     },

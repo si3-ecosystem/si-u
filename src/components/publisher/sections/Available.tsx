@@ -6,11 +6,12 @@ import Heading from "@/components/publisher/ui/Heading";
 import Link from "next/link";
 
 const Available = () => {
-  const {
-    avatar = "",
-    availableFor = [],
-    ctaText,
-  } = useSelector((state: RootState) => state.content.available);
+  const availableData = useSelector((state: RootState) => state.content?.available);
+  
+  // Add null checks to prevent destructuring errors
+  const avatar = availableData?.avatar || "";
+  const availableFor = availableData?.availableFor || [];
+  const ctaText = availableData?.ctaText || "";
 
   return (
     <div className="p-4 py-10">
