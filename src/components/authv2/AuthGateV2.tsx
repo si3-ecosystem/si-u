@@ -14,6 +14,7 @@ export function AuthGateV2({ children }: { children: React.ReactNode }) {
   const isAuthed = isAuthenticated;
 
   useEffect(() => {
+    // Only redirect if we're actually loading and not authenticated
     if (isLoading) return;
     if (!isAuthed && !isLoginRoute && !hasRedirected) {
       setHasRedirected(true);

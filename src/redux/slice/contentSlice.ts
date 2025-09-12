@@ -116,7 +116,46 @@ const contentSlice = createSlice({
   initialState,
   reducers: {
     setAllContent: (state, action: PayloadAction<ContentState>) => {
-      return action.payload;
+      // Merge with existing state instead of replacing completely
+      const newContent = action.payload;
+      
+      // Helper function to check if object has meaningful data
+      const hasObjectData = (obj: any) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+      
+      // Helper function to check if array has meaningful data
+      const hasArrayData = (arr: any) => Array.isArray(arr) && arr.length > 0;
+      
+      // Only update fields that have actual data
+      if (hasObjectData(newContent.landing)) {
+        state.landing = { ...state.landing, ...newContent.landing };
+      }
+      if (hasArrayData(newContent.slider)) {
+        state.slider = newContent.slider;
+      }
+      if (hasObjectData(newContent.value)) {
+        state.value = { ...state.value, ...newContent.value };
+      }
+      if (hasObjectData(newContent.live)) {
+        state.live = { ...state.live, ...newContent.live };
+      }
+      if (hasArrayData(newContent.organizations)) {
+        state.organizations = newContent.organizations;
+      }
+      if (hasArrayData(newContent.timeline)) {
+        state.timeline = newContent.timeline;
+      }
+      if (hasObjectData(newContent.available)) {
+        state.available = { ...state.available, ...newContent.available };
+      }
+      if (hasArrayData(newContent.socialChannels)) {
+        state.socialChannels = newContent.socialChannels;
+      }
+      if (typeof newContent.isNewWebpage === 'boolean') {
+        state.isNewWebpage = newContent.isNewWebpage;
+      }
+      if (newContent.domain && newContent.domain.trim() !== '') {
+        (state as any).domain = newContent.domain;
+      }
     },
     updateContent: (state, action: PayloadAction<{ section: keyof ContentState; data: any }>) => {
       const { section, data } = action.payload;
@@ -134,13 +173,10 @@ const contentSlice = createSlice({
       }
       if (Array.isArray(state[section])) {
         state[section] = data;
-        return;
-      }
-      if (typeof state[section] === "object" && data !== null && typeof data === "object") {
+      } else if (typeof state[section] === "object" && data !== null && typeof data === "object") {
         Object.keys(data).forEach((key) => {
           (state[section] as any)[key] = data[key];
         });
-        return;
       }
     },
     updateArrayItem: (
