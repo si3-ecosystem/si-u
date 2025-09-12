@@ -52,10 +52,18 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
     },
     {
       accessorKey: 'name',
-      header: 'Name',
+      header: 'Profile Name',
       cell: ({ row }) => {
         const name = row.original.name || `${row.original.firstName || ''} ${row.original.lastName || ''}`.trim() || row.original.username || 'No name';
-        return <span>{name}</span>;
+        const telegramHandle = row.original.telegramHandle;
+        return (
+          <div className="flex flex-col">
+            <span>{name}</span>
+            {telegramHandle && (
+              <span className="text-sm text-gray-500">{telegramHandle}</span>
+            )}
+          </div>
+        );
       },
     },
     {
@@ -107,24 +115,6 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
       cell: ({ row }) => (
         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.isVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {row.original.isVerified ? 'Yes' : 'No'}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'scholarsNewsletter',
-      header: 'Scholars WL',
-      cell: ({ row }) => (
-        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.scholarsNewsletter ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-          {row.original.scholarsNewsletter ? 'Yes' : 'No'}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'partnerNewsletter',
-      header: 'Partners NL',
-      cell: ({ row }) => (
-        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.partnerNewsletter ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-          {row.original.partnerNewsletter ? 'Yes' : 'No'}
         </span>
       ),
     },

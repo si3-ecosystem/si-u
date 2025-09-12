@@ -93,6 +93,7 @@ export interface AdminUserTableData {
   companyName?: string;
   companyAffiliation?: string;
   wallet_address?: string;
+  telegramHandle?: string;
   createdAt: string;
   updatedAt: string;
   lastLogin?: string;
