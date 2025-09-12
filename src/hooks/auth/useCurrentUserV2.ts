@@ -16,7 +16,7 @@ export function useCurrentUserV2(): CurrentUserState {
   const legacy = useAppSelector((s) => (s as any).user);
 
   const v2Authed = authV2?.status === 'authenticated' && !!(authV2?.user?._id || authV2?.user?.id);
-  const v2Loading = authV2?.status === 'idle' || authV2?.status === 'loading';
+  const v2Loading = authV2?.status === 'loading';
 
   // Prefer new store; fallback to legacy only if new not ready
   const user = v2Authed ? authV2.user : (legacy?.user?._id ? legacy.user : null);
