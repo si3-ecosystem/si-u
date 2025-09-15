@@ -256,6 +256,36 @@ const LiveFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
             Featured Video
           </label>
           <div className="space-y-4">
+            {/* Video URL Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+              <p className="font-medium text-blue-800 mb-2">
+                Supported Video Formats:
+              </p>
+              <ul className="space-y-1 text-blue-700">
+                <li>
+                  • <strong>YouTube:</strong> youtube.com/watch?v=... or
+                  youtu.be/...
+                </li>
+                <li>
+                  • <strong>Loom:</strong> Use the embed URL
+                  (loom.com/embed/...)
+                </li>
+                <li>
+                  • <strong>Raw Videos:</strong> Direct links to .mp4, .webm,
+                  .mov files
+                </li>
+              </ul>
+              <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
+                <p className="font-medium text-xs">💡 For Loom videos:</p>
+                <p className="text-xs">1. Open your Loom video</p>
+                <p className="text-xs">
+                  2. Click &ldquo;Share&rdquo; → &ldquo;Embed&rdquo;
+                </p>
+                <p className="text-xs">
+                  3. Copy the embed URL (starts with loom.com/embed/)
+                </p>
+              </div>
+            </div>
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <input
@@ -263,7 +293,7 @@ const LiveFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                   id="live-video"
                   value={localLive.url}
                   onChange={handleVideoChange}
-                  placeholder="Paste video URL here"
+                  placeholder="Paste video URL here (YouTube, Loom embed, or direct video file)"
                   className={`${inputStyles} pl-10 bg-gray-50 border-gray-200 focus:border-purple-300 focus:ring-purple-200`}
                 />
                 <Play className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 size-5" />

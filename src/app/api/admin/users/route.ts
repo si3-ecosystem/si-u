@@ -16,6 +16,7 @@ export interface AdminUserData {
   companyName?: string;
   companyAffiliation?: string;
   wallet_address?: string;
+  domain?: string;
   createdAt: string;
   updatedAt: string;
   lastLogin?: string;
@@ -41,6 +42,7 @@ export function generateMockUsers(): AdminUserData[] {
   const networks = ['Mainnet', 'Polygon', 'Arbitrum', 'Base', 'Optimism'];
   const interests = ['AI', 'Blockchain', 'Web3', 'DeFi', 'NFTs', 'Smart Contracts', 'Cryptocurrency', 'Decentralization'];
   const values = ['Innovation', 'Transparency', 'Community', 'Education', 'Sustainability', 'Inclusivity'];
+  const domains = ['example.com', 'techstartup.io', 'web3company.com', 'blockchainlab.org', 'cryptodev.net', null];
 
   const users: AdminUserData[] = [];
 
@@ -49,6 +51,7 @@ export function generateMockUsers(): AdminUserData[] {
     const randomCompany = companies[Math.floor(Math.random() * companies.length)];
     const randomWallet = wallets[Math.floor(Math.random() * wallets.length)];
     const randomNetwork = networks[Math.floor(Math.random() * networks.length)];
+    const randomDomain = domains[Math.floor(Math.random() * domains.length)];
     const randomInterests = interests.slice(0, Math.floor(Math.random() * 4) + 1);
     const randomValues = values.slice(0, Math.floor(Math.random() * 3) + 1);
     
@@ -66,6 +69,7 @@ export function generateMockUsers(): AdminUserData[] {
       companyName: randomCompany || undefined,
       companyAffiliation: randomCompany || undefined,
       wallet_address: randomWallet ? `0x${Math.random().toString(16).substr(2, 40)}` : undefined,
+      domain: randomDomain || undefined,
       createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
       updatedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       lastLogin: Math.random() > 0.2 ? new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : undefined,
@@ -215,13 +219,6 @@ export async function GET(request: NextRequest) {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedUsers = users.slice(startIndex, endIndex);
-
-    // Generate role statistics
-    const roleStats = users.reduce((acc, user) => {
-      const role = user.roles[0] || 'unknown';
-      acc[role] = (acc[role] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
 
     const response = {
       status: "success",

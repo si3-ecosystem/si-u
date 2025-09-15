@@ -6,6 +6,7 @@ import Orgs from "./_Orgs";
 import Available from "./_Available";
 import Live from "./_Live";
 import Footer from "./_Footer";
+import ReadMe from "./_ReadMe";
 
 const DynamicComponent = ({ toggleDrawer, editPage }: { toggleDrawer: () => void; editPage: string }) => {
   const renderComponent = () => {
@@ -26,6 +27,8 @@ const DynamicComponent = ({ toggleDrawer, editPage }: { toggleDrawer: () => void
         return <Live toggleDrawer={toggleDrawer} />;
       case "footer":
         return <Footer toggleDrawer={toggleDrawer} />;
+      case "readme":
+        return <ReadMe toggleDrawer={toggleDrawer} />;
       default:
         return null;
     }
