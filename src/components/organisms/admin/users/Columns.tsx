@@ -110,6 +110,28 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
       },
     },
     {
+      accessorKey: 'domain',
+      header: 'Domain',
+      cell: ({ row }) => {
+        const domain = row.original.domain;
+        if (!domain) {
+          return <span className="text-gray-400 text-sm">No domain</span>;
+        }
+        const domainWithSuffix = `${domain}.siher.eth.link`;
+        const fullUrl = domainWithSuffix.startsWith('http') ? domainWithSuffix : `https://${domainWithSuffix}`;
+        return (
+          <a 
+            href={fullUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium"
+          >
+            {domainWithSuffix}
+          </a>
+        );
+      },
+    },
+    {
       accessorKey: 'isVerified',
       header: 'Verified',
       cell: ({ row }) => (
@@ -142,7 +164,6 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
 
         // Get current user's roles for access control
         const isCurrentUserAdmin = currentUserRoles.includes('admin');
-        const isCurrentUserTeam = currentUserRoles.includes('team');
 
         // Only admin users can edit/delete, team users can only view
         const canEdit = isCurrentUserAdmin;
