@@ -111,7 +111,7 @@ export function getAdminUserColumns({ copiedWallet, copyToClipboard, refetch, re
     },
     {
       accessorKey: 'domain',
-      header: 'Domain',
+      header: 'siher.eth',
       cell: ({ row }) => {
         const domain = row.original.domain;
         if (!domain) {

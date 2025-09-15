@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Home, Loader2, X, BookOpen } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import { setIsNewWebpage } from "@/redux/slice/contentSlice";

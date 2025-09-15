@@ -27,8 +27,8 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
             </h2>
           </div>
           <p className="text-blue-800 text-sm">
-            This template helps you create a professional personal website.
-            Follow these instructions to get the best results.
+            This template helps you create a Web3 website for your personal
+            brand. Follow these instructions to get the best results.
           </p>
         </div>
 
@@ -44,11 +44,10 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 1
               </div>
               <div>
-                <p className="font-medium text-gray-900">
-                  Click on any section
-                </p>
+                <p className="font-medium text-gray-900">Access your content</p>
                 <p className="text-sm text-gray-600">
-                  Click on any section of your website to edit it
+                  Click within the website editor and this will open up the
+                  editable content fields in the right-hand side column.
                 </p>
               </div>
             </div>
@@ -57,11 +56,9 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 2
               </div>
               <div>
-                <p className="font-medium text-gray-900">
-                  Fill in your information
-                </p>
+                <p className="font-medium text-gray-900">Edit your content</p>
                 <p className="text-sm text-gray-600">
-                  Add your personal details, images, and content
+                  Add your text, images and media into the editable field.
                 </p>
               </div>
             </div>
@@ -70,10 +67,26 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 3
               </div>
               <div>
+                <p className="font-medium text-gray-900">
+                  Select your domain name
+                </p>
+                <p className="text-sm text-gray-600">
+                  Choose a domain name of your choice and type into the domain
+                  field at the top of the editor (add your name/avatar of choice
+                  with siher.eth to automatically be added to the end).
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="bg-green-100 text-green-800 rounded-full size-6 flex items-center justify-center text-sm font-semibold mt-0.5">
+                4
+              </div>
+              <div>
                 <p className="font-medium text-gray-900">Publish your site</p>
                 <p className="text-sm text-gray-600">
-                  Click the &ldquo;Publish&rdquo; or &ldquo;Update&rdquo; button
-                  when ready
+                  Click the &ldquo;Publish&rdquo; button at the top of the page
+                  when you are publishing your site for the first time, or
+                  &ldquo;Update&rdquo; button making future publishes.
                 </p>
               </div>
             </div>
@@ -95,11 +108,13 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 Your main introduction and hero area
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Add your full name and preferred pronouns</li>
+                <li>• Add your first name and preferred pronouns</li>
                 <li>
                   • Write a compelling headline that describes who you are
                 </li>
-                <li>• Upload a professional profile image</li>
+                <li>
+                  • Upload a profile image (professional or avatar works!)
+                </li>
                 <li>• Add relevant hashtags and location</li>
               </ul>
             </div>
@@ -112,9 +127,8 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 What you offer and your expertise
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Describe your main value proposition</li>
-                <li>• List your key skills and superpowers</li>
-                <li>• Add your experience and background</li>
+                <li>• Describe your personal value proposition and vision</li>
+                <li>• Add &apos;What You Create&apos; in the black ticker</li>
               </ul>
             </div>
 
@@ -126,9 +140,15 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 Showcase your work and content
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Upload images or add video URLs</li>
-                <li>• Add wallet connection details if applicable</li>
-                <li>• Include any media highlights</li>
+                <li>• Upload images and/or video URLs that represent you</li>
+                <li>
+                  • Add an Aurpay link or crypto payment gateway of your choice
+                  to receive crypto tipping
+                </li>
+                <li>
+                  • Include links from speaking or podcast or media of your
+                  choice
+                </li>
               </ul>
             </div>
 
@@ -140,9 +160,11 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 Your professional affiliations
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Add companies you&apos;ve worked with</li>
-                <li>• Include community affiliations</li>
-                <li>• List any partnerships or collaborations</li>
+                <li>
+                  • Add logos for organizations that you support - from
+                  companies you work with, have founded, are am ambassador for,
+                  and/or are sponsored by
+                </li>
               </ul>
             </div>
 
@@ -168,7 +190,7 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• List services you offer</li>
                 <li>• Add call-to-action text and links</li>
-                <li>• Upload a professional avatar</li>
+                <li>• Upload an NFT or avatar of your choice</li>
               </ul>
             </div>
           </div>
@@ -195,7 +217,9 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
               <div>
                 <p className="font-medium text-gray-900">Save Frequently</p>
                 <p className="text-sm text-gray-600">
-                  Your changes are saved automatically as you type
+                  Your changes are saved automatically as you type, but not
+                  published live until you press &apos;Publish&apos; or
+                  &apos;Update&apos;
                 </p>
               </div>
             </div>
@@ -223,7 +247,7 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           <div className="space-y-2 text-sm text-yellow-800">
             <p>
               • After clicking &ldquo;Publish&rdquo; or &ldquo;Update&rdquo;,
-              wait 2-3 minutes for IPFS to republish your site
+              wait 2-3 minutes for the IPFS to republish your site
             </p>
             <p>• Your changes will be live once the IPFS process completes</p>
             <p>• You can continue editing while your site is being updated</p>
@@ -272,8 +296,8 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           </h3>
           <p className="text-sm text-gray-600">
             If you encounter any issues or need assistance, please contact our
-            support team. We&apos;re here to help you create an amazing personal
-            website!
+            support team on tech@si3.space. We&apos;re here to help you create a
+            personal Web3 site you can be proud of!
           </p>
         </div>
       </div>
