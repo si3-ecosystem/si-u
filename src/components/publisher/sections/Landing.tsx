@@ -99,6 +99,8 @@ const ProfileCard = ({
 
 const Landing = () => {
   const landingData = useSelector((state: RootState) => state.content.landing);
+
+  // Safe data extraction with fallbacks
   const {
     hashTags = [],
     region = "",
@@ -109,7 +111,45 @@ const Landing = () => {
     pronoun = "",
     title = "",
     fullName = "",
-  } = useMemo(() => landingData || {}, [landingData]);
+  } = useMemo(() => {
+    // If no landing data, return empty defaults
+    if (!landingData || typeof landingData !== "object") {
+      return {
+        hashTags: [],
+        region: "",
+        organizationAffiliations: [],
+        communityAffiliations: [],
+        superPowers: [],
+        image: "",
+        pronoun: "",
+        title: "",
+        fullName: "",
+      };
+    }
+
+    // Return landing data with safe defaults
+    return {
+      hashTags: Array.isArray(landingData.hashTags) ? landingData.hashTags : [],
+      region: typeof landingData.region === "string" ? landingData.region : "",
+      organizationAffiliations: Array.isArray(
+        landingData.organizationAffiliations
+      )
+        ? landingData.organizationAffiliations
+        : [],
+      communityAffiliations: Array.isArray(landingData.communityAffiliations)
+        ? landingData.communityAffiliations
+        : [],
+      superPowers: Array.isArray(landingData.superPowers)
+        ? landingData.superPowers
+        : [],
+      image: typeof landingData.image === "string" ? landingData.image : "",
+      pronoun:
+        typeof landingData.pronoun === "string" ? landingData.pronoun : "",
+      title: typeof landingData.title === "string" ? landingData.title : "",
+      fullName:
+        typeof landingData.fullName === "string" ? landingData.fullName : "",
+    };
+  }, [landingData]);
 
   // Ensure hashTags is always an array
   const safeHashTags = Array.isArray(hashTags) ? hashTags : [];

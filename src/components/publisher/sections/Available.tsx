@@ -6,12 +6,37 @@ import Heading from "@/components/publisher/ui/Heading";
 import Link from "next/link";
 
 const Available = () => {
-  const availableData = useSelector((state: RootState) => state.content?.available);
-  
-  // Add null checks to prevent destructuring errors
-  const avatar = availableData?.avatar || "";
-  const availableFor = availableData?.availableFor || [];
-  const ctaText = availableData?.ctaText || "";
+  const availableData = useSelector(
+    (state: RootState) => state.content?.available
+  );
+
+  // Safe data extraction with meaningful fallbacks
+  const avatar =
+    availableData?.avatar &&
+    typeof availableData.avatar === "string" &&
+    availableData.avatar.trim() !== ""
+      ? availableData.avatar
+      : "https://res.cloudinary.com/dv52zu7pu/image/upload/v1751741835/available_uqqfbn.svg";
+
+  const availableFor =
+    Array.isArray(availableData?.availableFor) &&
+    availableData.availableFor.length > 0
+      ? availableData.availableFor
+      : ["collaboration", "advising", "speaking"];
+
+  const ctaText =
+    availableData?.ctaText &&
+    typeof availableData.ctaText === "string" &&
+    availableData.ctaText.trim() !== ""
+      ? availableData.ctaText
+      : "Join SI<3>";
+
+  const ctaUrl =
+    availableData?.ctaUrl &&
+    typeof availableData.ctaUrl === "string" &&
+    availableData.ctaUrl.trim() !== ""
+      ? availableData.ctaUrl
+      : "https://www.si3.space";
 
   return (
     <div className="p-4 py-10">
@@ -60,7 +85,7 @@ const Available = () => {
             )}
           </div>
           <Link
-            href="https://www.si3.space"
+            href={ctaUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-light-purple border border-[#3E21F3] text-blue-primary rounded-full transition-all ease-out duration-300 hover:bg-[#7E5BFF] hover:text-white font-fira-mono font-medium tracking-wide px-4 py-2 sm:px-5 sm:py-3 hover:shadow-md cursor-pointer mx-auto sm:mx-0 uppercase text-sm sm:text-base"
