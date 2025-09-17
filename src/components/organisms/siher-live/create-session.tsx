@@ -55,6 +55,8 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
     claimOpens: "",
     claimCloses: "",
     attendanceRequirement: "30 mins",
+    unlockEventLink: "",
+    huddle01Link: "",
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -152,6 +154,8 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           claimOpens: "",
           claimCloses: "",
           attendanceRequirement: "30 mins",
+          unlockEventLink: "",
+          huddle01Link: "",
         })
         onSaved?.(result)
       }, 2000)
@@ -221,6 +225,8 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           claimOpens: "",
           claimCloses: "",
           attendanceRequirement: "30 mins",
+          unlockEventLink: "",
+          huddle01Link: "",
         })
         onSaved?.(result)
       }, 2000)
@@ -349,8 +355,9 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Web3 Education">Web3 Education</SelectItem>
-                <SelectItem value="Workshop">Workshop</SelectItem>
-                <SelectItem value="Webinar">Webinar</SelectItem>
+                <SelectItem value="Interview">Interview</SelectItem>
+                <SelectItem value="BTS (Behind-the-Scenes)">BTS (Behind-the-Scenes)</SelectItem>
+                <SelectItem value="Lifestyle Show">Lifestyle Show</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -501,29 +508,51 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-gray-900">NFT Title</Label>
+          <Label className="text-sm font-medium text-gray-900">Session Title</Label>
           <Input
-            placeholder="POAP Title (default to Session Title)"
+            placeholder="Enter session title"
             value={formData.nftTitle}
             onChange={(e) => setFormData({ ...formData, nftTitle: e.target.value })}
             className="mt-1"
           />
         </div>
 
+        <div>
+          <Label className="text-sm font-medium text-gray-900">Unlock NFT Event Link</Label>
+          <Input
+            placeholder="https://app.unlock-protocol.com/locks/..."
+            value={formData.unlockEventLink || ''}
+            onChange={(e) => setFormData({ ...formData, unlockEventLink: e.target.value })}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium text-gray-900">Huddle01 Video Link</Label>
+          <Input
+            placeholder="https://huddle01.com/..."
+            value={formData.huddle01Link || ''}
+            onChange={(e) => setFormData({ ...formData, huddle01Link: e.target.value })}
+            className="mt-1"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="text-sm font-medium text-gray-900">Claim Opens</Label>
+            <Label htmlFor="claimOpens" className="text-sm font-medium text-gray-900">Claim Opens</Label>
             <Input
-              placeholder="dd/mm/yyyy"
+              id="claimOpens"
+              type="date"
               value={formData.claimOpens}
               onChange={(e) => setFormData({ ...formData, claimOpens: e.target.value })}
               className="mt-1"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-900">Claim Closes</Label>
+            <Label htmlFor="claimCloses" className="text-sm font-medium text-gray-900">Claim Closes</Label>
             <Input
-              placeholder="dd/mm/yyyy"
+              id="claimCloses"
+              type="date"
               value={formData.claimCloses}
               onChange={(e) => setFormData({ ...formData, claimCloses: e.target.value })}
               className="mt-1"
@@ -615,7 +644,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
               </div>
               {formData.nftTitle && (
                 <div className="text-sm">
-                  <span className="text-gray-600 font-medium">NFT Title:</span>{' '}
+                  <span className="text-gray-600 font-medium">Session Title:</span>{' '}
                   <span className="text-gray-900">{formData.nftTitle}</span>
                 </div>
               )}
@@ -629,6 +658,18 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
                   <span className="text-gray-900">
                     {formData.claimOpens || 'Not specified'} to {formData.claimCloses || 'Not specified'}
                   </span>
+                </div>
+              )}
+              {formData.unlockEventLink && (
+                <div className="text-sm">
+                  <span className="text-gray-600 font-medium">Unlock NFT Event Link:</span>{' '}
+                  <span className="text-gray-900">{formData.unlockEventLink}</span>
+                </div>
+              )}
+              {formData.huddle01Link && (
+                <div className="text-sm">
+                  <span className="text-gray-600 font-medium">Huddle01 Video Link:</span>{' '}
+                  <span className="text-gray-900">{formData.huddle01Link}</span>
                 </div>
               )}
             </div>
@@ -672,6 +713,8 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
         claimOpens: existingSession.claimOpens || "",
         claimCloses: existingSession.claimCloses || "",
         attendanceRequirement: existingSession.attendanceRequirement || "30 mins",
+        unlockEventLink: existingSession.unlockEventLink || "",
+        huddle01Link: existingSession.huddle01Link || "",
       })
     }
   }, [open, existingSession])
@@ -710,7 +753,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
                 {isSubmitting ? (
                   'Creating...'
                 ) : currentStep === 4 ? (
-                  isBetaTester ? (mode === 'edit' ? 'Update & Go Live' : 'Go Live') : 'Unlock As Beta Tester'
+                  isBetaTester ? (mode === 'edit' ? 'Update & Unlock As Beta Tester' : 'Unlock As Beta Tester') : 'Unlock As Beta Tester'
                 ) : (
                   'Continue'
                 )}
