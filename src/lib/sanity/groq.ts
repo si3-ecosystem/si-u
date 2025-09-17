@@ -725,6 +725,38 @@ export const grow3dgeIdeasLabCardByIdQuery = groq`
   }
 `;
 
+export const siherGoLiveSessionsQuery = groq`
+  *[_type == "siherGoLive"] | order(_createdAt desc) {
+    _id,
+    _createdAt,
+    title,
+    description,
+    sessionType,
+    date,
+    startTime,
+    endTime,
+    duration,
+    timezone,
+    accessType,
+    maxParticipants,
+    proofOfAttendance,
+    claimMethod,
+    nftTitle,
+    claimOpens,
+    claimCloses,
+    attendanceRequirement,
+    status,
+    "creator": {
+      "name": creator->name,
+      "email": creator->email,
+      "image": creator->image
+    }
+  }
+`;
+
+export const createSiherGoLiveMutation = groq`
+  *[_type == "siherGoLive" && _id == $id][0]
+`;
 
 export const dashboardBannerQuery = groq`
   *[_type == "dashboardSchema"][0] {

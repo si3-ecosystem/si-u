@@ -56,11 +56,11 @@ const mainMenuItems: MenuItem[] = [
     icon: Users,
     href: "/communities",
   },
-  {
-    title: "Sessions",
-    icon: Calendar,
-    href: "/sessions",
-  },
+  // {
+  //   title: "Sessions",
+  //   icon: Calendar,
+  //   href: "/sessions",
+  // },
   {
     title: "Admin Dashboard",
     icon: Shield,
@@ -107,6 +107,11 @@ const subMenuGroups: SubMenuGroup[] = [
         title: "Ideas Lab",
         icon: Brain,
         href: "/grow3dge/ideas-lab",
+      },
+      {
+        title: "Grow3dge",
+        icon: Calendar,
+        href: "/sessions",
       },
       // {
       //   title: "Grow3dge Playbook",

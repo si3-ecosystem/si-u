@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,15 +8,36 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { X, Calendar, Clock, Globe, Award, Info } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { X, Calendar, Clock, Globe, Award, Info, CheckCircle, AlertCircle } from "lucide-react"
+import { useAppSelector } from '@/redux/store';
+import { createSiherGoLiveSession, updateSiherGoLiveSession } from "@/lib/sanity/client"
 
 interface CreateSessionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  existingSession?: any
+  mode?: 'create' | 'edit'
+  onSaved?: (session: any) => void
 }
 
-export default function CreateSessionModal({ open, onOpenChange }: CreateSessionModalProps) {
+interface NotificationState {
+  show: boolean
+  type: 'success' | 'error' | 'warning'
+  title: string
+  message: string
+}
+
+export default function CreateSessionModal({ open, onOpenChange, existingSession, mode = 'create', onSaved }: CreateSessionModalProps) {
   const [currentStep, setCurrentStep] = useState(1)
+
+  const [notification, setNotification] = useState<NotificationState>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  })
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -34,7 +55,17 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
     claimOpens: "",
     claimCloses: "",
     attendanceRequirement: "30 mins",
+    unlockEventLink: "",
+    huddle01Link: "",
   })
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const user = useAppSelector((state) => state.authV2.user);
+  const isBetaTester = user?.email === 'kara@si3.space';
+  // const isBetaTester = user?.email === 'shayanabbasi006@gmail.com';
+
+  console.log("User", user);
 
   const steps = [
     { number: 1, title: "Session Info", active: currentStep === 1, completed: currentStep > 1 },
@@ -42,6 +73,15 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
     { number: 3, title: "POAP Setup", active: currentStep === 3, completed: currentStep > 3 },
     { number: 4, title: "Review", active: currentStep === 4, completed: false },
   ]
+
+  // Show notification helper
+  const showNotification = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+    setNotification({ show: true, type, title, message })
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      setNotification(prev => ({ ...prev, show: false }))
+    }, 5000)
+  }
 
   const handleNext = () => {
     if (currentStep < 4) {
@@ -57,7 +97,193 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
 
   const handleClose = () => {
     setCurrentStep(1)
+    setNotification(prev => ({ ...prev, show: false }))
     onOpenChange(false)
+  }
+
+  const handleSaveDraft = async () => {
+    if (!isBetaTester) {
+      showNotification(
+        'warning',
+        'Beta Access Required',
+        'Only beta testers can create live sessions at this time.'
+      )
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const baseData = {
+        ...formData,
+        accessType: 'draft',
+        ...(mode === 'create' && {
+          creator: {
+            _type: 'reference',
+            _ref: user?.id,
+          },
+        })
+      }
+
+      const result = mode === 'edit' && existingSession?._id
+        ? await updateSiherGoLiveSession(existingSession._id, baseData)
+        : await createSiherGoLiveSession(baseData)
+
+      showNotification(
+        'success',
+        mode === 'edit' ? 'Draft Updated' : 'Draft Saved',
+        mode === 'edit' ? 'Your session draft has been updated.' : 'Your session has been saved as draft.'
+      )
+
+      setTimeout(() => {
+        onOpenChange(false)
+        setCurrentStep(1)
+        setFormData({
+          title: "",
+          description: "",
+          sessionType: "Web3 Education",
+          date: "March, 4th, 2025",
+          startTime: "10:40 am",
+          endTime: "11:40 am",
+          duration: "60 mins",
+          timezone: "(GMT+01:00) Central European Standard Time",
+          accessType: "Public",
+          maxParticipants: "100",
+          proofOfAttendance: true,
+          claimMethod: "Auto-mint",
+          nftTitle: "",
+          claimOpens: "",
+          claimCloses: "",
+          attendanceRequirement: "30 mins",
+          unlockEventLink: "",
+          huddle01Link: "",
+        })
+        onSaved?.(result)
+      }, 2000)
+    } catch (error) {
+      console.error("Error saving draft:", error)
+      showNotification(
+        'error',
+        'Error',
+        'Failed to save draft. Please try again.'
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleGoLive = async () => {
+    if (!isBetaTester) {
+      showNotification(
+        'warning',
+        'Beta Access Required',
+        'Only beta testers can create live sessions at this time.'
+      )
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const baseData = {
+        ...formData,
+        accessType: 'public',
+        ...(mode === 'create' && {
+          creator: {
+            _type: 'reference',
+            _ref: user?.id,
+          },
+        })
+      }
+
+      const result = mode === 'edit' && existingSession?._id
+        ? await updateSiherGoLiveSession(existingSession._id, baseData)
+        : await createSiherGoLiveSession(baseData)
+      
+      showNotification(
+        'success',
+        mode === 'edit' ? 'Session Updated' : 'Session Created',
+        mode === 'edit' ? 'Your session has been updated successfully!' : 'Your live session has been created successfully!'
+      )
+      
+      // Close the modal and reset the form after a brief delay
+      setTimeout(() => {
+        onOpenChange(false)
+        setCurrentStep(1)
+        setFormData({
+          title: "",
+          description: "",
+          sessionType: "Web3 Education",
+          date: "March, 4th, 2025",
+          startTime: "10:40 am",
+          endTime: "11:40 am",
+          duration: "60 mins",
+          timezone: "(GMT+01:00) Central European Standard Time",
+          accessType: "Public",
+          maxParticipants: "100",
+          proofOfAttendance: true,
+          claimMethod: "Auto-mint",
+          nftTitle: "",
+          claimOpens: "",
+          claimCloses: "",
+          attendanceRequirement: "30 mins",
+          unlockEventLink: "",
+          huddle01Link: "",
+        })
+        onSaved?.(result)
+      }, 2000)
+    } catch (error) {
+      console.error("Error creating session:", error)
+      showNotification(
+        'error',
+        'Error',
+        'Failed to create session. Please try again.'
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const renderNotification = () => {
+    if (!notification.show) return null
+
+    return (
+      <div className="fixed top-4 right-4 z-50 max-w-sm">
+        <Alert className={`border-l-4 ${
+          notification.type === 'success' ? 'border-l-green-500 bg-green-50' :
+          notification.type === 'error' ? 'border-l-red-500 bg-red-50' :
+          'border-l-yellow-500 bg-yellow-50'
+        }`}>
+          <div className="flex items-start gap-3">
+            {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />}
+            {notification.type === 'error' && <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />}
+            {notification.type === 'warning' && <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />}
+            <div className="flex-1">
+              <h4 className={`font-medium text-sm ${
+                notification.type === 'success' ? 'text-green-800' :
+                notification.type === 'error' ? 'text-red-800' :
+                'text-yellow-800'
+              }`}>
+                {notification.title}
+              </h4>
+              <AlertDescription className={`text-sm ${
+                notification.type === 'success' ? 'text-green-700' :
+                notification.type === 'error' ? 'text-red-700' :
+                'text-yellow-700'
+              }`}>
+                {notification.message}
+              </AlertDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-1 h-auto"
+              onClick={() => setNotification(prev => ({ ...prev, show: false }))}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </Alert>
+      </div>
+    )
   }
 
   const renderStepIndicator = () => (
@@ -129,28 +355,44 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Web3 Education">Web3 Education</SelectItem>
-                <SelectItem value="Workshop">Workshop</SelectItem>
-                <SelectItem value="Webinar">Webinar</SelectItem>
+                <SelectItem value="Interview">Interview</SelectItem>
+                <SelectItem value="BTS (Behind-the-Scenes)">BTS (Behind-the-Scenes)</SelectItem>
+                <SelectItem value="Lifestyle Show">Lifestyle Show</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div>
+          {/* <div>
             <Label className="text-sm font-medium text-gray-900">Date</Label>
             <div className="relative mt-1">
               <Input value={formData.date} readOnly className="pr-10" />
               <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
+          </div> */}
+          <div>
+            <Label htmlFor="date" className="text-sm font-medium text-gray-900">Date</Label>
+            <Input 
+              id="date"
+              type="date"
+              value={formData.date} 
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="mt-1" 
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="text-sm font-medium text-gray-900">Start Time</Label>
-            <div className="relative mt-1">
-              <Input value={`${formData.startTime} / ${formData.endTime}`} readOnly className="pr-10" />
-              <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            </div>
+            <div>
+            <Label htmlFor="startTime" className="text-sm font-medium text-gray-900">Start Time</Label>
+            <Input 
+              id="startTime"
+              type="time"
+              value={formData.startTime} 
+              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+              className="mt-1" 
+            />
+          </div>
           </div>
 
           <div>
@@ -266,29 +508,51 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-gray-900">NFT Title</Label>
+          <Label className="text-sm font-medium text-gray-900">Session Title</Label>
           <Input
-            placeholder="POAP Title (default to Session Title)"
+            placeholder="Enter session title"
             value={formData.nftTitle}
             onChange={(e) => setFormData({ ...formData, nftTitle: e.target.value })}
             className="mt-1"
           />
         </div>
 
+        <div>
+          <Label className="text-sm font-medium text-gray-900">Unlock NFT Event Link</Label>
+          <Input
+            placeholder="https://app.unlock-protocol.com/locks/..."
+            value={formData.unlockEventLink || ''}
+            onChange={(e) => setFormData({ ...formData, unlockEventLink: e.target.value })}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium text-gray-900">Huddle01 Video Link</Label>
+          <Input
+            placeholder="https://huddle01.com/..."
+            value={formData.huddle01Link || ''}
+            onChange={(e) => setFormData({ ...formData, huddle01Link: e.target.value })}
+            className="mt-1"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="text-sm font-medium text-gray-900">Claim Opens</Label>
+            <Label htmlFor="claimOpens" className="text-sm font-medium text-gray-900">Claim Opens</Label>
             <Input
-              placeholder="dd/mm/yyyy"
+              id="claimOpens"
+              type="date"
               value={formData.claimOpens}
               onChange={(e) => setFormData({ ...formData, claimOpens: e.target.value })}
               className="mt-1"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-gray-900">Claim Closes</Label>
+            <Label htmlFor="claimCloses" className="text-sm font-medium text-gray-900">Claim Closes</Label>
             <Input
-              placeholder="dd/mm/yyyy"
+              id="claimCloses"
+              type="date"
               value={formData.claimCloses}
               onChange={(e) => setFormData({ ...formData, claimCloses: e.target.value })}
               className="mt-1"
@@ -327,21 +591,23 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-medium text-gray-900 mb-3">Session Info</h3>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-900">Mastering DAO Governance</span>
+            <div className="text-sm">
+              <span className="text-gray-600 font-medium">Title:</span>{' '}
+              <span className="text-gray-900">{formData.title || 'Not specified'}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-900">August 15, 2025</span>
+            <div className="text-sm">
+              <span className="text-gray-600 font-medium">Description:</span>{' '}
+              <span className="text-gray-900">{formData.description || 'Not specified'}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-900">10am to 11am</span>
+            <div className="text-sm">
+              <span className="text-gray-600 font-medium">Type:</span>{' '}
+              <span className="text-gray-900">{formData.sessionType}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Globe className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-900">(GMT+01:00) Central European Standard Time</span>
+            <div className="text-sm">
+              <span className="text-gray-600 font-medium">Date & Time:</span>{' '}
+              <span className="text-gray-900">
+                {formData.date} • {formData.startTime} - {formData.endTime} ({formData.timezone})
+              </span>
             </div>
           </div>
         </div>
@@ -350,25 +616,65 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-medium text-gray-900 mb-3">Access</h3>
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-              <span className="text-sm text-gray-900">Public</span>
+            <div className="text-sm">
+              <span className="text-gray-600 font-medium">Access Type:</span>{' '}
+              <span className="text-gray-900">{formData.accessType}</span>
             </div>
-            <div className="text-sm text-gray-600">Max Participants: 100</div>
+            {formData.accessType === 'Public' && formData.maxParticipants && (
+              <div className="text-sm">
+                <span className="text-gray-600 font-medium">Max Participants:</span>{' '}
+                <span className="text-gray-900">{formData.maxParticipants}</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Proof of Attendance Summary */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-medium text-gray-900 mb-3">Proof of Attendance</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-              <span className="text-sm text-gray-900">Enabled</span>
+        {formData.proofOfAttendance && (
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-medium text-gray-900 mb-3">Proof of Attendance</h3>
+            <div className="space-y-2">
+              <div className="text-sm">
+                <span className="text-gray-600 font-medium">Status:</span>{' '}
+                <span className="text-gray-900">Enabled</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-gray-600 font-medium">Claim Method:</span>{' '}
+                <span className="text-gray-900">{formData.claimMethod}</span>
+              </div>
+              {formData.nftTitle && (
+                <div className="text-sm">
+                  <span className="text-gray-600 font-medium">Session Title:</span>{' '}
+                  <span className="text-gray-900">{formData.nftTitle}</span>
+                </div>
+              )}
+              <div className="text-sm">
+                <span className="text-gray-600 font-medium">Attendance Requirement:</span>{' '}
+                <span className="text-gray-900">{formData.attendanceRequirement}</span>
+              </div>
+              {(formData.claimOpens || formData.claimCloses) && (
+                <div className="text-sm">
+                  <span className="text-gray-600 font-medium">Claim Period:</span>{' '}
+                  <span className="text-gray-900">
+                    {formData.claimOpens || 'Not specified'} to {formData.claimCloses || 'Not specified'}
+                  </span>
+                </div>
+              )}
+              {formData.unlockEventLink && (
+                <div className="text-sm">
+                  <span className="text-gray-600 font-medium">Unlock NFT Event Link:</span>{' '}
+                  <span className="text-gray-900">{formData.unlockEventLink}</span>
+                </div>
+              )}
+              {formData.huddle01Link && (
+                <div className="text-sm">
+                  <span className="text-gray-600 font-medium">Huddle01 Video Link:</span>{' '}
+                  <span className="text-gray-900">{formData.huddle01Link}</span>
+                </div>
+              )}
             </div>
-            <div className="text-sm text-gray-600">Claim Method: Auto-Mint</div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
@@ -388,42 +694,74 @@ export default function CreateSessionModal({ open, onOpenChange }: CreateSession
     }
   }
 
+  useEffect(() => {
+    if (open && existingSession) {
+      setFormData({
+        title: existingSession.title || "",
+        description: existingSession.description || "",
+        sessionType: existingSession.sessionType || "Web3 Education",
+        date: existingSession.date || "March, 4th, 2025",
+        startTime: existingSession.startTime || "10:40 am",
+        endTime: existingSession.endTime || "11:40 am",
+        duration: existingSession.duration || "60 mins",
+        timezone: existingSession.timezone || "(GMT+01:00) Central European Standard Time",
+        accessType: existingSession.accessType || "Public",
+        maxParticipants: existingSession.maxParticipants || "100",
+        proofOfAttendance: existingSession.proofOfAttendance ?? true,
+        claimMethod: existingSession.claimMethod || "Auto-mint",
+        nftTitle: existingSession.nftTitle || "",
+        claimOpens: existingSession.claimOpens || "",
+        claimCloses: existingSession.claimCloses || "",
+        attendanceRequirement: existingSession.attendanceRequirement || "30 mins",
+        unlockEventLink: existingSession.unlockEventLink || "",
+        huddle01Link: existingSession.huddle01Link || "",
+      })
+    }
+  }, [open, existingSession])
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
-        {/* Header with DialogTitle */}
-        <div className="flex items-center justify-between p-6 pb-0">
-          <DialogTitle className="text-xl font-semibold text-gray-900">Create New Session</DialogTitle>
-          {/* <Button variant="ghost" size="sm" onClick={handleClose} className="p-1">
-            <X className="w-5 h-5" />
-          </Button> */}
-        </div>
-
-        {/* Step Indicator */}
-        {renderStepIndicator()}
-
-        {/* Step Content */}
-        {renderCurrentStep()}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between p-6 pt-2 border-t">
-          <Button variant="outline" onClick={handleBack} disabled={currentStep === 1} className="bg-transparent">
-            Back
-          </Button>
-
-          <div className="flex gap-3">
-            <Button variant="outline" className="bg-transparent">
-              Save Draft
-            </Button>
-            <Button
-              onClick={currentStep === 4 ? handleClose : handleNext}
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              {currentStep === 4 ? "Go Live" : "Continue"}
-            </Button>
+    <>
+      {renderNotification()}
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          {/* Header with DialogTitle */}
+          <div className="flex items-center justify-between p-6 pb-0">
+            <DialogTitle className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Session' : 'Create New Session'}</DialogTitle>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+
+          {/* Step Indicator */}
+          {renderStepIndicator()}
+
+          {/* Step Content */}
+          {renderCurrentStep()}
+
+          {/* Footer */}
+          <div className="flex items-center justify-between p-6 pt-2 border-t">
+            <Button variant="outline" onClick={handleBack} disabled={currentStep === 1} className="bg-transparent">
+              Back
+            </Button>
+
+            <div className="flex gap-3">
+              <Button variant="outline" className="bg-transparent" onClick={currentStep === 4 ? handleSaveDraft : handleNext} disabled={isSubmitting}>
+                Save Draft
+              </Button>
+              <Button
+                onClick={currentStep === 4 ? handleGoLive : handleNext}
+                className={`${isBetaTester ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'}`}
+                disabled={!isBetaTester || isSubmitting}
+              >
+                {isSubmitting ? (
+                  'Creating...'
+                ) : currentStep === 4 ? (
+                  isBetaTester ? (mode === 'edit' ? 'Update & Unlock As Beta Tester' : 'Unlock As Beta Tester') : 'Unlock As Beta Tester'
+                ) : (
+                  'Continue'
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
