@@ -31,7 +31,8 @@ export default function LiveStreamingDashboard() {
     const [activeTab, setActiveTab] = useState<'live' | 'drafts'>('live')
     const [editingSession, setEditingSession] = useState<Session | null>(null)
     const user = useAppSelector((state) => state.authV2.user)
-    const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
+    // const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
+    const isBetaTester = user?.email === 'kara@si3.space';
 
     // Fetch sessions when component mounts or activeTab changes
     useEffect(() => {
