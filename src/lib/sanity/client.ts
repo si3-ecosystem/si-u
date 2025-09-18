@@ -29,7 +29,6 @@ import {
   seoSettingsQuery,
   liveSessionsQuery,
   liveSessionSchemaQuery,
-  siherGoLiveSessionsQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -54,7 +53,7 @@ export const previewClient = projectId
       dataset,
       apiVersion,
       useCdn,
-      token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
+      token: previewSecretId,
     })
   : null;
 
