@@ -45,7 +45,6 @@ export const client = projectId
       dataset,
       apiVersion,
       useCdn,
-      token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
     })
   : null;
 
