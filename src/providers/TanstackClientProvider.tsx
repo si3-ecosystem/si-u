@@ -5,18 +5,38 @@ import { useEffect, useRef } from "react";
 import { store } from "@/redux/store";
 import { setUnauthenticated } from "@/redux/slice/authSliceV2";
 
+// Helper function to check if 401 error is from main API (not external services)
+const isMainApi401Error = (error: any) => {
+  if (!error) return false;
+  
+  // Check if it's a 401 error
+  const is401 = error?.status === 401 || error?.statusCode === 401;
+  if (!is401) return false;
+  
+  // Check if the error is from our main API (not Sanity, etc.)
+  const errorUrl = error?.url || error?.config?.url || '';
+  const isMainApi = errorUrl.includes('/api/') || errorUrl.includes('api.si3.space');
+  
+  return is401 && isMainApi;
+};
+
 // Create auth-aware query client
 const createAuthAwareQueryClient = () => {
   return new QueryClient({
     defaultOptions: {
       queries: {
         retry: (failureCount, error: any) => {
-          // Don't retry on 401 errors - handle auth failure
-          if (error?.status === 401 || error?.statusCode === 401) {
-            console.log('[QueryClient] 401 error detected, marking unauthenticated');
+          // Only handle 401 errors from main API, not external services like Sanity
+          if (isMainApi401Error(error)) {
             try { store.dispatch(setUnauthenticated()); } catch {}
             return false;
           }
+          
+          // For Sanity/external 401 errors, just don't retry but don't logout
+          if (error?.status === 401 || error?.statusCode === 401) {
+            return false;
+          }
+          
           // Retry other errors up to 3 times
           return failureCount < 3;
         },
@@ -25,12 +45,17 @@ const createAuthAwareQueryClient = () => {
       },
       mutations: {
         retry: (failureCount, error: any) => {
-          // Don't retry on 401 errors
-          if (error?.status === 401 || error?.statusCode === 401) {
-            console.log('[QueryClient] 401 error in mutation, marking unauthenticated');
+          // Only handle 401 errors from main API
+          if (isMainApi401Error(error)) {
             try { store.dispatch(setUnauthenticated()); } catch {}
             return false;
           }
+          
+          // For external 401 errors, just don't retry
+          if (error?.status === 401 || error?.statusCode === 401) {
+            return false;
+          }
+          
           // Don't retry mutations by default
           return false;
         },
@@ -58,7 +83,6 @@ export function TanstackClientProvider({
     const unsubscribe = store.subscribe(() => {
       const state: any = store.getState();
       if (state?.authV2?.status === 'unauthenticated') {
-        console.log('[TanstackClientProvider] Clearing cache on unauthenticated');
         queryClient.clear();
       }
     });

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCurrentUserV2 } from '@/hooks/auth/useCurrentUserV2';
 
 export function AuthGateV2({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useCurrentUserV2();
+  const { isAuthenticated, isLoading, user } = useCurrentUserV2();
   const router = useRouter();
   const pathname = usePathname();
   const [hasRedirected, setHasRedirected] = useState(false);
