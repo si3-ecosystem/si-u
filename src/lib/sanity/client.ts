@@ -29,7 +29,6 @@ import {
   seoSettingsQuery,
   liveSessionsQuery,
   liveSessionSchemaQuery,
-  siherGoLiveSessionsQuery,
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -45,7 +44,6 @@ export const client = projectId
       dataset,
       apiVersion,
       useCdn,
-      // Only use token if it's available, otherwise use public access
       ...(process.env.NEXT_PUBLIC_SANITY_API_TOKEN && {
         token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
       }),
@@ -58,7 +56,7 @@ export const previewClient = projectId
       dataset,
       apiVersion,
       useCdn,
-      token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
+      token: previewSecretId,
     })
   : null;
 
