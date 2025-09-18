@@ -45,7 +45,10 @@ export const client = projectId
       dataset,
       apiVersion,
       useCdn,
-      token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
+      // Only use token if it's available, otherwise use public access
+      ...(process.env.NEXT_PUBLIC_SANITY_API_TOKEN && {
+        token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
+      }),
     })
   : null;
 
@@ -72,16 +75,37 @@ export const fetcher = async <T = unknown>([query, params]: [
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
 ]): FetchResult<T> => {
-  return client ? await client.fetch<T>(query, params || {}) : [];
+  if (!client) return [];
+  
+  try {
+    return await client.fetch<T>(query, params || {});
+  } catch (error: any) {
+    // Handle Sanity 401 errors gracefully without affecting authentication
+    if (error?.statusCode === 401 || error?.message?.includes('Unauthorized')) {
+      console.warn('[Sanity] 401 error - likely missing or invalid token, returning empty data:', error.message);
+      return [];
+    }
+    
+    // Re-throw other errors
+    throw error;
+  }
 };
 
 (async () => {
   if (client) {
-    const data = await client.fetch(getAll);
-    if (!data || !data.length) {
-      console.error(
-        "Sanity returns empty array. Are you sure the dataset is public?"
-      );
+    try {
+      const data = await client.fetch(getAll);
+      if (!data || !data.length) {
+        console.warn(
+          "Sanity returns empty array. Are you sure the dataset is public?"
+        );
+      }
+    } catch (error: any) {
+      if (error?.statusCode === 401 || error?.message?.includes('Unauthorized')) {
+        console.warn('[Sanity] 401 error during initialization - likely missing token, continuing without Sanity data');
+      } else {
+        console.error('[Sanity] Error during initialization:', error);
+      }
     }
   }
 })();
