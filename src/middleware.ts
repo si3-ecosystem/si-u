@@ -6,13 +6,6 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('si3-jwt')?.value;
   const pathname = request.nextUrl.pathname;
 
-  console.log('[Middleware] Processing request:', {
-    pathname,
-    hasToken: !!token,
-    tokenLength: token?.length || 0,
-    userAgent: request.headers.get('user-agent')?.substring(0, 50) || 'unknown'
-  });
-
   if (pathname === '/login') {
     // Prevent caching of the login page (avoid serving RSC flight as text)
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -27,11 +20,6 @@ export function middleware(request: NextRequest) {
   );
 
   if (isProtectedRoute && !token) {
-    console.log('[Middleware] Protected route accessed without token, redirecting to login:', {
-      pathname,
-      isProtectedRoute,
-      hasToken: !!token
-    });
     const redirectResponse = NextResponse.redirect(new URL('/login', request.url));
     redirectResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     redirectResponse.headers.set('Pragma', 'no-cache');

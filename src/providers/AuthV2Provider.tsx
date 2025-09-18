@@ -17,20 +17,14 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
 
   useEffect(() => {
     dispatch(setAuthLoading());
-    // Debug initial auth state
-    debugAuthState();
   }, [dispatch]);
 
   const { data, error, isLoading } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
-      console.log('[AuthV2Provider] Making /auth/me request');
-      const authState = debugAuthState();
-      
       // Check if we have a valid token before making the request
       const token = localStorage.getItem('si3-jwt');
       if (!token || !validateToken(token)) {
-        console.log('[AuthV2Provider] No valid token found, clearing auth data');
         clearAuthData();
         throw new Error('No valid token found');
       }
@@ -38,7 +32,6 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
       return authApiV2.me();
     },
     retry: (failureCount, error) => {
-      console.log('[AuthV2Provider] Query retry attempt:', { failureCount, error: error?.message });
       // Only retry once for 401 errors
       if (failureCount < 1 && error?.message?.includes('401')) {
         return true;
