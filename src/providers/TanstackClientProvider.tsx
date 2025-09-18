@@ -17,13 +17,6 @@ const isMainApi401Error = (error: any) => {
   const errorUrl = error?.url || error?.config?.url || '';
   const isMainApi = errorUrl.includes('/api/') || errorUrl.includes('api.si3.space');
   
-  console.log('[QueryClient] 401 error analysis:', {
-    is401,
-    errorUrl,
-    isMainApi,
-    shouldHandle: is401 && isMainApi
-  });
-  
   return is401 && isMainApi;
 };
 
@@ -35,14 +28,12 @@ const createAuthAwareQueryClient = () => {
         retry: (failureCount, error: any) => {
           // Only handle 401 errors from main API, not external services like Sanity
           if (isMainApi401Error(error)) {
-            console.log('[QueryClient] Main API 401 error detected, marking unauthenticated');
             try { store.dispatch(setUnauthenticated()); } catch {}
             return false;
           }
           
           // For Sanity/external 401 errors, just don't retry but don't logout
           if (error?.status === 401 || error?.statusCode === 401) {
-            console.log('[QueryClient] External service 401 error (Sanity, etc.), not logging out');
             return false;
           }
           
@@ -56,14 +47,12 @@ const createAuthAwareQueryClient = () => {
         retry: (failureCount, error: any) => {
           // Only handle 401 errors from main API
           if (isMainApi401Error(error)) {
-            console.log('[QueryClient] Main API 401 error in mutation, marking unauthenticated');
             try { store.dispatch(setUnauthenticated()); } catch {}
             return false;
           }
           
           // For external 401 errors, just don't retry
           if (error?.status === 401 || error?.statusCode === 401) {
-            console.log('[QueryClient] External service 401 error in mutation, not logging out');
             return false;
           }
           
@@ -94,7 +83,6 @@ export function TanstackClientProvider({
     const unsubscribe = store.subscribe(() => {
       const state: any = store.getState();
       if (state?.authV2?.status === 'unauthenticated') {
-        console.log('[TanstackClientProvider] Clearing cache on unauthenticated');
         queryClient.clear();
       }
     });

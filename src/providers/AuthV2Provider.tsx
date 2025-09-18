@@ -6,7 +6,37 @@ import { authApiV2 } from '@/services/authV2';
 import { useAppDispatch } from '@/redux/store';
 import { setAuthLoading, setAuthenticated, setUnauthenticated } from '@/redux/slice/authSliceV2';
 import { setAllContent } from '@/redux/slice/contentSlice';
-import { debugAuthState, validateToken, clearAuthData } from '@/utils/authDebug';
+// Token validation and auth data clearing utilities
+const validateToken = (token: string | null): boolean => {
+  if (!token) return false;
+  
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const now = Math.floor(Date.now() / 1000);
+    
+    if (payload.exp && payload.exp < now) {
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const clearAuthData = () => {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    localStorage.removeItem('si3-jwt');
+    document.cookie = 'si3-jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  } catch (error) {
+    // Silently handle errors
+  }
+};
 
 interface AuthV2ProviderProps {
   readonly children: React.ReactNode;
@@ -44,21 +74,11 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
   });
 
   useEffect(() => {
-    console.log('[AuthV2Provider] Auth state change:', {
-      isLoading,
-      hasError: !!error,
-      hasData: !!data,
-      errorMessage: error?.message || 'none'
-    });
-
     if (isLoading) return;
     
     if (error) {
-      console.log('[AuthV2Provider] Authentication error, setting unauthenticated:', error);
-      
       // If it's a 401 error, clear auth data and redirect
       if (error?.message?.includes('401') || error?.message?.includes('Unauthorized')) {
-        console.log('[AuthV2Provider] 401 Unauthorized error, clearing auth data');
         clearAuthData();
       }
       
@@ -68,26 +88,12 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
     
     const res: any = data as any;
     const user = res?.data?.user || res?.data?.data?.user || res?.data || null;
-    
-    console.log('[AuthV2Provider] User data received:', {
-      hasUser: !!user,
-      userId: user?._id || user?.id,
-      userEmail: user?.email,
-      responseStructure: {
-        hasData: !!res?.data,
-        hasUserInData: !!res?.data?.user,
-        hasDataInData: !!res?.data?.data?.user
-      }
-    });
 
     if (user?._id || user?.id) {
-      console.log('[AuthV2Provider] User authenticated successfully');
       dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
       
       // Process webcontent if available
       if (user?.webcontent) {
-        console.log('[AuthV2Provider] Processing webcontent data');
-        
         const webcontent = user.webcontent;
         const contentData = {
           landing: webcontent.landing,
@@ -102,20 +108,9 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
           domain: webcontent.domain
         };
 
-        console.log('[AuthV2Provider] Updating content slice with webcontent data:', {
-          hasLanding: !!contentData.landing?.fullName,
-          hasSlider: contentData.slider?.length > 0,
-          hasLive: !!contentData.live?.image,
-          domain: contentData.domain,
-          isNewWebpage: contentData.isNewWebpage
-        });
-
         dispatch(setAllContent(contentData));
-      } else {
-        console.log('[AuthV2Provider] No webcontent found - skipping content update');
       }
     } else {
-      console.log('[AuthV2Provider] No valid user data, setting unauthenticated');
       dispatch(setUnauthenticated());
     }
   }, [data, error, isLoading, dispatch]);

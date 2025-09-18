@@ -82,7 +82,6 @@ export const fetcher = async <T = unknown>([query, params]: [
   } catch (error: any) {
     // Handle Sanity 401 errors gracefully without affecting authentication
     if (error?.statusCode === 401 || error?.message?.includes('Unauthorized')) {
-      console.warn('[Sanity] 401 error - likely missing or invalid token, returning empty data:', error.message);
       return [];
     }
     
@@ -102,7 +101,7 @@ export const fetcher = async <T = unknown>([query, params]: [
       }
     } catch (error: any) {
       if (error?.statusCode === 401 || error?.message?.includes('Unauthorized')) {
-        console.warn('[Sanity] 401 error during initialization - likely missing token, continuing without Sanity data');
+        // Silently handle missing token during initialization
       } else {
         console.error('[Sanity] Error during initialization:', error);
       }
