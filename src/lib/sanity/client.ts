@@ -299,7 +299,11 @@ export async function getSiherGoLiveSessions(accessType?: string) {
         ? `*[_type == "siherGoLive" && accessType == $accessType] | order(_createdAt desc) ${baseFields}`
         : `*[_type == "siherGoLive"] | order(_createdAt desc) ${baseFields}`;
 
-      return (await client.fetch(query, accessType ? { accessType } : {})) || [];
+      // Add cache control to ensure fresh data
+      return await client.fetch(query, accessType ? { accessType } : {}, {
+        cache: 'no-store',
+        next: { tags: ['siherGoLive'] }
+      }) || [];
     } catch (error) {
       console.error('Error fetching SIHER Go Live sessions:', error);
       return [];
@@ -324,12 +328,17 @@ export async function createSiherGoLiveSession(sessionData: any) {
     sessionWithMetadata.creator = sessionWithMetadata.creator._ref || sessionWithMetadata.creator;
   }
 
+  // Clear cache after creation
+  await fetch('/api/revalidate?tag=siherGoLive', { method: 'POST' });
   return client.create(sessionWithMetadata);
 }
 
 // Update an existing SIHER Go Live session
 export async function updateSiherGoLiveSession(id: string, updates: any) {
   if (!client) throw new Error("Sanity client not configured");
+  
+  // Clear cache before updating
+  await fetch('/api/revalidate?tag=siherGoLive', { method: 'POST' });
   
   return client
     .patch(id)
@@ -343,5 +352,8 @@ export async function updateSiherGoLiveSession(id: string, updates: any) {
 // Delete a SIHER Go Live session
 export async function deleteSiherGoLiveSession(id: string) {
   if (!client) throw new Error("Sanity client not configured");
-  return client.delete(id);
+  
+  // Clear cache before deleting
+  await fetch('/api/revalidate?tag=siherGoLive', { method: 'POST' });
+  return client.delete({ query: `*[_id == "${id}"]` });
 }
