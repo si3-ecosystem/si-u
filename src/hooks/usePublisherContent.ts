@@ -27,19 +27,16 @@ export function usePublisherContent() {
     const loadContent = async () => {
       // If content is already loaded, don't reload
       if (hasContent) {
-        console.log('[usePublisherContent] Content already loaded');
         return;
       }
 
       // If user is not authenticated, don't try to load
       if (!isAuthenticated || !user) {
-        console.log('[usePublisherContent] User not authenticated');
         return;
       }
 
       // If user has webcontent, use it
       if (user.webcontent) {
-        console.log('[usePublisherContent] Loading content from user webcontent');
         const webcontent = user.webcontent;
         const contentData = {
           landing: webcontent.landing,
@@ -61,19 +58,13 @@ export function usePublisherContent() {
       try {
         setIsLoading(true);
         setError(null);
-        console.log('[usePublisherContent] Fetching content from API');
         
         const response = await apiClient.get('/webcontent/get');
         if (response.status === 'success' && response.data) {
-          console.log('[usePublisherContent] Content loaded from API:', response.data);
-          dispatch(setAllContent(response.data));
-        } else {
-          console.log('[usePublisherContent] No content found in API response, using default content');
-          // The default content is already in the contentSlice initialState
+          dispatch(setAllContent(response.data as any));
         }
+        // If no content found, use default content from initialState
       } catch (err: any) {
-        console.error('[usePublisherContent] Error loading content:', err);
-        console.log('[usePublisherContent] Using default content due to error');
         // Don't set error, just use default content
         setError(null);
       } finally {
