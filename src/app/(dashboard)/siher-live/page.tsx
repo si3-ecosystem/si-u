@@ -34,24 +34,51 @@ export default function LiveStreamingDashboard() {
     const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
     // const isBetaTester = user?.email === 'kara@si3.space';
 
+    // Function to refresh sessions
+    const refreshSessions = async () => {
+        setIsLoading(true);
+        try {
+            const accessType = activeTab === 'live' ? 'public' : 'draft';
+            const sessionsByAccess = await getSiherGoLiveSessions(accessType) as Session[];
+            setSessions(sessionsByAccess);
+        } catch (error) {
+            console.error('Error refreshing sessions:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // Fetch sessions when component mounts or activeTab changes
     useEffect(() => {
-        const fetchSessions = async () => {
-            setIsLoading(true)
-            try {
-                const accessType = activeTab === 'live' ? 'public' : 'draft'
-                const sessionsByAccess = await getSiherGoLiveSessions(accessType) as Session[]
-                console.log('sessionsByAccess',sessionsByAccess)
-                setSessions(sessionsByAccess)
-            } catch (error) {
-                console.error('Error fetching sessions:', error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
+        refreshSessions();
+    }, [activeTab]);
 
-        fetchSessions()
-    }, [activeTab])
+    const handleSessionCreated = async () => {
+        await refreshSessions();
+        setIsModalOpen(false);
+    };
+
+    const handleSessionUpdated = async () => {
+        await refreshSessions();
+        setEditingSession(null);
+        setIsModalOpen(false);
+    };
+
+    const handleDeleteSession = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this session?')) return;
+        
+        try {
+            // Optimistic update
+            setSessions(prev => prev.filter(s => s._id !== id));
+            await deleteSiherGoLiveSession(id);
+            // Refresh to ensure consistency
+            await refreshSessions();
+        } catch (error) {
+            console.error('Error deleting session:', error);
+            // Revert on error
+            await refreshSessions();
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-2">
@@ -132,18 +159,15 @@ export default function LiveStreamingDashboard() {
                         </div>
                     ) : sessions.length > 0 ? (
                         sessions.map((session) => (
-                            <SessionCard key={session._id} session={session} onEdit={() => { setEditingSession(session); setIsModalOpen(true) }} onDelete={async () => {
-                                // Optimistic UI update
-                                const prev = sessions
-                                setSessions((s) => s.filter(x => x._id !== session._id))
-                                try {
-                                    await deleteSiherGoLiveSession(session._id)
-                                } catch (e) {
-                                    console.error('Failed to delete session', e)
-                                    // revert on error
-                                    setSessions(prev)
-                                }
-                            }} />
+                            <SessionCard 
+                                key={session._id} 
+                                session={session} 
+                                onEdit={() => { 
+                                    setEditingSession(session); 
+                                    setIsModalOpen(true); 
+                                }} 
+                                onDelete={() => handleDeleteSession(session._id)}
+                            />
                         ))
                     ) : (
                         <Card className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
@@ -163,28 +187,14 @@ export default function LiveStreamingDashboard() {
             </div>
 
             <CreateSessionModal 
-              open={isModalOpen} 
-              onOpenChange={(open) => {
-                if (!open) setEditingSession(null)
-                setIsModalOpen(open)
-              }} 
-              existingSession={editingSession as any}
-              mode={editingSession ? 'edit' : 'create'}
-              onSaved={() => {
-                // refresh list after save
-                (async () => {
-                  setIsLoading(true)
-                  try {
-                    const accessType = activeTab === 'live' ? 'public' : 'draft'
-                    const sessionsByAccess = await getSiherGoLiveSessions(accessType) as Session[]
-                    setSessions(sessionsByAccess)
-                  } catch (err) {
-                    console.error(err)
-                  } finally {
-                    setIsLoading(false)
-                  }
-                })()
-              }}
+                open={isModalOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setEditingSession(null);
+                    setIsModalOpen(open);
+                }} 
+                existingSession={editingSession as any}
+                mode={editingSession ? 'edit' : 'create'}
+                onSaved={editingSession ? handleSessionUpdated : handleSessionCreated}
             />
         </div>
     )
