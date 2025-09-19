@@ -62,8 +62,8 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const user = useAppSelector((state) => state.authV2.user);
-  const isBetaTester = user?.email === 'kara@si3.space';
-  // const isBetaTester = user?.email === 'shayanabbasi006@gmail.com';
+  // const isBetaTester = user?.email === 'kara@si3.space';
+  const isBetaTester = user?.email === 'shayanabbasi006@gmail.com';
 
   console.log("User", user);
 
@@ -411,18 +411,136 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           </div>
         </div>
 
-        <div>
+        <div className="relative">
           <Label className="text-sm font-medium text-gray-900">Time Zone</Label>
-          <Select value={formData.timezone} onValueChange={(value) => setFormData({ ...formData, timezone: value })}>
-            <SelectTrigger className="mt-1">
-              <SelectValue />
+          <Select 
+            value={formData.timezone} 
+            onValueChange={(value) => setFormData({ ...formData, timezone: value })}
+          >
+            <SelectTrigger className="mt-1 text-left">
+              <Globe className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" />
+              <SelectValue placeholder="Select time zone" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="(GMT+01:00) Central European Standard Time">
-                (GMT+01:00) Central European Standard Time
-              </SelectItem>
-              <SelectItem value="(GMT+00:00) Greenwich Mean Time">(GMT+00:00) Greenwich Mean Time</SelectItem>
-              <SelectItem value="(GMT-05:00) Eastern Standard Time">(GMT-05:00) Eastern Standard Time</SelectItem>
+            <SelectContent className="max-h-[300px] overflow-y-auto">
+              <div className="sticky top-0 bg-background z-10 px-3 py-2 text-xs font-medium text-muted-foreground border-b">
+                Common Time Zones
+              </div>
+              {[
+                { value: '(GMT+00:00) Greenwich Mean Time', label: 'Greenwich Mean Time (GMT)' },
+                { value: '(GMT-05:00) Eastern Standard Time', label: 'Eastern Time (ET)' },
+                { value: '(GMT-06:00) Central Standard Time', label: 'Central Time (CT)' },
+                { value: '(GMT-08:00) Pacific Standard Time', label: 'Pacific Time (PT)' },
+                { value: '(GMT+01:00) Central European Standard Time', label: 'Central European Time (CET)' },
+                { value: '(GMT+05:30) India Standard Time', label: 'India Standard Time (IST)' },
+                { value: '(GMT+08:00) China Standard Time', label: 'China Standard Time (CST)' },
+                { value: '(GMT+09:00) Japan Standard Time', label: 'Japan Standard Time (JST)' },
+                { value: '(GMT+10:00) Australian Eastern Standard Time', label: 'Australian Eastern Time (AET)' },
+              ].map((zone) => (
+                <SelectItem key={zone.value} value={zone.value}>
+                  <div className="flex items-center">
+                    <span className="font-medium">{zone.label.split(' (')[0]}</span>
+                    <span className="ml-2 text-muted-foreground">
+                      {zone.value.split(') ')[0]})
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
+              
+              <div className="sticky top-0 bg-background z-10 px-3 py-2 text-xs font-medium text-muted-foreground border-b border-t">
+                All Time Zones
+              </div>
+              
+              {[
+                '(GMT-12:00) International Date Line West',
+                '(GMT-11:00) Midway Island, Samoa',
+                '(GMT-10:00) Hawaii',
+                '(GMT-09:00) Alaska',
+                '(GMT-08:00) Pacific Time (US & Canada)',
+                '(GMT-07:00) Arizona',
+                '(GMT-07:00) Mountain Time (US & Canada)',
+                '(GMT-06:00) Central America',
+                '(GMT-06:00) Central Time (US & Canada)',
+                '(GMT-06:00) Mexico City',
+                '(GMT-06:00) Saskatchewan',
+                '(GMT-05:00) Bogota, Lima, Quito',
+                '(GMT-05:00) Eastern Time (US & Canada)',
+                '(GMT-05:00) Indiana (East)',
+                '(GMT-04:30) Caracas',
+                '(GMT-04:00) Asuncion',
+                '(GMT-04:00) Atlantic Time (Canada)',
+                '(GMT-04:00) Georgetown, La Paz, Manaus',
+                '(GMT-04:00) Santiago',
+                '(GMT-03:30) Newfoundland',
+                '(GMT-03:00) Brasilia',
+                '(GMT-03:00) Buenos Aires',
+                '(GMT-03:00) Greenland',
+                '(GMT-03:00) Montevideo',
+                '(GMT-02:00) Mid-Atlantic',
+                '(GMT-01:00) Azores',
+                '(GMT-01:00) Cape Verde Is.',
+                '(GMT+00:00) Casablanca',
+                '(GMT+00:00) Dublin, Edinburgh, Lisbon, London',
+                '(GMT+00:00) Monrovia, Reykjavik',
+                '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+                '(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague',
+                '(GMT+01:00) Brussels, Copenhagen, Madrid, Paris',
+                '(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb',
+                '(GMT+01:00) West Central Africa',
+                '(GMT+02:00) Amman',
+                '(GMT+02:00) Athens, Bucharest',
+                '(GMT+02:00) Beirut',
+                '(GMT+02:00) Cairo',
+                '(GMT+02:00) Chisinau',
+                '(GMT+02:00) Damascus',
+                '(GMT+02:00) Harare, Pretoria',
+                '(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius',
+                '(GMT+02:00) Jerusalem',
+                '(GMT+02:00) Windhoek',
+                '(GMT+03:00) Baghdad',
+                '(GMT+03:00) Kuwait, Riyadh',
+                '(GMT+03:00) Minsk',
+                '(GMT+03:00) Moscow, St. Petersburg, Volgograd',
+                '(GMT+03:00) Nairobi',
+                '(GMT+03:30) Tehran',
+                '(GMT+04:00) Abu Dhabi, Muscat',
+                '(GMT+04:00) Baku',
+                '(GMT+04:00) Tbilisi',
+                '(GMT+04:00) Yerevan',
+                '(GMT+04:30) Kabul',
+                '(GMT+05:00) Islamabad, Karachi',
+                '(GMT+05:00) Tashkent',
+                '(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi',
+                '(GMT+05:45) Kathmandu',
+                '(GMT+06:00) Astana',
+                '(GMT+06:00) Dhaka',
+                '(GMT+06:30) Yangon (Rangoon)',
+                '(GMT+07:00) Bangkok, Hanoi, Jakarta',
+                '(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi',
+                '(GMT+08:00) Kuala Lumpur, Singapore',
+                '(GMT+08:00) Perth',
+                '(GMT+08:00) Taipei',
+                '(GMT+09:00) Osaka, Sapporo, Tokyo',
+                '(GMT+09:00) Seoul',
+                '(GMT+09:30) Adelaide',
+                '(GMT+09:30) Darwin',
+                '(GMT+10:00) Brisbane',
+                '(GMT+10:00) Canberra, Melbourne, Sydney',
+                '(GMT+10:00) Guam, Port Moresby',
+                '(GMT+10:00) Hobart',
+                '(GMT+11:00) Magadan, Solomon Is., New Caledonia',
+                '(GMT+12:00) Auckland, Wellington',
+                '(GMT+12:00) Fiji',
+                '(GMT+13:00) Nuku\'alofa',
+              ].map((timezone) => (
+                <SelectItem key={timezone} value={timezone} className="py-2">
+                  <div className="flex items-center">
+                    <span className="font-medium">{timezone.split(') ')[1]}</span>
+                    <span className="ml-2 text-muted-foreground">
+                      {timezone.split(') ')[0]})
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -507,7 +625,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           </Select>
         </div>
 
-        <div>
+        {/* <div>
           <Label className="text-sm font-medium text-gray-900">Session Title</Label>
           <Input
             placeholder="Enter session title"
@@ -515,7 +633,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
             onChange={(e) => setFormData({ ...formData, nftTitle: e.target.value })}
             className="mt-1"
           />
-        </div>
+        </div> */}
 
         <div>
           <Label className="text-sm font-medium text-gray-900">Unlock NFT Event Link</Label>
