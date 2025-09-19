@@ -31,8 +31,8 @@ export default function LiveStreamingDashboard() {
     const [activeTab, setActiveTab] = useState<'live' | 'drafts'>('live')
     const [editingSession, setEditingSession] = useState<Session | null>(null)
     const user = useAppSelector((state) => state.authV2.user)
-    // const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
-    const isBetaTester = user?.email === 'kara@si3.space';
+    const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
+    // const isBetaTester = user?.email === 'kara@si3.space';
 
     // Fetch sessions when component mounts or activeTab changes
     useEffect(() => {
@@ -70,18 +70,19 @@ export default function LiveStreamingDashboard() {
                 </Card>
             )}
             {/* Header Section with Gradient */}
-            <div className="relative mb-8 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-400 p-8 text-white overflow-hidden">
-                <div className="relative z-10">
+            {/* <div className="relative mb-8 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-400 p-8 text-white overflow-hidden"> */}
+                {/* <div className="relative z-10">
                     <h1 className="text-4xl font-bold mb-3">GO LIVE</h1>
                     <p className="text-purple-100 max-w-2xl">
                         The Go Live page allows Si Her Guides to manage their live sessions events, from scheduling to attendance
                         tracking and Proof of Attendance NFTs.
                     </p>
-                </div>
-                {/* Decorative elements */}
+                </div> */}
+                <img src="/fixx/SIHERGOLIVE.png" className="relative mb-8 rounded-2xl pt-2 text-white overflow-hidden"/>
+{/*                 
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
                 <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 translate-x-16"></div>
-            </div>
+            </div> */}
 
             {/* Live Sessions Section */}
             <div className="mb-6">
