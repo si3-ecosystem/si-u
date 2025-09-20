@@ -175,6 +175,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(baseData),
+          cache: 'no-store',
         });
       } else {
         response = await fetch('/api/siher-live', {
@@ -183,6 +184,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(baseData),
+          cache: 'no-store',
         });
       }
 
@@ -264,6 +266,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(baseData),
+          cache: 'no-store',
         });
       } else {
         response = await fetch('/api/siher-live', {
@@ -272,6 +275,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(baseData),
+          cache: 'no-store',
         });
       }
 

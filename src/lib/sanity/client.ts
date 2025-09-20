@@ -267,52 +267,5 @@ export async function getLiveSessionSchema() {
   return {};
 }
 
-// Get all SIHER Go Live sessions with proper caching
-export async function getSiherGoLiveSessions(accessType?: string) {
-  if (client) {
-    try {
-      const baseFields = `{
-        _id,
-        title,
-        description,
-        status,
-        date,
-        startTime,
-        endTime,
-        duration,
-        timezone,
-        accessType,
-        maxParticipants,
-        proofOfAttendance,
-        claimMethod,
-        nftTitle,
-        claimOpens,
-        claimCloses,
-        attendanceRequirement,
-        unlockEventLink,
-        huddle01Link,
-        creator,
-        _createdAt,
-        _updatedAt
-      }`;
-
-      const query = accessType
-        ? `*[_type == "siherGoLive" && accessType == $accessType] | order(_createdAt desc) ${baseFields}`
-        : `*[_type == "siherGoLive"] | order(_createdAt desc) ${baseFields}`;
-
-      // Use proper Next.js caching with tags for revalidation
-      return await client.fetch(query, accessType ? { accessType } : {}, {
-        next: { 
-          tags: ['siherGoLive'],
-        }
-      }) || [];
-    } catch (error) {
-      console.error('Error fetching SIHER Go Live sessions:', error);
-      return [];
-    }
-  }
-  return [];
-}
-
-// CRUD operations for SIHER Go Live sessions are now handled via API routes and server actions
+// CRUD operations for SIHER Go Live sessions are handled via API routes and server actions
 // See: /api/siher-live and /lib/server-actions/siher-live.ts

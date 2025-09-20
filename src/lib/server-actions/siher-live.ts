@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from 'next/cache';
 import { client } from '@/lib/sanity/client';
 
 export interface SiherLiveSessionData {
@@ -55,10 +54,6 @@ export async function createSiherLiveSession(sessionData: SiherLiveSessionData):
 
     const result = await client.create(sessionWithMetadata);
 
-    // Revalidate cache immediately
-    revalidateTag('siherGoLive');
-    revalidatePath('/siher-live');
-
     return {
       success: true,
       data: result,
@@ -95,10 +90,6 @@ export async function updateSiherLiveSession(id: string, updates: Partial<SiherL
       })
       .commit();
 
-    // Revalidate cache immediately
-    revalidateTag('siherGoLive');
-    revalidatePath('/siher-live');
-
     return {
       success: true,
       data: result,
@@ -128,10 +119,6 @@ export async function deleteSiherLiveSession(id: string): Promise<SiherLiveRespo
     }
 
     const result = await client.delete(id);
-
-    // Revalidate cache immediately
-    revalidateTag('siherGoLive');
-    revalidatePath('/siher-live');
 
     return {
       success: true,

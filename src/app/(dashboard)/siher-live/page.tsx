@@ -9,7 +9,6 @@ import CreateSessionModal from "@/components/organisms/siher-live/create-session
 import { Card, CardContent } from "@/components/ui/card"
 import NFTGatedLiveJoin from "@/components/organisms/sessions/NFTGatedLiveJoin"
 import { useAppSelector } from '@/redux/store'
-import { getSiherGoLiveSessions } from "@/lib/sanity/client"
 
 interface Session {
     _id: string
@@ -42,7 +41,7 @@ export default function LiveStreamingDashboard() {
         try {
             const accessType = activeTab === 'live' ? 'public' : 'draft';
             const response = await fetch(`/api/siher-live?accessType=${accessType}`, {
-                next: { tags: ['siherGoLive'] }, // ✅ use the cache tag
+                cache: 'no-store',
             });
 
             if (response.ok) {
@@ -84,17 +83,27 @@ export default function LiveStreamingDashboard() {
         };
     }, [activeTab]);
 
-    const handleSessionCreated = async (newSession?: any) => {
-        // Immediately refresh sessions to get the latest data
-        await refreshSessions(true);
+    const handleSessionCreated = async (newSession: any) => {
+        // Optimistically update the sessions list
+        if (newSession) {
+            setSessions(prev => [newSession, ...prev]);
+        }
         setIsModalOpen(false);
+        // Refresh in background to ensure consistency
+        refreshSessions();
     };
 
-    const handleSessionUpdated = async (updatedSession?: any) => {
-        // Immediately refresh sessions to get the latest data
-        await refreshSessions(true);
+    const handleSessionUpdated = async (updatedSession: any) => {
+        // Optimistically update the sessions list
+        if (updatedSession) {
+            setSessions(prev => prev.map(session => 
+                session._id === updatedSession._id ? updatedSession : session
+            ));
+        }
         setEditingSession(null);
         setIsModalOpen(false);
+        // Refresh in background to ensure consistency
+        refreshSessions();
     };
 
     const handleDeleteSession = async (id: string) => {
@@ -103,14 +112,17 @@ export default function LiveStreamingDashboard() {
         setDeletingSessionId(id);
 
         try {
+            // Optimistically remove from UI
+            setSessions(prev => prev.filter(session => session._id !== id));
+
             const response = await fetch(`/api/siher-live/${id}`, {
                 method: 'DELETE',
+                cache: 'no-store',
             });
 
-            if (response.ok) {
-                // Immediately refresh sessions to get the latest data
+            if (!response.ok) {
+                // Revert optimistic update on error
                 await refreshSessions(true);
-            } else {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to delete session');
             }
