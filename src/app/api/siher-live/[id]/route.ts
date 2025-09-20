@@ -3,6 +3,7 @@ import {
   updateSiherLiveSession, 
   deleteSiherLiveSession 
 } from '@/lib/server-actions/siher-live';
+import { revalidateTag } from 'next/cache';
 
 // PUT - Update session
 export async function PUT(
@@ -14,20 +15,17 @@ export async function PUT(
     const updates = await request.json();
 
     if (!id) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
     }
 
     const result = await updateSiherLiveSession(id, updates);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
+
+    // ✅ revalidate cache after update
+    revalidateTag('siherGoLive');
 
     return NextResponse.json({
       success: true,
@@ -36,10 +34,7 @@ export async function PUT(
     });
   } catch (error) {
     console.error('PUT /api/siher-live/[id] error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -52,20 +47,17 @@ export async function DELETE(
     const { id } = params;
 
     if (!id) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
     }
 
     const result = await deleteSiherLiveSession(id);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
+
+    // ✅ revalidate cache after delete
+    revalidateTag('siherGoLive');
 
     return NextResponse.json({
       success: true,
@@ -74,9 +66,6 @@ export async function DELETE(
     });
   } catch (error) {
     console.error('DELETE /api/siher-live/[id] error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

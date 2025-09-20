@@ -42,9 +42,9 @@ export default function LiveStreamingDashboard() {
         try {
             const accessType = activeTab === 'live' ? 'public' : 'draft';
             const response = await fetch(`/api/siher-live?accessType=${accessType}`, {
-                cache: 'no-store'
+                next: { tags: ['siherGoLive'] }, // ✅ use the cache tag
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 setSessions(result.data || []);
@@ -59,6 +59,7 @@ export default function LiveStreamingDashboard() {
             if (force) setIsLoading(false);
         }
     };
+
 
     // Fetch sessions when component mounts or activeTab changes
     useEffect(() => {

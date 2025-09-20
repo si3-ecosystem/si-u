@@ -304,7 +304,6 @@ export async function getSiherGoLiveSessions(accessType?: string) {
       return await client.fetch(query, accessType ? { accessType } : {}, {
         next: { 
           tags: ['siherGoLive'],
-          revalidate: 60 // Cache for 60 seconds, but can be revalidated via tags
         }
       }) || [];
     } catch (error) {
