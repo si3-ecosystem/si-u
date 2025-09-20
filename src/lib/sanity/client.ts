@@ -267,11 +267,10 @@ export async function getLiveSessionSchema() {
   return {};
 }
 
-// Get all SIHER Go Live sessions
+// Get all SIHER Go Live sessions with proper caching
 export async function getSiherGoLiveSessions(accessType?: string) {
   if (client) {
     try {
-      // If accessType is provided, filter by it; otherwise fetch all
       const baseFields = `{
         _id,
         title,
@@ -290,6 +289,8 @@ export async function getSiherGoLiveSessions(accessType?: string) {
         claimOpens,
         claimCloses,
         attendanceRequirement,
+        unlockEventLink,
+        huddle01Link,
         creator,
         _createdAt,
         _updatedAt
@@ -299,10 +300,12 @@ export async function getSiherGoLiveSessions(accessType?: string) {
         ? `*[_type == "siherGoLive" && accessType == $accessType] | order(_createdAt desc) ${baseFields}`
         : `*[_type == "siherGoLive"] | order(_createdAt desc) ${baseFields}`;
 
-      // Add cache control to ensure fresh data
+      // Use proper Next.js caching with tags for revalidation
       return await client.fetch(query, accessType ? { accessType } : {}, {
-        cache: 'no-store',
-        next: { tags: ['siherGoLive'], revalidate: 0 }
+        next: { 
+          tags: ['siherGoLive'],
+          revalidate: 60 // Cache for 60 seconds, but can be revalidated via tags
+        }
       }) || [];
     } catch (error) {
       console.error('Error fetching SIHER Go Live sessions:', error);
@@ -312,71 +315,5 @@ export async function getSiherGoLiveSessions(accessType?: string) {
   return [];
 }
 
-// Create a new SIHER Go Live session
-export async function createSiherGoLiveSession(sessionData: any) {
-  if (!client) throw new Error("Sanity client not configured");
-
-  const sessionWithMetadata = {
-    ...sessionData,
-    _type: 'siherGoLive',
-    _createdAt: new Date().toISOString(),
-    _updatedAt: new Date().toISOString(),
-  };
-
-  // Remove the creator reference since we're just storing the ID as a string
-  if (sessionWithMetadata.creator && typeof sessionWithMetadata.creator === 'object') {
-    sessionWithMetadata.creator = sessionWithMetadata.creator._ref || sessionWithMetadata.creator;
-  }
-
-  const result = await client.create(sessionWithMetadata);
-
-  // Clear cache after creation
-  try {
-    const { invalidateCache } = await import('../cache-utils');
-    await invalidateCache('siherGoLive');
-  } catch (error) {
-    console.warn('Cache revalidation failed:', error);
-  }
-
-  return result;
-}
-
-// Update an existing SIHER Go Live session
-export async function updateSiherGoLiveSession(id: string, updates: any) {
-  if (!client) throw new Error("Sanity client not configured");
-
-  const result = await client
-    .patch(id)
-    .set({
-      ...updates,
-      _updatedAt: new Date().toISOString()
-    })
-    .commit();
-
-  // Clear cache after updating
-  try {
-    const { invalidateCache } = await import('../cache-utils');
-    await invalidateCache('siherGoLive');
-  } catch (error) {
-    console.warn('Cache revalidation failed:', error);
-  }
-
-  return result;
-}
-
-// Delete a SIHER Go Live session
-export async function deleteSiherGoLiveSession(id: string) {
-  if (!client) throw new Error("Sanity client not configured");
-
-  const result = await client.delete({ query: `*[_id == "${id}"]` });
-
-  // Clear cache after deleting
-  try {
-    const { invalidateCache } = await import('../cache-utils');
-    await invalidateCache('siherGoLive');
-  } catch (error) {
-    console.warn('Cache revalidation failed:', error);
-  }
-
-  return result;
-}
+// CRUD operations for SIHER Go Live sessions are now handled via API routes and server actions
+// See: /api/siher-live and /lib/server-actions/siher-live.ts

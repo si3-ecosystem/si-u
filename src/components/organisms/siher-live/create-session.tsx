@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { X, Calendar, Clock, Globe, Award, Info, CheckCircle, AlertCircle } from "lucide-react"
 import { useAppSelector } from '@/redux/store';
-import { createSiherGoLiveSession, updateSiherGoLiveSession } from "@/lib/sanity/client"
+// Removed direct Sanity imports - now using API routes
 
 interface CreateSessionModalProps {
   open: boolean
@@ -65,7 +65,53 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
   // const isBetaTester = user?.email === 'kara@si3.space';
   const isBetaTester = user?.email === 'shayanabbasi006@gmail.com';
 
-  console.log("User", user);
+  // Populate form data when editing existing session
+  useEffect(() => {
+    if (mode === 'edit' && existingSession && open) {
+      setFormData({
+        title: existingSession.title || "",
+        description: existingSession.description || "",
+        sessionType: existingSession.sessionType || "Web3 Education",
+        date: existingSession.date || "March, 4th, 2025",
+        startTime: existingSession.startTime || "10:40 am",
+        endTime: existingSession.endTime || "11:40 am",
+        duration: existingSession.duration || "60 mins",
+        timezone: existingSession.timezone || "(GMT+01:00) Central European Standard Time",
+        accessType: existingSession.accessType || "Public",
+        maxParticipants: existingSession.maxParticipants || "100",
+        proofOfAttendance: existingSession.proofOfAttendance ?? true,
+        claimMethod: existingSession.claimMethod || "Auto-mint",
+        nftTitle: existingSession.nftTitle || "",
+        claimOpens: existingSession.claimOpens || "",
+        claimCloses: existingSession.claimCloses || "",
+        attendanceRequirement: existingSession.attendanceRequirement || "30 mins",
+        unlockEventLink: existingSession.unlockEventLink || "",
+        huddle01Link: existingSession.huddle01Link || "",
+      });
+    } else if (mode === 'create' && open) {
+      // Reset form for new session
+      setFormData({
+        title: "",
+        description: "",
+        sessionType: "Web3 Education",
+        date: "March, 4th, 2025",
+        startTime: "10:40 am",
+        endTime: "11:40 am",
+        duration: "60 mins",
+        timezone: "(GMT+01:00) Central European Standard Time",
+        accessType: "Public",
+        maxParticipants: "100",
+        proofOfAttendance: true,
+        claimMethod: "Auto-mint",
+        nftTitle: "",
+        claimOpens: "",
+        claimCloses: "",
+        attendanceRequirement: "30 mins",
+        unlockEventLink: "",
+        huddle01Link: "",
+      });
+    }
+  }, [mode, existingSession, open]);
 
   const steps = [
     { number: 1, title: "Session Info", active: currentStep === 1, completed: currentStep > 1 },
@@ -117,16 +163,35 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
         ...formData,
         accessType: 'draft',
         ...(mode === 'create' && {
-          creator: {
-            _type: 'reference',
-            _ref: user?.id,
-          },
+          creator: user?.id,
         })
       }
 
-      const result = mode === 'edit' && existingSession?._id
-        ? await updateSiherGoLiveSession(existingSession._id, baseData)
-        : await createSiherGoLiveSession(baseData)
+      let response;
+      if (mode === 'edit' && existingSession?._id) {
+        response = await fetch(`/api/siher-live/${existingSession._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(baseData),
+        });
+      } else {
+        response = await fetch('/api/siher-live', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(baseData),
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save session');
+      }
+
+      const result = await response.json();
 
       showNotification(
         'success',
@@ -157,7 +222,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           unlockEventLink: "",
           huddle01Link: "",
         })
-        onSaved?.(result)
+        onSaved?.(result.data)
       }, 2000)
     } catch (error) {
       console.error("Error saving draft:", error)
@@ -187,23 +252,42 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
         ...formData,
         accessType: 'public',
         ...(mode === 'create' && {
-          creator: {
-            _type: 'reference',
-            _ref: user?.id,
-          },
+          creator: user?.id,
         })
       }
 
-      const result = mode === 'edit' && existingSession?._id
-        ? await updateSiherGoLiveSession(existingSession._id, baseData)
-        : await createSiherGoLiveSession(baseData)
-      
+      let response;
+      if (mode === 'edit' && existingSession?._id) {
+        response = await fetch(`/api/siher-live/${existingSession._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(baseData),
+        });
+      } else {
+        response = await fetch('/api/siher-live', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(baseData),
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save session');
+      }
+
+      const result = await response.json();
+
       showNotification(
         'success',
         mode === 'edit' ? 'Session Updated' : 'Session Created',
         mode === 'edit' ? 'Your session has been updated successfully!' : 'Your live session has been created successfully!'
       )
-      
+
       // Close the modal and reset the form after a brief delay
       setTimeout(() => {
         onOpenChange(false)
@@ -228,7 +312,7 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           unlockEventLink: "",
           huddle01Link: "",
         })
-        onSaved?.(result)
+        onSaved?.(result.data)
       }, 2000)
     } catch (error) {
       console.error("Error creating session:", error)
@@ -247,28 +331,25 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
 
     return (
       <div className="fixed top-4 right-4 z-50 max-w-sm">
-        <Alert className={`border-l-4 ${
-          notification.type === 'success' ? 'border-l-green-500 bg-green-50' :
+        <Alert className={`border-l-4 ${notification.type === 'success' ? 'border-l-green-500 bg-green-50' :
           notification.type === 'error' ? 'border-l-red-500 bg-red-50' :
-          'border-l-yellow-500 bg-yellow-50'
-        }`}>
+            'border-l-yellow-500 bg-yellow-50'
+          }`}>
           <div className="flex items-start gap-3">
             {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />}
             {notification.type === 'error' && <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />}
             {notification.type === 'warning' && <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />}
             <div className="flex-1">
-              <h4 className={`font-medium text-sm ${
-                notification.type === 'success' ? 'text-green-800' :
+              <h4 className={`font-medium text-sm ${notification.type === 'success' ? 'text-green-800' :
                 notification.type === 'error' ? 'text-red-800' :
-                'text-yellow-800'
-              }`}>
+                  'text-yellow-800'
+                }`}>
                 {notification.title}
               </h4>
-              <AlertDescription className={`text-sm ${
-                notification.type === 'success' ? 'text-green-700' :
+              <AlertDescription className={`text-sm ${notification.type === 'success' ? 'text-green-700' :
                 notification.type === 'error' ? 'text-red-700' :
-                'text-yellow-700'
-              }`}>
+                  'text-yellow-700'
+                }`}>
                 {notification.message}
               </AlertDescription>
             </div>
@@ -292,13 +373,12 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
         <div key={step.number} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step.completed
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step.completed
+                ? "bg-purple-600 text-white"
+                : step.active
                   ? "bg-purple-600 text-white"
-                  : step.active
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-              }`}
+                  : "bg-gray-200 text-gray-500"
+                }`}
             >
               {step.number}
             </div>
@@ -371,12 +451,12 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
           </div> */}
           <div>
             <Label htmlFor="date" className="text-sm font-medium text-gray-900">Date</Label>
-            <Input 
+            <Input
               id="date"
               type="date"
-              value={formData.date} 
+              value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="mt-1" 
+              className="mt-1"
             />
           </div>
         </div>
@@ -384,15 +464,15 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div>
-            <Label htmlFor="startTime" className="text-sm font-medium text-gray-900">Start Time</Label>
-            <Input 
-              id="startTime"
-              type="time"
-              value={formData.startTime} 
-              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-              className="mt-1" 
-            />
-          </div>
+              <Label htmlFor="startTime" className="text-sm font-medium text-gray-900">Start Time</Label>
+              <Input
+                id="startTime"
+                type="time"
+                value={formData.startTime}
+                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                className="mt-1"
+              />
+            </div>
           </div>
 
           <div>
@@ -413,8 +493,8 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
 
         <div className="relative">
           <Label className="text-sm font-medium text-gray-900">Time Zone</Label>
-          <Select 
-            value={formData.timezone} 
+          <Select
+            value={formData.timezone}
             onValueChange={(value) => setFormData({ ...formData, timezone: value })}
           >
             <SelectTrigger className="mt-1 text-left">
@@ -445,11 +525,11 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
                   </div>
                 </SelectItem>
               ))}
-              
+
               <div className="sticky top-0 bg-background z-10 px-3 py-2 text-xs font-medium text-muted-foreground border-b border-t">
                 All Time Zones
               </div>
-              
+
               {[
                 '(GMT-12:00) International Date Line West',
                 '(GMT-11:00) Midway Island, Samoa',
@@ -558,11 +638,10 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
               <Button
                 key={type}
                 variant={formData.accessType === type ? "default" : "outline"}
-                className={`${
-                  formData.accessType === type
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-transparent text-gray-600 hover:bg-gray-50"
-                }`}
+                className={`${formData.accessType === type
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "bg-transparent text-gray-600 hover:bg-gray-50"
+                  }`}
                 onClick={() => setFormData({ ...formData, accessType: type })}
               >
                 {type}
