@@ -40,24 +40,24 @@ if (!projectId) {
 
 export const client = projectId
   ? createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      useCdn,
-      ...(process.env.NEXT_PUBLIC_SANITY_API_TOKEN && {
-        token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
-      }),
-    })
+    projectId,
+    dataset,
+    apiVersion,
+    useCdn,
+    ...(process.env.NEXT_PUBLIC_SANITY_API_TOKEN && {
+      token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
+    }),
+  })
   : null;
 
 export const previewClient = projectId
   ? createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      useCdn,
-      token: previewSecretId,
-    })
+    projectId,
+    dataset,
+    apiVersion,
+    useCdn,
+    token: previewSecretId,
+  })
   : null;
 
 import { QueryParams } from "next-sanity";
@@ -74,7 +74,7 @@ export const fetcher = async <T = unknown>([query, params]: [
   // @ts-ignore
 ]): FetchResult<T> => {
   if (!client) return [];
-  
+
   try {
     return await client.fetch<T>(query, params || {});
   } catch (error: any) {
@@ -82,7 +82,7 @@ export const fetcher = async <T = unknown>([query, params]: [
     if (error?.statusCode === 401 || error?.message?.includes('Unauthorized')) {
       return [];
     }
-    
+
     // Re-throw other errors
     throw error;
   }
@@ -302,7 +302,7 @@ export async function getSiherGoLiveSessions(accessType?: string) {
       // Add cache control to ensure fresh data
       return await client.fetch(query, accessType ? { accessType } : {}, {
         cache: 'no-store',
-        next: { tags: ['siherGoLive'] }
+        next: { tags: ['siherGoLive'], revalidate: 0 }
       }) || [];
     } catch (error) {
       console.error('Error fetching SIHER Go Live sessions:', error);
@@ -315,7 +315,7 @@ export async function getSiherGoLiveSessions(accessType?: string) {
 // Create a new SIHER Go Live session
 export async function createSiherGoLiveSession(sessionData: any) {
   if (!client) throw new Error("Sanity client not configured");
-  
+
   const sessionWithMetadata = {
     ...sessionData,
     _type: 'siherGoLive',
@@ -328,32 +328,55 @@ export async function createSiherGoLiveSession(sessionData: any) {
     sessionWithMetadata.creator = sessionWithMetadata.creator._ref || sessionWithMetadata.creator;
   }
 
+  const result = await client.create(sessionWithMetadata);
+
   // Clear cache after creation
-  await fetch('/api/revalidate?tag=siherGoLive', { method: 'POST' });
-  return client.create(sessionWithMetadata);
+  try {
+    const { invalidateCache } = await import('../cache-utils');
+    await invalidateCache('siherGoLive');
+  } catch (error) {
+    console.warn('Cache revalidation failed:', error);
+  }
+
+  return result;
 }
 
 // Update an existing SIHER Go Live session
 export async function updateSiherGoLiveSession(id: string, updates: any) {
   if (!client) throw new Error("Sanity client not configured");
-  
-  // Clear cache before updating
-  await fetch('/api/revalidate?tag=siherGoLive', { method: 'POST' });
-  
-  return client
+
+  const result = await client
     .patch(id)
     .set({
       ...updates,
       _updatedAt: new Date().toISOString()
     })
     .commit();
+
+  // Clear cache after updating
+  try {
+    const { invalidateCache } = await import('../cache-utils');
+    await invalidateCache('siherGoLive');
+  } catch (error) {
+    console.warn('Cache revalidation failed:', error);
+  }
+
+  return result;
 }
 
 // Delete a SIHER Go Live session
 export async function deleteSiherGoLiveSession(id: string) {
   if (!client) throw new Error("Sanity client not configured");
-  
-  // Clear cache before deleting
-  await fetch('/api/revalidate?tag=siherGoLive', { method: 'POST' });
-  return client.delete({ query: `*[_id == "${id}"]` });
+
+  const result = await client.delete({ query: `*[_id == "${id}"]` });
+
+  // Clear cache after deleting
+  try {
+    const { invalidateCache } = await import('../cache-utils');
+    await invalidateCache('siherGoLive');
+  } catch (error) {
+    console.warn('Cache revalidation failed:', error);
+  }
+
+  return result;
 }

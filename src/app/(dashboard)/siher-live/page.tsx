@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Users, Edit, Award, Loader2 } from "lucide-react"
+import { Users, Edit, Award, Loader2 } from "lucide-react"
 import CreateSessionModal from "@/components/organisms/siher-live/create-session"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import NFTGatedLiveJoin from "@/components/organisms/sessions/NFTGatedLiveJoin"
 import { useAppSelector } from '@/redux/store'
 import { getSiherGoLiveSessions, deleteSiherGoLiveSession } from "@/lib/sanity/client"
@@ -21,6 +20,8 @@ interface Session {
     startTime: string
     endTime: string
     accessType: string
+    _createdAt?: string
+    _updatedAt?: string
     // Add other session fields as needed
 }
 
@@ -30,13 +31,14 @@ export default function LiveStreamingDashboard() {
     const [isLoading, setIsLoading] = useState(true)
     const [activeTab, setActiveTab] = useState<'live' | 'drafts'>('live')
     const [editingSession, setEditingSession] = useState<Session | null>(null)
+    const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
     const user = useAppSelector((state) => state.authV2.user)
     const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
     // const isBetaTester = user?.email === 'kara@si3.space';
 
     // Function to refresh sessions
-    const refreshSessions = async () => {
-        setIsLoading(true);
+    const refreshSessions = async (force = false) => {
+        if (force) setIsLoading(true);
         try {
             const accessType = activeTab === 'live' ? 'public' : 'draft';
             const sessionsByAccess = await getSiherGoLiveSessions(accessType) as Session[];
@@ -44,39 +46,105 @@ export default function LiveStreamingDashboard() {
         } catch (error) {
             console.error('Error refreshing sessions:', error);
         } finally {
-            setIsLoading(false);
+            if (force) setIsLoading(false);
         }
     };
 
     // Fetch sessions when component mounts or activeTab changes
     useEffect(() => {
-        refreshSessions();
+        refreshSessions(true);
     }, [activeTab]);
 
-    const handleSessionCreated = async () => {
-        await refreshSessions();
+    // Add polling to keep data fresh (especially important for production)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refreshSessions();
+        }, 30000); // Refresh every 30 seconds
+
+        return () => clearInterval(interval);
+    }, [activeTab]);
+
+    // Refresh data when user returns to the tab/window
+    useEffect(() => {
+        const handleFocus = () => refreshSessions();
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                refreshSessions();
+            }
+        };
+
+        window.addEventListener('focus', handleFocus);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [activeTab]);
+
+    const handleSessionCreated = async (newSession?: any) => {
+        if (newSession) {
+            // Optimistically add the new session to the list if it matches current tab
+            const shouldShow = (activeTab === 'live' && newSession.accessType === 'public') ||
+                (activeTab === 'drafts' && newSession.accessType === 'draft');
+            if (shouldShow) {
+                setSessions(prev => [newSession, ...prev]);
+            }
+        }
+        // Refresh to ensure consistency after a short delay
+        setTimeout(() => refreshSessions(), 500);
         setIsModalOpen(false);
     };
 
-    const handleSessionUpdated = async () => {
-        await refreshSessions();
+    const handleSessionUpdated = async (updatedSession?: any) => {
+        if (updatedSession) {
+            // Optimistically update the session in the list
+            setSessions(prev => {
+                const updated = prev.map(session =>
+                    session._id === updatedSession._id ? updatedSession : session
+                );
+                // If access type changed, filter it out if it doesn't belong to current tab
+                const shouldShow = (activeTab === 'live' && updatedSession.accessType === 'public') ||
+                    (activeTab === 'drafts' && updatedSession.accessType === 'draft');
+                return shouldShow ? updated : updated.filter(s => s._id !== updatedSession._id);
+            });
+        }
+        // Refresh to ensure consistency after a short delay
+        setTimeout(() => refreshSessions(), 500);
         setEditingSession(null);
         setIsModalOpen(false);
     };
 
     const handleDeleteSession = async (id: string) => {
         if (!confirm('Are you sure you want to delete this session?')) return;
-        
+
+        // Store the session for potential rollback
+        const sessionToDelete = sessions.find(s => s._id === id);
+        setDeletingSessionId(id);
+
         try {
-            // Optimistic update
+            // Optimistic update - remove immediately from UI
             setSessions(prev => prev.filter(s => s._id !== id));
+
+            // Perform the actual deletion
             await deleteSiherGoLiveSession(id);
-            // Refresh to ensure consistency
-            await refreshSessions();
+
+            // Refresh to ensure consistency after a short delay
+            setTimeout(() => refreshSessions(), 500);
         } catch (error) {
             console.error('Error deleting session:', error);
-            // Revert on error
-            await refreshSessions();
+
+            // Revert optimistic update on error
+            if (sessionToDelete) {
+                setSessions(prev => [sessionToDelete, ...prev].sort((a, b) =>
+                    new Date(b._createdAt || '').getTime() - new Date(a._createdAt || '').getTime()
+                ));
+            }
+
+            // Show error message
+            alert('Failed to delete session. Please try again.');
+        } finally {
+            setDeletingSessionId(null);
         }
     };
 
@@ -98,15 +166,15 @@ export default function LiveStreamingDashboard() {
             )}
             {/* Header Section with Gradient */}
             {/* <div className="relative mb-8 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-400 p-8 text-white overflow-hidden"> */}
-                {/* <div className="relative z-10">
+            {/* <div className="relative z-10">
                     <h1 className="text-4xl font-bold mb-3">GO LIVE</h1>
                     <p className="text-purple-100 max-w-2xl">
                         The Go Live page allows Si Her Guides to manage their live sessions events, from scheduling to attendance
                         tracking and Proof of Attendance NFTs.
                     </p>
                 </div> */}
-                <img src="/fixx/SIHERGOLIVE.png" className="relative mb-8 rounded-2xl pt-2 text-white overflow-hidden"/>
-{/*                 
+            <img src="/fixx/SIHERGOLIVE.png" className="relative mb-8 rounded-2xl pt-2 text-white overflow-hidden" />
+            {/*                 
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
                 <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 translate-x-16"></div>
             </div> */}
@@ -119,6 +187,15 @@ export default function LiveStreamingDashboard() {
                         <p className="text-gray-600">Manage your live sessions and attendance</p>
                     </div>
                     <div className="flex gap-3">
+                        {/* <Button
+                            variant="outline"
+                            onClick={() => refreshSessions(true)}
+                            disabled={isLoading}
+                            className="gap-2"
+                        >
+                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "↻"}
+                            Refresh
+                        </Button> */}
                         <Button
                             className="gap-2 bg-purple-600 hover:bg-purple-700"
                             onClick={() => { setEditingSession(null); setIsModalOpen(true) }}
@@ -132,15 +209,15 @@ export default function LiveStreamingDashboard() {
 
                 {/* Tabs */}
                 <div className="flex gap-1 mb-6">
-                    <Button 
-                        variant={activeTab === 'live' ? 'default' : 'ghost'} 
+                    <Button
+                        variant={activeTab === 'live' ? 'default' : 'ghost'}
                         className={`${activeTab === 'live' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'text-gray-600'} px-6`}
                         onClick={() => setActiveTab('live')}
                     >
                         Live
                     </Button>
-                    <Button 
-                        variant={activeTab === 'drafts' ? 'default' : 'ghost'} 
+                    <Button
+                        variant={activeTab === 'drafts' ? 'default' : 'ghost'}
                         className={`${activeTab === 'drafts' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'text-gray-600'} px-6`}
                         onClick={() => setActiveTab('drafts')}
                     >
@@ -159,14 +236,15 @@ export default function LiveStreamingDashboard() {
                         </div>
                     ) : sessions.length > 0 ? (
                         sessions.map((session) => (
-                            <SessionCard 
-                                key={session._id} 
-                                session={session} 
-                                onEdit={() => { 
-                                    setEditingSession(session); 
-                                    setIsModalOpen(true); 
-                                }} 
+                            <SessionCard
+                                key={session._id}
+                                session={session}
+                                onEdit={() => {
+                                    setEditingSession(session);
+                                    setIsModalOpen(true);
+                                }}
                                 onDelete={() => handleDeleteSession(session._id)}
+                                isDeleting={deletingSessionId === session._id}
                             />
                         ))
                     ) : (
@@ -186,12 +264,12 @@ export default function LiveStreamingDashboard() {
                 </div>
             </div>
 
-            <CreateSessionModal 
-                open={isModalOpen} 
+            <CreateSessionModal
+                open={isModalOpen}
                 onOpenChange={(open) => {
                     if (!open) setEditingSession(null);
                     setIsModalOpen(open);
-                }} 
+                }}
                 existingSession={editingSession as any}
                 mode={editingSession ? 'edit' : 'create'}
                 onSaved={editingSession ? handleSessionUpdated : handleSessionCreated}
@@ -201,7 +279,7 @@ export default function LiveStreamingDashboard() {
 }
 
 // Session Card Component
-function SessionCard({ session, onEdit, onDelete }: { session: Session, onEdit: () => void, onDelete: () => void }) {
+function SessionCard({ session, onEdit, onDelete, isDeleting }: { session: Session, onEdit: () => void, onDelete: () => void, isDeleting?: boolean }) {
     return (
         <Card className="overflow-hidden">
             <div className="p-6">
@@ -237,8 +315,8 @@ function SessionCard({ session, onEdit, onDelete }: { session: Session, onEdit: 
                             <Edit className="w-4 h-4 mr-2" />
                             Edit
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={onDelete}>
-                            Delete
+                        <Button variant="destructive" size="sm" onClick={onDelete} disabled={isDeleting}>
+                            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
                         </Button>
                     </div>
                 </div>
