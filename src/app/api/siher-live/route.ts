@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
   createSiherLiveSession, 
-  updateSiherLiveSession, 
-  deleteSiherLiveSession,
   getSiherLiveSessionsAction 
 } from '@/lib/server-actions/siher-live';
+import { revalidateTag } from 'next/cache';
 
 // GET - Fetch sessions
 export async function GET(request: NextRequest) {
@@ -15,22 +14,20 @@ export async function GET(request: NextRequest) {
     const result = await getSiherLiveSessionsAction(accessType);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
-    return NextResponse.json({
-      success: true,
-      data: result.data,
-    });
+    return NextResponse.json(
+      { success: true, data: result.data },
+      {
+        headers: {
+          'Cache-Tag': 'siherGoLive', // ✅ mark this response
+        },
+      }
+    );
   } catch (error) {
     console.error('GET /api/siher-live error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -49,11 +46,11 @@ export async function POST(request: NextRequest) {
     const result = await createSiherLiveSession(sessionData);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
+
+    // ✅ revalidate cache after creating
+    revalidateTag('siherGoLive');
 
     return NextResponse.json({
       success: true,
@@ -62,9 +59,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('POST /api/siher-live error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
