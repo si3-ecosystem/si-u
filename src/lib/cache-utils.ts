@@ -4,8 +4,8 @@
 
 export async function invalidateCache(tag: string) {
   try {
-    // Use the dedicated siher-live revalidate endpoint for better reliability
-    const response = await fetch('/api/siher-live/revalidate', { 
+    // Use the general revalidate endpoint
+    const response = await fetch(`/api/revalidate?tag=${tag}`, { 
       method: 'POST',
       cache: 'no-store',
       headers: {

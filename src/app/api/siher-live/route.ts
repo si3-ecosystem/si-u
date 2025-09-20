@@ -3,7 +3,6 @@ import {
   createSiherLiveSession, 
   getSiherLiveSessionsAction 
 } from '@/lib/server-actions/siher-live';
-import { revalidateTag } from 'next/cache';
 
 // GET - Fetch sessions
 export async function GET(request: NextRequest) {
@@ -17,14 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
-    return NextResponse.json(
-      { success: true, data: result.data },
-      {
-        headers: {
-          'Cache-Tag': 'siherGoLive', // ✅ mark this response
-        },
-      }
-    );
+    return NextResponse.json({ success: true, data: result.data });
   } catch (error) {
     console.error('GET /api/siher-live error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -48,9 +40,6 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
-
-    // ✅ revalidate cache after creating
-    revalidateTag('siherGoLive');
 
     return NextResponse.json({
       success: true,

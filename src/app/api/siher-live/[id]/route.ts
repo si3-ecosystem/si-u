@@ -3,7 +3,6 @@ import {
   updateSiherLiveSession, 
   deleteSiherLiveSession 
 } from '@/lib/server-actions/siher-live';
-import { revalidateTag } from 'next/cache';
 
 // PUT - Update session
 export async function PUT(
@@ -23,9 +22,6 @@ export async function PUT(
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
-
-    // ✅ revalidate cache after update
-    revalidateTag('siherGoLive');
 
     return NextResponse.json({
       success: true,
@@ -55,9 +51,6 @@ export async function DELETE(
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
-
-    // ✅ revalidate cache after delete
-    revalidateTag('siherGoLive');
 
     return NextResponse.json({
       success: true,
