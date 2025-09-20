@@ -9,7 +9,7 @@ import CreateSessionModal from "@/components/organisms/siher-live/create-session
 import { Card, CardContent } from "@/components/ui/card"
 import NFTGatedLiveJoin from "@/components/organisms/sessions/NFTGatedLiveJoin"
 import { useAppSelector } from '@/redux/store'
-import { getSiherGoLiveSessions, deleteSiherGoLiveSession } from "@/lib/sanity/client"
+import { getSiherGoLiveSessions } from "@/lib/sanity/client"
 
 interface Session {
     _id: string
@@ -36,15 +36,25 @@ export default function LiveStreamingDashboard() {
     const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
     // const isBetaTester = user?.email === 'kara@si3.space';
 
-    // Function to refresh sessions
+    // Function to refresh sessions using API
     const refreshSessions = async (force = false) => {
         if (force) setIsLoading(true);
         try {
             const accessType = activeTab === 'live' ? 'public' : 'draft';
-            const sessionsByAccess = await getSiherGoLiveSessions(accessType) as Session[];
-            setSessions(sessionsByAccess);
+            const response = await fetch(`/api/siher-live?accessType=${accessType}`, {
+                cache: 'no-store'
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                setSessions(result.data || []);
+            } else {
+                console.error('Failed to fetch sessions:', response.statusText);
+                setSessions([]);
+            }
         } catch (error) {
             console.error('Error refreshing sessions:', error);
+            setSessions([]);
         } finally {
             if (force) setIsLoading(false);
         }
@@ -55,16 +65,7 @@ export default function LiveStreamingDashboard() {
         refreshSessions(true);
     }, [activeTab]);
 
-    // Add polling to keep data fresh (especially important for production)
-    useEffect(() => {
-        const interval = setInterval(() => {
-            refreshSessions();
-        }, 30000); // Refresh every 30 seconds
-
-        return () => clearInterval(interval);
-    }, [activeTab]);
-
-    // Refresh data when user returns to the tab/window
+    // Refresh data when user returns to the tab/window (keep this for better UX)
     useEffect(() => {
         const handleFocus = () => refreshSessions();
         const handleVisibilityChange = () => {
@@ -83,34 +84,14 @@ export default function LiveStreamingDashboard() {
     }, [activeTab]);
 
     const handleSessionCreated = async (newSession?: any) => {
-        if (newSession) {
-            // Optimistically add the new session to the list if it matches current tab
-            const shouldShow = (activeTab === 'live' && newSession.accessType === 'public') ||
-                (activeTab === 'drafts' && newSession.accessType === 'draft');
-            if (shouldShow) {
-                setSessions(prev => [newSession, ...prev]);
-            }
-        }
-        // Refresh to ensure consistency after a short delay
-        setTimeout(() => refreshSessions(), 500);
+        // Immediately refresh sessions to get the latest data
+        await refreshSessions(true);
         setIsModalOpen(false);
     };
 
     const handleSessionUpdated = async (updatedSession?: any) => {
-        if (updatedSession) {
-            // Optimistically update the session in the list
-            setSessions(prev => {
-                const updated = prev.map(session =>
-                    session._id === updatedSession._id ? updatedSession : session
-                );
-                // If access type changed, filter it out if it doesn't belong to current tab
-                const shouldShow = (activeTab === 'live' && updatedSession.accessType === 'public') ||
-                    (activeTab === 'drafts' && updatedSession.accessType === 'draft');
-                return shouldShow ? updated : updated.filter(s => s._id !== updatedSession._id);
-            });
-        }
-        // Refresh to ensure consistency after a short delay
-        setTimeout(() => refreshSessions(), 500);
+        // Immediately refresh sessions to get the latest data
+        await refreshSessions(true);
         setEditingSession(null);
         setIsModalOpen(false);
     };
@@ -118,30 +99,22 @@ export default function LiveStreamingDashboard() {
     const handleDeleteSession = async (id: string) => {
         if (!confirm('Are you sure you want to delete this session?')) return;
 
-        // Store the session for potential rollback
-        const sessionToDelete = sessions.find(s => s._id === id);
         setDeletingSessionId(id);
 
         try {
-            // Optimistic update - remove immediately from UI
-            setSessions(prev => prev.filter(s => s._id !== id));
+            const response = await fetch(`/api/siher-live/${id}`, {
+                method: 'DELETE',
+            });
 
-            // Perform the actual deletion
-            await deleteSiherGoLiveSession(id);
-
-            // Refresh to ensure consistency after a short delay
-            setTimeout(() => refreshSessions(), 500);
+            if (response.ok) {
+                // Immediately refresh sessions to get the latest data
+                await refreshSessions(true);
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to delete session');
+            }
         } catch (error) {
             console.error('Error deleting session:', error);
-
-            // Revert optimistic update on error
-            if (sessionToDelete) {
-                setSessions(prev => [sessionToDelete, ...prev].sort((a, b) =>
-                    new Date(b._createdAt || '').getTime() - new Date(a._createdAt || '').getTime()
-                ));
-            }
-
-            // Show error message
             alert('Failed to delete session. Please try again.');
         } finally {
             setDeletingSessionId(null);
