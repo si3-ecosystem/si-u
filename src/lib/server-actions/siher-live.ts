@@ -1,6 +1,6 @@
 "use server";
 
-import { client } from '@/lib/sanity/client';
+import { client, writeClient } from '@/lib/sanity/client';
 
 export interface SiherLiveSessionData {
   title: string;
@@ -36,8 +36,8 @@ export interface SiherLiveResponse {
  */
 export async function createSiherLiveSession(sessionData: SiherLiveSessionData): Promise<SiherLiveResponse> {
   try {
-    if (!client) {
-      throw new Error("Sanity client not configured");
+    if (!writeClient) {
+      throw new Error("Sanity write client not configured");
     }
 
     const sessionWithMetadata = {
@@ -52,7 +52,7 @@ export async function createSiherLiveSession(sessionData: SiherLiveSessionData):
       sessionWithMetadata.creator = sessionWithMetadata.creator._ref || sessionWithMetadata.creator;
     }
 
-    const result = await client.create(sessionWithMetadata);
+    const result = await writeClient.create(sessionWithMetadata);
 
     return {
       success: true,
@@ -74,15 +74,15 @@ export async function createSiherLiveSession(sessionData: SiherLiveSessionData):
  */
 export async function updateSiherLiveSession(id: string, updates: Partial<SiherLiveSessionData>): Promise<SiherLiveResponse> {
   try {
-    if (!client) {
-      throw new Error("Sanity client not configured");
+    if (!writeClient) {
+      throw new Error("Sanity write client not configured");
     }
 
     if (!id) {
       throw new Error("Session ID is required");
     }
 
-    const result = await client
+    const result = await writeClient
       .patch(id)
       .set({
         ...updates,
@@ -110,15 +110,15 @@ export async function updateSiherLiveSession(id: string, updates: Partial<SiherL
  */
 export async function deleteSiherLiveSession(id: string): Promise<SiherLiveResponse> {
   try {
-    if (!client) {
-      throw new Error("Sanity client not configured");
+    if (!writeClient) {
+      throw new Error("Sanity write client not configured");
     }
 
     if (!id) {
       throw new Error("Session ID is required");
     }
 
-    const result = await client.delete(id);
+    const result = await writeClient.delete(id);
 
     return {
       success: true,

@@ -40,8 +40,13 @@ export default function LiveStreamingDashboard() {
         if (force) setIsLoading(true);
         try {
             const accessType = activeTab === 'live' ? 'public' : 'draft';
-            const response = await fetch(`/api/siher-live?accessType=${accessType}`, {
+            const response = await fetch(`/api/siher-live?accessType=${accessType}&t=${Date.now()}`, {
                 cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
             });
 
             if (response.ok) {
@@ -96,7 +101,7 @@ export default function LiveStreamingDashboard() {
     const handleSessionUpdated = async (updatedSession: any) => {
         // Optimistically update the sessions list
         if (updatedSession) {
-            setSessions(prev => prev.map(session => 
+            setSessions(prev => prev.map(session =>
                 session._id === updatedSession._id ? updatedSession : session
             ));
         }
