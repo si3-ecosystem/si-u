@@ -50,6 +50,19 @@ export const client = projectId
   })
   : null;
 
+// Create a separate client for write operations without CDN
+export const writeClient = projectId
+  ? createClient({
+    projectId,
+    dataset,
+    apiVersion,
+    useCdn: false, // Always disable CDN for write operations
+    ...(process.env.NEXT_PUBLIC_SANITY_API_TOKEN && {
+      token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
+    }),
+  })
+  : null;
+
 export const previewClient = projectId
   ? createClient({
     projectId,
