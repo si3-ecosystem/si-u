@@ -34,10 +34,12 @@ export default function FixxSessionsPage() {
   } = useGrow3dgeSessions(sessions?.fixCards || [], "");
 
   // Create filtered session data for the workshops component
-  const filteredSessionData = sessions ? {
-    ...sessions,
-    fixCards: filteredSessions
-  } : null;
+  const filteredSessionData = sessions
+    ? {
+        ...sessions,
+        fixCards: filteredSessions,
+      }
+    : null;
 
   if (loading) return <Loading />;
 
@@ -77,42 +79,44 @@ export default function FixxSessionsPage() {
   }
 
   return (
-    <>
-      <ContentBanner
-        title={sessions?.banner?.title || "Grow3dge Sessions"}
-        description={
-          sessions.banner?.description ||
-          "Exclusive innovation hub for our partner community to collaborate and access cutting-edge sessions"
-        }
-        backgroundImage={sessions.banner?.background}
-        thumbnailImage={sessions.banner?.thumbnail}
-        variant="default"
-        textColor="dark"
-        className="mb-8"
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
-        showSearch={true}
-      />
-
-      <div className=" mt-11 pb-16">
-        <PopularTopics
-          data={{
-            topicTitle: sessions?.topicTitle || "Popular Topics",
-            topicDesc:
-              sessions?.topicDesc ||
-              "Explore sessions by category and find content that interests you",
-            topics: sessions?.topics || [], // Array of topics
-          }}
-          categoryCounts={categoryCounts}
-          setSelectedCategory={setSelectedCategory}
-          selectedCategory={selectedCategory}
+    <div className="">
+      <div className="w-full min-h-screen">
+        <ContentBanner
+          title={sessions?.banner?.title || "Grow3dge Sessions"}
+          description={
+            sessions.banner?.description ||
+            "Exclusive innovation hub for our partner community to collaborate and access cutting-edge sessions"
+          }
+          backgroundImage={sessions.banner?.background}
+          thumbnailImage={sessions.banner?.thumbnail}
+          variant="default"
+          textColor="dark"
+          className="mb-8"
+          globalFilter={globalFilter}
+          setGlobalFilter={setGlobalFilter}
+          showSearch={true}
         />
 
-        <Grow3dgeWorkShops 
-          data={filteredSessionData || sessions} 
-          selectedCategory={selectedCategory}
-        />
+        <div className="px-4 mt-11 lg:px-6 pb-16">
+          <PopularTopics
+            data={{
+              topicTitle: sessions?.topicTitle || "Popular Topics",
+              topicDesc:
+                sessions?.topicDesc ||
+                "Explore sessions by category and find content that interests you",
+              topics: sessions?.topics || [], // Array of topics
+            }}
+            categoryCounts={categoryCounts}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+          />
+
+          <Grow3dgeWorkShops
+            data={filteredSessionData || sessions}
+            selectedCategory={selectedCategory}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 }
