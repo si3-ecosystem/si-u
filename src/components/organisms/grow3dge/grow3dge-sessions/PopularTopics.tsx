@@ -112,7 +112,7 @@ export function PopularTopics({
 
       <div className="relative">
         <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-6">
+          <div className="flex gap-6 w-full max-w-[1000px]">
             {/* Category/Topic Cards - No "All Sessions" card */}
             {displayItems?.map((item: any, index: number) => {
               const categorySlug = item.slug?.current || item._id;

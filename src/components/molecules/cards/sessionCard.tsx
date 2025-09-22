@@ -156,6 +156,14 @@ export function SessionCard({
     }
   };
 
+  const handleRSVPClick = () => {
+  if (session.guidesRsvp) {
+    window.open(session.guidesRsvp, "_blank");
+  } else {
+    toggleDropdown(session._id);
+  }
+};
+
   return (
     <Card className="p-4 w-full">
       <div className="flex flex-col md:flex-row gap-4 h-full">
@@ -241,18 +249,17 @@ export function SessionCard({
             <div className="mt-4 md:mt-0 relative max-lg:w-full">
               {config.isRSVPEnabled === true && (
                 <button
-                  onClick={() => {
-                    // Always use dropdown functionality regardless of external RSVP
-                    toggleDropdown(session._id);
-                  }}
+                  onClick={handleRSVPClick}
                   className={getButtonStyle()}
                   disabled={
-                    !config.isRSVPEnabled ||
-                    config.isDeadlinePassed ||
-                    !config.hasValidEmail
+                    session.guidesRsvp
+                      ? false
+                      : !config.isRSVPEnabled ||
+                        config.isDeadlinePassed ||
+                        !config.hasValidEmail
                   }
                 >
-                  {getButtonText()}
+                  {session.guidesRsvp ? "RSVP" : getButtonText()}
                 </button>
               )}
 
