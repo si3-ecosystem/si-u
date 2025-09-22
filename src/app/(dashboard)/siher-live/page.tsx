@@ -354,8 +354,9 @@ export default function LiveStreamingDashboard() {
     const [editingSession, setEditingSession] = useState<Session | null>(null)
     const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
     const user = useAppSelector((state) => state.authV2.user)
-    // const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
-    const isBetaTester = user?.email === 'kara@si3.space';
+    const betaTesters = ['kara@si3.space', 'imhaseeb8@gmail.com', 'shayanabbasi006@gmail.com'];
+
+    const isBetaTester = betaTesters.includes(user?.email);
 
     // Function to fetch sessions - removed all caching and revalidation logic
     const fetchSessions = async () => {
