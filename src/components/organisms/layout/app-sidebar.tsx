@@ -111,7 +111,7 @@ const subMenuGroups: SubMenuGroup[] = [
       {
         title: "Grow3dge",
         icon: Calendar,
-        href: "/sessions",
+        href: "/grow3dge/sessions",
       },
       // {
       //   title: "Grow3dge Playbook",
