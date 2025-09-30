@@ -36,7 +36,7 @@ export default function DashboardLayout({
           <Header />
 
           <AuthGateV2>
-            <div className="flex flex-1 flex-col gap-4 h-full overflow-y-scroll no-scrollbar px-4 md:!px-20 mx-auto w-full py-10 max-w-[1920px]">
+            <div className="flex flex-1 flex-col gap-4 h-full overflow-y-scroll no-scrollbar p-6 mx-auto w-full max-w-[1920px]">
               {children}
             </div>
           </AuthGateV2>

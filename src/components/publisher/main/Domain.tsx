@@ -13,10 +13,8 @@ const Domain = () => {
     useSelector((state: RootState) => state.content?.domain) ?? "";
   const [subDomain, setSubDomain] = useState<string>("");
   const [domainLoading, setDomainLoading] = useState<boolean>(false);
-
   const getDisplayDomain = (value: string): string => {
     if (!value) return "";
-    // If it's just a subdomain (no dot), append full suffix
     return value.includes(".") ? value : `${value}.siher.eth.link`;
   };
 
@@ -36,7 +34,9 @@ const Domain = () => {
       subDomain.includes("siher") ||
       subDomain.includes("eth")
     ) {
-      toast.error("Please enter only the subdomain name (without .siher.eth.link)");
+      toast.error(
+        "Please enter only the subdomain name (without .siher.eth.link)"
+      );
       return;
     }
     try {
@@ -44,28 +44,22 @@ const Domain = () => {
       const response: any = await apiClient.post(`/domain/publish`, {
         domain: subDomain,
       });
-      
-      // Handle the response from domain controller
-      // Backend returns: { message: "Domain published successfully", domain: "subdomain.siher.eth.link" }
       if (response?.message && response?.domain) {
-        // Extract just the subdomain part (without .siher.eth.link)
         const fullDomain = response.domain;
-        const subdomain = fullDomain.replace('.siher.eth.link', '');
-        
+        const subdomain = fullDomain.replace(".siher.eth.link", "");
         dispatch(setDomain(subdomain));
-        // Display the exact success message from the backend
         toast.success(response.message);
       } else {
-        // Display the exact error message from the backend response
-        const errorMessage = response?.message || response?.error?.message || "Failed to register domain.";
+        const errorMessage =
+          response?.message ||
+          response?.error?.message ||
+          "Failed to register domain.";
         toast.error(errorMessage);
       }
     } catch (error: any) {
       if (error instanceof ApiErrorClass) {
-        // Display the exact error message from the backend
         toast.error(error.message || "Failed to register domain.");
       } else if (typeof error?.message === "string") {
-        // Display generic error messages
         toast.error(error.message);
       } else {
         toast.error("Something went wrong. Please try again.");
@@ -76,7 +70,7 @@ const Domain = () => {
   };
 
   return (
-    <div className="tracking-wider border-b border-gray-300 shadow-md text-xs py-1 lg:py-2 px-2">
+    <div className="tracking-wider border-y border-gray-300 text-xs py-1 lg:py-2 px-2">
       <div className="flex justify-center items-center mx-auto">
         {existingDomain ? (
           <div className="flex items-center p-2">

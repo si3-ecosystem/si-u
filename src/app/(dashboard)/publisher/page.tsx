@@ -20,8 +20,6 @@ const Home = () => {
   };
   const { user } = useCurrentUserV2();
   const router = useRouter();
-
-  // Load content and debug
   const { hasContent, isLoading, error } = usePublisherContent();
 
   useEffect(() => {
@@ -74,7 +72,7 @@ const Home = () => {
   }
 
   return (
-    <div className="h-screen font-firamono text-gray-800">
+    <div className="font-firamono bg-white text-gray-800 border shadow-md rounded-lg">
       <Navbar onOpenReadMe={openReadMe} />
       <Domain />
       {/* Page View */}

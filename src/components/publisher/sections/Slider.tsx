@@ -46,7 +46,7 @@ const Slider = () => {
   return (
     <div className="relative overflow-hidden h-12 bg-gray-900 py-3 px-4 lg:py-auto flex items-center mt-10">
       <div
-        className="absolute flex items-center"
+        className="absolute flex max-w-[90rem] mx-auto items-center"
         ref={scrollerRef}
         style={{ display: "flex", whiteSpace: "nowrap" }}
       >
