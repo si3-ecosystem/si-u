@@ -75,6 +75,9 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                   field at the top of the editor (add your name/avatar of choice
                   with siher.eth to automatically be added to the end).
                 </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong>Note:</strong> This is a Web3 domain resolver. The domain will be automatically added to your site and needs to be configured on your domain provider to be visible on all Web2 browsers. Click on the displayed domain in the publisher to access it.
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -142,8 +145,7 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Upload images and/or video URLs that represent you</li>
                 <li>
-                  • Add an Aurpay link or crypto payment gateway of your choice
-                  to receive crypto tipping
+                  • (Optional): Add a crypto payment gateway or name of your choice to receive tips in crypto
                 </li>
                 <li>
                   • Include links from speaking or podcast or media of your
@@ -286,6 +288,14 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                 site
               </p>
             </div>
+            <div className="border border-orange-200 rounded-lg p-3">
+              <p className="font-medium text-gray-900 mb-1">
+                Domain Not Accessible
+              </p>
+              <p className="text-sm text-gray-600">
+                This is a Web3 domain resolver. The domain needs to be configured on your domain provider to be visible on all Web2 browsers. Click on the displayed domain in the publisher to access it and follow the setup instructions.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -296,7 +306,7 @@ const ReadMeFields = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           </h3>
           <p className="text-sm text-gray-600">
             If you encounter any issues or need assistance, please contact our
-            support team on tech@si3.space. We&apos;re here to help you create a
+            support team on members@si3.space. We&apos;re here to help you create a
             personal Web3 site you can be proud of!
           </p>
         </div>

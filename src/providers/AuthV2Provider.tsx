@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { authApiV2 } from '@/services/authV2';
 import { useAppDispatch } from '@/redux/store';
 import { setAuthLoading, setAuthenticated, setUnauthenticated } from '@/redux/slice/authSliceV2';
-import { setAllContent } from '@/redux/slice/contentSlice';
+import { setAllContent, clearContent } from '@/redux/slice/contentSlice';
 // Token validation and auth data clearing utilities
 const validateToken = (token: string | null): boolean => {
   if (!token) return false;
@@ -93,7 +93,8 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
       dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
       
       // Process webcontent if available
-      if (user?.webcontent) {
+      if (user?.webcontent && !Array.isArray(user.webcontent)) {
+        // webcontent is an object with actual data
         const webcontent = user.webcontent;
         const contentData = {
           landing: webcontent.landing,
@@ -105,10 +106,16 @@ export function AuthV2Provider({ children }: AuthV2ProviderProps) {
           available: webcontent.available,
           socialChannels: webcontent.socialChannels,
           isNewWebpage: webcontent.isNewWebpage,
-          domain: webcontent.domain
+          domain: webcontent.domain,
+          versionUpdated: webcontent.versionUpdated,
+          version: webcontent.version
         };
 
         dispatch(setAllContent(contentData));
+      } else {
+        console.log('[AuthV2Provider] No webcontent found or empty array - clearing persisted content and using initial values');
+        // Clear persisted webcontent values and use initial values
+        dispatch(clearContent());
       }
     } else {
       dispatch(setUnauthenticated());

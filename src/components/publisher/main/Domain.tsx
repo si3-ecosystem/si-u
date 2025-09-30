@@ -36,7 +36,7 @@ const Domain = () => {
       subDomain.includes("siher") ||
       subDomain.includes("eth")
     ) {
-      toast.error("Please enter only the name");
+      toast.error("Please enter only the subdomain name (without .siher.eth.link)");
       return;
     }
     try {
@@ -44,20 +44,29 @@ const Domain = () => {
       const response: any = await apiClient.post(`/domain/publish`, {
         domain: subDomain,
       });
-      // Support both shapes:
-      // 1) { domain: string }
-      // 2) { status: 'success', data: { domain: string } }
-      const newDomain = (response && (response.domain || response?.data?.domain)) || "";
-      if (newDomain) {
-        dispatch(setDomain(newDomain));
-        toast.success("Domain successfully published!");
+      
+      // Handle the response from domain controller
+      // Backend returns: { message: "Domain published successfully", domain: "subdomain.siher.eth.link" }
+      if (response?.message && response?.domain) {
+        // Extract just the subdomain part (without .siher.eth.link)
+        const fullDomain = response.domain;
+        const subdomain = fullDomain.replace('.siher.eth.link', '');
+        
+        dispatch(setDomain(subdomain));
+        // Display the exact success message from the backend
+        toast.success(response.message);
       } else {
-        const message = response?.error?.message || "Failed to register domain.";
-        toast.error(message);
+        // Display the exact error message from the backend response
+        const errorMessage = response?.message || response?.error?.message || "Failed to register domain.";
+        toast.error(errorMessage);
       }
     } catch (error: any) {
       if (error instanceof ApiErrorClass) {
+        // Display the exact error message from the backend
         toast.error(error.message || "Failed to register domain.");
+      } else if (typeof error?.message === "string") {
+        // Display generic error messages
+        toast.error(error.message);
       } else {
         toast.error("Something went wrong. Please try again.");
       }

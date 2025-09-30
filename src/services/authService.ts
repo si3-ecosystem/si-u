@@ -6,7 +6,7 @@ import {
   forceUpdateUser,
   UserData,
 } from "@/redux/slice/userSlice";
-import { setAllContent } from "@/redux/slice/contentSlice";
+import { setAllContent, clearContent } from "@/redux/slice/contentSlice";
 import { apiClient } from "./api";
 import { AuthCacheManager } from "@/utils/authCacheManager";
 
@@ -35,9 +35,9 @@ export class UnifiedAuthService {
   /**
    * Process webcontent data from user response and update content slice
    */
-  private static processWebContent(userData: any): void {
+  private static processWebContent(userData: any, isLogin: boolean = false): void {
     try {
-      if (userData?.webcontent) {
+      if (userData?.webcontent && !Array.isArray(userData.webcontent)) {
         console.log("[AuthService] Processing webcontent from user data");
         
         const webcontent = userData.webcontent;
@@ -53,7 +53,9 @@ export class UnifiedAuthService {
           available: webcontent.available,
           socialChannels: webcontent.socialChannels,
           isNewWebpage: webcontent.isNewWebpage,
-          domain: webcontent.domain
+          domain: webcontent.domain,
+          versionUpdated: webcontent.versionUpdated,
+          version: webcontent.version
         };
 
         console.log("[AuthService] Updating content slice with webcontent data:", {
@@ -67,7 +69,13 @@ export class UnifiedAuthService {
         // Update the content slice only with actual data
         store.dispatch(setAllContent(contentData));
       } else {
-        console.log("[AuthService] No webcontent found in user data - skipping content update");
+        if (isLogin) {
+          console.log("[AuthService] No webcontent found during login - clearing persisted content and using initial values");
+          // Clear persisted webcontent values and use initial values during login
+          store.dispatch(clearContent());
+        } else {
+          console.log("[AuthService] No webcontent found in user data - skipping content update");
+        }
       }
     } catch (error) {
       console.error("[AuthService] Error processing webcontent:", error);
@@ -166,7 +174,7 @@ export class UnifiedAuthService {
             store.dispatch(initializeUser(userData));
 
             // Process webcontent if available
-            this.processWebContent(userData);
+            this.processWebContent(userData, true);
 
             return true;
           }
@@ -412,7 +420,7 @@ export class UnifiedAuthService {
         });
 
         // Process webcontent if available in response
-        this.processWebContent(response.data.user);
+        this.processWebContent(response.data.user, true);
 
         console.log(
           "[AuthService] Auth update applied, checking stored token..."
@@ -767,7 +775,7 @@ export class UnifiedAuthService {
         });
 
         // Process webcontent if available in response
-        this.processWebContent(response.data.user);
+        this.processWebContent(response.data.user, true);
 
         // Wait for Redux state to be updated before proceeding
         await new Promise((resolve) => {

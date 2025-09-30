@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useAppSelector, store } from '@/redux/store';
 import { apiClient } from '@/services/api';
 import { initializeUser } from '@/redux/slice/userSlice';
-import { setAllContent } from '@/redux/slice/contentSlice';
+import { setAllContent, clearContent } from '@/redux/slice/contentSlice';
 
 /**
  * Simplified hook to initialize authentication state from server
@@ -58,7 +58,7 @@ export function useAuthInitializer() {
           store.dispatch(initializeUser(normalizedUserData));
 
           // Process webcontent if available
-          if (userData?.webcontent) {
+          if (userData?.webcontent && !Array.isArray(userData.webcontent)) {
             console.log('[useAuthInitializer] Processing webcontent data');
             
             const webcontent = userData.webcontent;
@@ -72,13 +72,17 @@ export function useAuthInitializer() {
               available: webcontent.available,
               socialChannels: webcontent.socialChannels,
               isNewWebpage: webcontent.isNewWebpage,
-              domain: webcontent.domain
+              domain: webcontent.domain,
+              versionUpdated: webcontent.versionUpdated,
+              version: webcontent.version
             };
 
             console.log('[useAuthInitializer] Updating content slice with actual webcontent data');
             store.dispatch(setAllContent(contentData));
           } else {
-            console.log('[useAuthInitializer] No webcontent found - skipping content update');
+            console.log('[useAuthInitializer] No webcontent found during login - clearing persisted content and using initial values');
+            // Clear persisted webcontent values and use initial values during login
+            store.dispatch(clearContent());
           }
         } else {
           console.log('[useAuthInitializer] No valid user data from server');

@@ -62,4 +62,6 @@ export interface ContentState {
   socialChannels: SocialChannelTypes[];
   slider: string[];
   domain?: string;
+  versionUpdated: boolean;
+  version: number;
 }

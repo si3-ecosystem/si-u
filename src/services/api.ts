@@ -1,16 +1,11 @@
-/**
- * Base API Client
- * Handles HTTP requests with authentication and error handling
- */
-
-import { ApiResponse, ApiError } from '@/types/rsvp';
+import { ApiResponse, ApiError } from "@/types/rsvp";
 
 export class ApiClient {
-  private baseURL: string;
-
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'https://api.si3.space') {
-    // Ensure the base URL always ends with /api
-    this.baseURL = baseURL.endsWith('/api') ? baseURL : `${baseURL}/api`;
+  private readonly baseURL: string;
+  constructor(
+    baseURL: string = process.env.NEXT_PUBLIC_API_URL || "https://api.si3.space"
+  ) {
+    this.baseURL = baseURL.endsWith("/api") ? baseURL : `${baseURL}/api`;
   }
 
   private async request<T>(
@@ -18,79 +13,98 @@ export class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-
-    // Don't set Content-Type for FormData - let browser handle it
     const isFormData = options.body instanceof FormData;
-
     const config: RequestInit = {
       headers: {
-        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        // Removed Authorization header - relying on cookies for authentication
-        // The si3-jwt cookie will be sent automatically with credentials: 'include'
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...options.headers,
       },
-      credentials: 'include', // Include cookies for authentication,
-      mode: 'cors', // Enable CORS
+      credentials: "include",
+      mode: "cors",
       ...options,
     };
 
     try {
       const response = await fetch(url, config);
       const data = await response.json();
-
       if (!response.ok) {
-        throw new ApiErrorClass(data);
+        if (data.message && !data.error) {
+          throw new ApiErrorClass({
+            status: "error",
+            error: {
+              message: data.message,
+              statusCode: response.status,
+              errorCode: `HTTP_${response.status}`,
+              timestamp: new Date().toISOString(),
+            },
+          });
+        } else {
+          throw new ApiErrorClass(data);
+        }
       }
-
       return data;
     } catch (error) {
       if (error instanceof ApiErrorClass) {
         throw error;
       }
-
-      // Handle network errors
       throw new ApiErrorClass({
-        status: 'error',
+        status: "error",
         error: {
-          message: 'Network error occurred',
+          message: "Network error occurred",
           statusCode: 0,
-          errorCode: 'NETWORK_ERROR',
+          errorCode: "NETWORK_ERROR",
           timestamp: new Date().toISOString(),
         },
       });
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
-    const url = params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint;
-    return this.request<T>(url, { method: 'GET' });
+  async get<T>(
+    endpoint: string,
+    params?: Record<string, any>
+  ): Promise<ApiResponse<T>> {
+    const url = params
+      ? `${endpoint}?${new URLSearchParams(params)}`
+      : endpoint;
+    return this.request<T>(url, { method: "GET" });
   }
 
-  async post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+  async post<T>(
+    endpoint: string,
+    data?: any,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'POST',
-      body: data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined),
+      method: "POST",
+      body: (() => {
+        if (data instanceof FormData) return data;
+        return data ? JSON.stringify(data) : undefined;
+      })(),
       ...options,
     });
   }
 
   async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'PUT',
+      method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+  async patch<T>(
+    endpoint: string,
+    data?: any,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
-      method: 'PATCH',
+      method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
       ...options,
     });
   }
 
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+    return this.request<T>(endpoint, { method: "DELETE" });
   }
 }
 

@@ -124,6 +124,8 @@ const initialState: ContentState = {
   ],
   isNewWebpage: true,
   domain: "",
+  versionUpdated: false,
+  version: 1,
 };
 
 const contentSlice = createSlice({
@@ -192,6 +194,12 @@ const contentSlice = createSlice({
       if (newContent.domain && newContent.domain.trim() !== "") {
         (state as any).domain = newContent.domain;
       }
+      if (typeof newContent.versionUpdated === "boolean") {
+        state.versionUpdated = newContent.versionUpdated;
+      }
+      if (typeof newContent.version === "number") {
+        state.version = newContent.version;
+      }
     },
     updateContent: (
       state,
@@ -204,6 +212,15 @@ const contentSlice = createSlice({
       }
       if (section === "domain") {
         (state as any).domain = typeof data === "string" ? data : "";
+        return;
+      }
+      if (section === "versionUpdated" && typeof data === "boolean") {
+        console.log('[contentSlice] Updating versionUpdated from', state.versionUpdated, 'to', data);
+        state.versionUpdated = data;
+        return;
+      }
+      if (section === "version" && typeof data === "number") {
+        state.version = data;
         return;
       }
       if (!state[section]) {
@@ -308,6 +325,10 @@ const contentSlice = createSlice({
     setIsNewWebpage: (state, action: PayloadAction<boolean>) => {
       state.isNewWebpage = action.payload;
     },
+    setVersionUpdatedFalse: (state) => {
+      console.log('[contentSlice] Setting versionUpdated to false');
+      state.versionUpdated = false;
+    },
   },
 });
 
@@ -320,6 +341,7 @@ export const {
   clearContent,
   setDomain,
   setIsNewWebpage,
+  setVersionUpdatedFalse,
 } = contentSlice.actions;
 
 export default contentSlice.reducer;
