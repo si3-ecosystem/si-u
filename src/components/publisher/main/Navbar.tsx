@@ -93,7 +93,7 @@ const Navbar = ({ onOpenReadMe }: { onOpenReadMe?: () => void }) => {
   }, [loading, dispatch, router, store, isNewWebpage, getErrorMessage]);
 
   return (
-    <nav className="font-dm-sans border-y border-gray-300 sm:px-6 lg:px-8">
+    <nav className="font-dm-sans sm:px-6 lg:px-8">
       <div className="flex relative justify-between items-center px-2 w-full p-1 lg:p-2 max-w-[90rem] mx-auto text-xs">
         {/* Logo Section */}
         <div className="flex gap-2 sm:gap-4 items-center">

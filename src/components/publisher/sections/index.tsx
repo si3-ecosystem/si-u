@@ -15,7 +15,8 @@ const Home = ({ setEditPage, openDrawer }: { setEditPage: (section: string) => v
     <>
       <Navbar />
       {/* Landing section */}
-      <section
+      <button
+      className="cursor-default text-left"
         id="landing"
         onKeyDown={() => {}}
         onClick={() => {
@@ -24,7 +25,7 @@ const Home = ({ setEditPage, openDrawer }: { setEditPage: (section: string) => v
         }}
       >
         <Landing />
-      </section>
+      </button>
       {/* Slider section */}
       <section
         id="slider"
@@ -38,7 +39,7 @@ const Home = ({ setEditPage, openDrawer }: { setEditPage: (section: string) => v
         <Slider />
       </section>
       {/* Value section */}
-      <section
+      <button
         id="value"
         onKeyDown={() => {}}
         onClick={() => {
@@ -47,9 +48,9 @@ const Home = ({ setEditPage, openDrawer }: { setEditPage: (section: string) => v
         }}
       >
         <Value />
-      </section>
+      </button>
       {/* Live section */}
-      <section
+      <button
         id="media"
         onKeyDown={() => {}}
         onClick={() => {
@@ -58,7 +59,7 @@ const Home = ({ setEditPage, openDrawer }: { setEditPage: (section: string) => v
         }}
       >
         <Live />
-      </section>
+      </button>
       {/* Orgs section */}
       <section
         id="orgs"
