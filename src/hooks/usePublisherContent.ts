@@ -36,7 +36,7 @@ export function usePublisherContent() {
       }
 
       // If user has webcontent, use it
-      if (user.webcontent) {
+      if (user.webcontent && !Array.isArray(user.webcontent)) {
         const webcontent = user.webcontent;
         const contentData = {
           landing: webcontent.landing,
@@ -48,7 +48,9 @@ export function usePublisherContent() {
           available: webcontent.available,
           socialChannels: webcontent.socialChannels,
           isNewWebpage: webcontent.isNewWebpage,
-          domain: webcontent.domain
+          domain: webcontent.domain,
+          versionUpdated: webcontent.versionUpdated,
+          version: webcontent.version
         };
         dispatch(setAllContent(contentData));
         return;

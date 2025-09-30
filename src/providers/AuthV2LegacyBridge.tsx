@@ -16,7 +16,7 @@ export default function AuthV2LegacyBridge({ children }: { children: React.React
       store.dispatch(initializeUser({ ...(user as any), _id: (user as any)._id || (user as any).id }));
       
       // Process webcontent if available
-      if ((user as any)?.webcontent) {
+      if ((user as any)?.webcontent && !Array.isArray((user as any).webcontent)) {
         console.log('[AuthV2LegacyBridge] Processing webcontent data');
         
         const webcontent = (user as any).webcontent;
@@ -30,7 +30,9 @@ export default function AuthV2LegacyBridge({ children }: { children: React.React
           available: webcontent.available,
           socialChannels: webcontent.socialChannels,
           isNewWebpage: webcontent.isNewWebpage,
-          domain: webcontent.domain
+          domain: webcontent.domain,
+          versionUpdated: webcontent.versionUpdated,
+          version: webcontent.version
         };
 
         console.log('[AuthV2LegacyBridge] Updating content slice with webcontent data');

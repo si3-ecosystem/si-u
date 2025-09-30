@@ -3,12 +3,12 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { setAuthLoading, setAuthenticated, setUnauthenticated, mergeUser } from '@/redux/slice/authSliceV2';
-import { setAllContent } from '@/redux/slice/contentSlice';
+import { setAllContent, clearContent } from '@/redux/slice/contentSlice';
 import { authApiV2 } from '@/services/authV2';
 
 // Helper function to process webcontent data
-const processWebContent = (user: any, dispatch: any) => {
-  if (user?.webcontent) {
+const processWebContent = (user: any, dispatch: any, isLogin: boolean = false) => {
+  if (user?.webcontent && !Array.isArray(user.webcontent)) {
     console.log('[useAuthV2] Processing webcontent data');
     
     const webcontent = user.webcontent;
@@ -22,11 +22,21 @@ const processWebContent = (user: any, dispatch: any) => {
       available: webcontent.available,
       socialChannels: webcontent.socialChannels,
       isNewWebpage: webcontent.isNewWebpage,
-      domain: webcontent.domain
+      domain: webcontent.domain,
+      versionUpdated: webcontent.versionUpdated,
+      version: webcontent.version
     };
 
     console.log('[useAuthV2] Updating content slice with webcontent data');
     dispatch(setAllContent(contentData));
+  } else {
+    if (isLogin) {
+      console.log('[useAuthV2] No webcontent found during login - clearing persisted content and using initial values');
+      // Clear persisted webcontent values and use initial values during login
+      dispatch(clearContent());
+    } else {
+      console.log('[useAuthV2] No webcontent found - skipping content update');
+    }
   }
 };
 
@@ -41,7 +51,7 @@ export function useAuthV2() {
       const user = (res as any).data?.user || (res as any).data?.data?.user || (res as any).data || null;
       if (user?.id || user?._id) {
         dispatch(setAuthenticated({ ...user, _id: user._id || user.id }));
-        processWebContent(user, dispatch);
+        processWebContent(user, dispatch, true);
         return true;
       }
       dispatch(setUnauthenticated());
@@ -80,7 +90,7 @@ export function useAuthV2() {
         const user = (meRes as any).data?.user || (meRes as any).data?.data?.user || (meRes as any).data || null;
         if (user) {
           dispatch(mergeUser({ ...user, _id: user._id || user.id }));
-          processWebContent(user, dispatch);
+          processWebContent(user, dispatch, true);
         }
       } catch (error) {
         console.error('[useAuthV2] Error fetching full profile:', error);

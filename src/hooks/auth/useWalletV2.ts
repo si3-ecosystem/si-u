@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 
 // Helper function to process webcontent data
 const processWebContent = (user: any, dispatch: any) => {
-  if (user?.webcontent) {
+  if (user?.webcontent && !Array.isArray(user.webcontent)) {
     console.log('[useWalletV2] Processing webcontent data');
     
     const webcontent = user.webcontent;
@@ -23,7 +23,9 @@ const processWebContent = (user: any, dispatch: any) => {
       available: webcontent.available,
       socialChannels: webcontent.socialChannels,
       isNewWebpage: webcontent.isNewWebpage,
-      domain: webcontent.domain
+      domain: webcontent.domain,
+      versionUpdated: webcontent.versionUpdated,
+      version: webcontent.version
     };
 
     console.log('[useWalletV2] Updating content slice with webcontent data');
