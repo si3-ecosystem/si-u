@@ -154,7 +154,7 @@ const Footer = () => {
               e.stopPropagation()
               setIsDropdownOpen(false)
             }}>
-              <NewsletterSubscribe listKey="publisher" className="w-full" />
+              <NewsletterSubscribe listKey="currentsi" className="w-full" />
             </div>
           </section>
         </section>

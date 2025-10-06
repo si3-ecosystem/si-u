@@ -14,7 +14,7 @@ interface Props {
 }
 
 const NewsletterSubscribe: React.FC<Props> = ({
-  listKey = "publisher",
+  listKey = "currentsi",
   className,
   source,
 }) => {
