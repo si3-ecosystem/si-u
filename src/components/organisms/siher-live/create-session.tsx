@@ -1031,10 +1031,10 @@ export default function CreateSessionModal({ open, onOpenChange, existingSession
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const user = useAppSelector((state) => state.authV2.user);
-  const betaTesters = ['kara@si3.space', 'imhaseeb8@gmail.com', 'shayanabbasi006@gmail.com'];
-
-  const isBetaTester = betaTesters.includes(user?.email);
-
+  // const isBetaTester = user?.email === 'kara@si3.space';
+  const isBetaTester = user?.email === 'codingfectum@gmail.com' || 'kara@si3.space' || 'imhaseeb8@gmail.com' //'shayanabbasi006@gmail.com';
+  console.log("User email:", user?.email, "Is beta tester:", isBetaTester);
+  
   // Populate form data when editing existing session
   useEffect(() => {
     if (mode === 'edit' && existingSession && open) {
