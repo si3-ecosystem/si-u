@@ -1,4 +1,4 @@
-export const useCdn = process.env.NODE_ENV === "production";
+export const useCdn = process.env.NODE_ENV === "development";
 
 export const projectId: string =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ||

@@ -33,8 +33,8 @@ export default function LiveStreamingDashboard() {
     const [editingSession, setEditingSession] = useState<Session | null>(null)
     const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
     const user = useAppSelector((state) => state.authV2.user)
-    const isBetaTester = user?.email === 'shayanabbasi006@gmail.com'
-    // const isBetaTester = user?.email === 'kara@si3.space';
+    // const isBetaTester = user?.email === 'codingfectum@gmail.com' //'shayanabbasi006@gmail.com'
+    const isBetaTester = user?.email === 'codingfectum@gmail.com' || 'kara@si3.space' // || 'imhaseeb8@gmail.com';
 
     // Function to refresh sessions using API
     const refreshSessions = async (force = false) => {
